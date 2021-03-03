@@ -14,14 +14,16 @@ UPDATED VERSION:
 Version 1.4 -  03/2021 - Manuel Diercks
 
 # INPUTS:
-Two input formats are supported:
+Three input formats are supported:
 1) A shapefile (in UTM coordinates) that contains all faults. It may contain more faults than to be modelled, faults can be selected within the workflow.
-2) A table (txt, csv, xlsx,...) that contains the properties of the faults PLUS kml/kmz files of al faults (in the Fault_traces folder). If kml import is chosen
-   please specify the utmzone (UTM zone number) and utmhemi (hemisphere,'n' or 's') variables in the faults_3D file.
+2) kml-files of all faults (stored in the 'Fault_traces' folder) AND a table (txt, csv, xlsx,...) that contains the properties of the faults
+3) A kmz-file containing the fault traces and a table containing the fault properties
+
+If kml or kmz import is chosen please specify the utmzone (UTM zone number) and utmhemi (hemisphere,'n' or 's') variables in the faults_3D file.
 
 Required properties (either in the table or as attributes in the shape file) are:
 
-fault_name - for kml/kmz import the name of the kml file must be the same as the fault_name
+fault_name - for kml import the name of the kml file must be the same as the fault_name
 dip - dip angle
 rake
 dip_dir - dip direction (projection direction)
