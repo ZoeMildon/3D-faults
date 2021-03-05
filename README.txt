@@ -29,7 +29,7 @@ rake
 dip_dir - dip direction (projection direction)
 len - length of the fault (km)
 
-Make sure that the field names are spelled exactly as given. The order of the columns may vary. Example files for each input type are included in the 'input_examples' folder.
+It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
 
 # RUNNING THE CODE
 In MATLAB, navigate to the 'faults_3D_v1.4' folder. Open the faults_3D script and edit the necessary parameters, then execute the script by entering 'faults_3D' in the command line or pressing F5.

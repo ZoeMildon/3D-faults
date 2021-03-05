@@ -4,22 +4,18 @@ switch import
     case 'shapefile'
         [file,path] = uigetfile('*.shp','Choose a .shp-file');
         fault_input = struct2table(shaperead(fullfile(path,file)));
-        vars = {'fault_name','dip','rake','dip_dir','len'};  %variable names of the relevant fields
-        t = fault_input(:,vars);
     case 'kml'
         [file,path] = uigetfile({'*.txt';'*.csv';'*.xlsx';'*.xls';'*.dat'},'Choose an input table');
-        t = readtable(fullfile(path,file)); %t is the table plotted in UI, fault_input is the table containing the geometry etc.
-        fault_input = t;
-        fault_input.X = cell(length(t.fault_name),1);
-        fault_input.Y = cell(length(t.fault_name),1);
-
+        fault_input = readtable(fullfile(path,file));
+        fault_input.X = cell(length(fault_input.fault_name),1);
+        fault_input.Y = cell(length(fault_inputt.fault_name),1);
         i = 1;                      %independent counter to keep the right number if lines are deleted
-        for n = 1:length(t.fault_name)
-            kml_file = strcat('Fault_traces/',t.fault_name{n},'.kml');
+        for n = 1:length(fault_input.fault_name)
+            kml_file = strcat('Fault_traces/',fault_input.fault_name{n},'.kml');
             if isfile(kml_file) == false
-                msg = strcat('No kml file found for:',t.fault_name(n));
+                msg = strcat('No kml file found for:',fault_input.fault_name(n));
                 warndlg(msg)
-                t(n,:) = [];    %delete all rows from table where no kml file is given
+                fault_input(n,:) = [];    %delete all rows from table where no kml file is given
             else
                 fault_struct = kml2struct_multi(kml_file);
                 [fault_input.X{i}, fault_input.Y{i}] = wgs2utm(fault_struct.Lon',fault_struct.Lat',utmzone,utmhemi);
@@ -38,7 +34,6 @@ switch import
         fault_input.rake = NaN(length(fault_input.fault_name),1);
         fault_input.dip_dir = NaN(length(fault_input.fault_name),1);
         fault_input.len = NaN(length(fault_input.fault_name),1);
-        
         for k = 1:length(kmz_table.Name)
             [fault_input.X{k}, fault_input.Y{k}] = wgs2utm(kmz_table.Lon{k},kmz_table.Lat{k},utmzone,utmhemi);
             row_idx = strcmp(fault_input.fault_name(k),props.fault_name);
@@ -51,17 +46,25 @@ switch import
                 msg = sprintf('Missing information for: %s',fault_input.fault_name{k});
                 warndlg(msg)
             end
-        t = fault_input(:,{'fault_name','dip','rake','dip_dir','len'});
         end
 end
+%check if variables in input files have correct names
+vars = {'fault_name','dip','rake','dip_dir','len'};  %variable names of the relevant fields
+for i = 1:length(vars)    
+    while any(strcmp(vars{i},fault_input.Properties.VariableNames)) == false
+        msg = sprintf('Enter the field name containing %s',vars{i});
+        var1 = inputdlg(msg,'Var not found');
+        if any(strcmp(var1,fault_input.Properties.VariableNames)) == true
+            fault_input.Properties.VariableNames{var1} = vars{i};
+        end
+    end
+end
+
+t = fault_input(:,vars);
 t.slip_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
-
-missing_dip = find(ismissing(t.dip));
-missing_rake = find(ismissing(t.rake));
-missing_dip_dir = find(ismissing(t.dip_dir));
-missing_vals = [missing_dip; missing_rake; missing_dip_dir];
-t.plot(missing_vals) = false;
+[row,col] = find(ismissing([t.dip, t.rake, t.dip_dir]));
+t.plot(row) = false;
 
 %open main user interface:
 fig = uifigure('Name','Fault Input','Position',[10 50 1346 668],'Color',[1 1 1]);
@@ -75,10 +78,8 @@ lbl.Text = sprintf(' 1 - Tick all faults to be plotted. Choose one slip fault (r
 uit = uitable(fig,'Data',t,'ColumnWidth',{240,80,80,80,80,70,68});
 uit.Position = [10 50 700, 400];
 uit.ColumnEditable = true;
-
-[row,col] = find(ismissing(t));
 s = uistyle('BackgroundColor','yellow');
-addStyle(uit,s,'cell',[row,col]);
+addStyle(uit,s,'row',row);
 
 %initiate plot:
 axe = uiaxes(fig,'Position',[720 50 400 400],'Color',[1 1 1],'Box','On');
