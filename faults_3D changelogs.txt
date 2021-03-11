@@ -17,9 +17,11 @@ Version 1.3
 - added 'input_examples' folder with various different input files
 
 Version 1.4 - in preparation
-- added import from .kmz-file (+ .txt-file)
+- added import from .kmz-file (+ table)
 - added import selection dialog (shp, kml or kmz) and import via uigetfile
 - added code that checks the names of input attributes (e.g. fault_name, dip,..). If names vary from the default names they can be entered during execution.
+- added button to calculate fault length from input data
+- added depth column to UI table to specify the depth of single faults (useful to avoid cross-cutting faults)
 - faults with missing values are now automatically deselected in user interface table and missing fields are highlighted
 - improved error and warning dialogs (more detailed information,...)
 - faults longer than the seismogenic depth are now cut at the seismogenic depth, so that no fault reaches deeper
