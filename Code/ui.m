@@ -8,7 +8,7 @@ switch import
         [file,path] = uigetfile({'*.txt';'*.csv';'*.xlsx';'*.xls';'*.dat'},'Choose an input table');
         fault_input = readtable(fullfile(path,file));
         fault_input.X = cell(length(fault_input.fault_name),1);
-        fault_input.Y = cell(length(fault_inputt.fault_name),1);
+        fault_input.Y = cell(length(fault_input.fault_name),1);
         i = 1;                      %independent counter to keep the right number if lines are deleted
         for n = 1:length(fault_input.fault_name)
             kml_file = strcat('Fault_traces/',fault_input.fault_name{n},'.kml');
@@ -61,6 +61,7 @@ for i = 1:length(vars)
 end
 
 t = fault_input(:,vars);
+t.depth = NaN(1,length(t.fault_name))';
 t.slip_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
 [row,col] = find(ismissing([t.dip, t.rake, t.dip_dir]));
@@ -72,10 +73,12 @@ fig = uifigure('Name','Fault Input','Position',[10 50 1346 668],'Color',[1 1 1])
 %bottom label:
 lbl = uilabel(fig,'FontSize',13,'BackgroundColor',[1 1 1],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
 lbl.Position = [10 10 700 30];
-lbl.Text = sprintf(' 1 - Tick all faults to be plotted. Choose one slip fault (rupture plane).\n 2 - Press "Save Changes and Plot" to exit the dialog and build the 3D fault network.');
+lbltext = sprintf([' 1 - Tick all faults to be plotted. Choose one slip fault (rupture plane).\n' ...
+    ' 2 - Press "Save Changes and Plot" to exit the dialog and build the 3D fault network.']);
+lbl.Text = lbltext;
 
 %table
-uit = uitable(fig,'Data',t,'ColumnWidth',{240,80,80,80,80,70,68});
+uit = uitable(fig,'Data',t,'ColumnWidth',{273,50,50,70,70,70,70,45});
 uit.Position = [10 50 700, 400];
 uit.ColumnEditable = true;
 s = uistyle('BackgroundColor','yellow');
@@ -115,6 +118,13 @@ btn = uibutton(fig,'push',...
                'Position',[860, 10, 150, 30],...
                'BackgroundColor',[.1 .5 .8],'FontWeight','bold',...
                'ButtonPushedFcn','model_3D_variable_faults');
+           
+%additional buttons
+len_btn = uibutton(fig,'push',...
+               'Text','calc. length',...
+               'Position',[455, 454, 74, 20],...
+               'BackgroundColor',[.9 .9 .9],'FontWeight','bold',...
+               'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
 
 set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
 axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
@@ -151,8 +161,8 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt)
     rectangle(axe,'Position',[min_x min_y max_x-min_x max_y-min_y],'FaceColor',[.9 .99 .9])
     axis(axe, 'equal')
     title(axe, 'Overview Map of the Fault Network')
-    xlabel(axe,'UTM_x')
-    ylabel(axe,'UTM_y')
+    xlabel(axe,'UTM x')
+    ylabel(axe,'UTM y')
     for i = 1:length(fault_input.X)
         if uit.Data.plot(i) == true && uit.Data.slip_fault(i) == false
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'k')
@@ -160,4 +170,20 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt)
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'r','LineWidth',2)
         end
     end
+end
+%function to calculate fault length from X and Y data
+function uit = calc_length(fault_input,uit)
+    f = waitbar(0,'Please wait for the calculation of fault lengths...');
+    uit.Data.len = zeros(length(uit.Data.len),1);
+    for i = 1:length(fault_input.X)
+        fault_input.X{i}(ismissing(fault_input.X{i})) = [];
+        fault_input.Y{i}(ismissing(fault_input.Y{i})) = [];
+        for j = 1:length(fault_input.X{i})-1
+            dist = sqrt((fault_input.X{i}(j)-fault_input.X{i}(j+1))^2 + (fault_input.Y{i}(j)-fault_input.Y{i}(j+1))^2)/1000;
+            uit.Data.len(i) = uit.Data.len(i) + dist;
+        end
+        waitbar(i/length(fault_input.X));
+    end
+    uit.Data.len = round(uit.Data.len);
+    close(f)
 end

@@ -1,4 +1,7 @@
 %% import and define variables
+set(fig, 'HandleVisibility', 'off');
+close all                   %close all windows except the UI
+%set(fig, 'HandleVisibility', 'on');
 format long
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
@@ -68,7 +71,7 @@ if nnz(uit.Data.slip_fault) ~= 1    %checks if exactly 1 fault is selected as ru
 end
 slip_idx = faults.slip_fault == 1;
 fault_slip_name = faults.fault_name{slip_idx};  %extract the fault that slips
-close(fig)                                      %closes UI, the variables of the UI elements are lost at this point
+%close(fig)                                      %closes UI, the variables of the UI elements are lost at this point
 
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
@@ -123,12 +126,16 @@ for i = 1:length(faults.fault_name)
     utm_z(:,length(utm_x))=0; % Assuming all faults come to the surface (0m depth)
     
     % extracting the relevant depth to use. If length<15km then aspect ratio=1
-    if ismissing(faults.len(i)) == true
-        fault_down_dip_length = -seismo_depthm/sind(constant_dip);
-    elseif faults.len(i) > seismo_depth
-        fault_down_dip_length = -seismo_depthm/sind(constant_dip);
-    elseif faults.len(i) <= seismo_depth
-        fault_down_dip_length = faults.len(i)*-1000;
+    if ismissing(faults.depth(i)) == true
+        if ismissing(faults.len(i)) == true
+            fault_down_dip_length = -seismo_depthm/sind(constant_dip);
+        elseif faults.len(i) > seismo_depth
+            fault_down_dip_length = -seismo_depthm/sind(constant_dip);
+        elseif faults.len(i) <= seismo_depth
+            fault_down_dip_length = faults.len(i)*-1000;
+        end
+    else
+        fault_down_dip_length = faults.depth(i)*-1000;
     end
     
     % calculating the grid size to use to depth (to ensure a whole number
@@ -219,7 +226,7 @@ for i = 1:length(faults.fault_name)
             end
         end
     end
-    clearvars -except vardepth faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface plotting slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
+    clearvars -except fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface plotting slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
 end
 %% Finishing off writing the Coulomb input file
 fprintf (fid,'\n');
