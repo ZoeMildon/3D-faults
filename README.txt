@@ -20,6 +20,7 @@ Three input formats are supported:
 3) A kmz-file containing the fault traces and a table containing the fault properties
 
 If kml or kmz import is chosen please specify the utmzone (UTM zone number) and utmhemi (hemisphere,'n' or 's') variables in the faults_3D file.
+For shp-import, the file should also be projected in UTM coordinates.
 
 Required properties (either in the table or as attributes in the shape file) are:
 
@@ -30,6 +31,7 @@ dip_dir - dip direction (projection direction)
 len - length of the fault (km)
 
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
+A depth column may be optionally given. In the 3D-plot, faults will reach to that specified depth (km).
 
 # RUNNING THE CODE
 In MATLAB, navigate to the 'faults_3D_v1.4' folder. Open the faults_3D script and edit the necessary parameters, then execute the script by entering 'faults_3D' in the command line or pressing F5.

@@ -17,6 +17,7 @@ end
 % build input table from selected faults
 rows = find(uit.Data.plot);
 faults = uit.Data(rows,:);
+
 faults.X = fault_input.X(rows);
 faults.Y = fault_input.Y(rows);
 faults.plot = [];
@@ -126,7 +127,7 @@ for i = 1:length(faults.fault_name)
     utm_z(:,length(utm_x))=0; % Assuming all faults come to the surface (0m depth)
     
     % extracting the relevant depth to use. If length<15km then aspect ratio=1
-    if ismissing(faults.depth(i)) == true
+    if isempty(faults.depth{i}) == true
         if ismissing(faults.len(i)) == true
             fault_down_dip_length = -seismo_depthm/sind(constant_dip);
         elseif faults.len(i) > seismo_depth
@@ -135,7 +136,7 @@ for i = 1:length(faults.fault_name)
             fault_down_dip_length = faults.len(i)*-1000;
         end
     else
-        fault_down_dip_length = faults.depth(i)*-1000;
+        fault_down_dip_length = faults.depth{i}*-1000;
     end
     
     % calculating the grid size to use to depth (to ensure a whole number

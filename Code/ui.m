@@ -59,29 +59,33 @@ for i = 1:length(vars)
         end
     end
 end
-
+%build the table t to be plotted in the uitable
 t = fault_input(:,vars);
-t.depth = NaN(1,length(t.fault_name))';
+%t.depth = NaN(1,length(t.fault_name))';
+t.depth = cell(1,length(t.fault_name))';
 t.slip_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
 [row,col] = find(ismissing([t.dip, t.rake, t.dip_dir]));
 t.plot(row) = false;
 
 %open main user interface:
-fig = uifigure('Name','Fault Input','Position',[10 50 1346 668],'Color',[1 1 1]);
+fig = uifigure('Name','Fault Input - 3D-Faults v.1.4','Position',[10 150 1316 568],'Color',[.98 .98 .98]);
 
-%bottom label:
-lbl = uilabel(fig,'FontSize',13,'BackgroundColor',[1 1 1],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
-lbl.Position = [10 10 700 30];
+%text label:
+lbl = uilabel(fig,'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
+lbl.Position = [10 450 700 100];
 lbltext = sprintf([' 1 - Tick all faults to be plotted. Choose one slip fault (rupture plane).\n' ...
-    ' 2 - Press "Save Changes and Plot" to exit the dialog and build the 3D fault network.']);
+    ' 2 - Press "Save Changes and Plot" to exit the dialog and build the 3D fault network.\n \n' ...
+    ' Make sure that dip, rake and dip_dir are specified for each fault to be plotted.\n' ...
+    ' Fault depth may be optionally specified.\n' ...
+    ' Fault length can be calculated from coordinates >>>']);
 lbl.Text = lbltext;
 
 %table
-uit = uitable(fig,'Data',t,'ColumnWidth',{273,50,50,70,70,70,70,45});
+uit = uitable(fig,'Data',t,'ColumnWidth',{265,60,60,60,60,60,67,45});
 uit.Position = [10 50 700, 400];
 uit.ColumnEditable = true;
-s = uistyle('BackgroundColor','yellow');
+s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
 %initiate plot:
@@ -104,27 +108,32 @@ autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt);
 coord_btn = uibutton(coord_pnl,'push',...
                'Text','Update Plot',...
                'Position',[10 220 80 20],...
-               'BackgroundColor',[.1 .5 .8],...
+               'BackgroundColor',[.3 .8 .8],...
                'ButtonPushedFcn',@(coord_btn,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
 auto_btn = uibutton(coord_pnl,'push',...
                'Text','Auto',...
                'Position',[95 220 80 20],...
-               'BackgroundColor',[.1 .5 .8],...
+               'BackgroundColor',[.3 .8 .8],...
                'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt));     
 
 %'Save and Plot' button
 btn = uibutton(fig,'push',...
                'Text','Save Changes and Plot',...
                'Position',[860, 10, 150, 30],...
-               'BackgroundColor',[.1 .5 .8],'FontWeight','bold',...
+               'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
                'ButtonPushedFcn','model_3D_variable_faults');
            
 %additional buttons
 len_btn = uibutton(fig,'push',...
-               'Text','calc. length',...
-               'Position',[455, 454, 74, 20],...
-               'BackgroundColor',[.9 .9 .9],'FontWeight','bold',...
+               'Text','calculate length',...
+               'Position',[345, 457, 100, 20],...
+               'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
                'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
+exp_btn = uibutton(fig,'push',...
+               'Text','Export table',...
+               'Position',[15, 20, 90, 20],...
+               'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
+               'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
 
 set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
 axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
@@ -158,7 +167,7 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt)
     max_y = str2double(maxy_txt.Value{1});
     cla(axe)
     hold(axe,'ON')
-    rectangle(axe,'Position',[min_x min_y max_x-min_x max_y-min_y],'FaceColor',[.9 .99 .9])
+    rectangle(axe,'Position',[min_x min_y max_x-min_x max_y-min_y],'FaceColor',[.85 .95 .7])
     axis(axe, 'equal')
     title(axe, 'Overview Map of the Fault Network')
     xlabel(axe,'UTM x')
@@ -186,4 +195,12 @@ function uit = calc_length(fault_input,uit)
     end
     uit.Data.len = round(uit.Data.len);
     close(f)
+end
+%function for table export to .csv
+function table_export(uit)
+    output_file = inputdlg('Output file name:');
+    file = strcat('Output_files/',output_file{1},'.csv');
+    writetable(uit.Data,file)
+    msg = sprintf('Table stored to %s',file);
+    msgbox(msg)
 end
