@@ -61,7 +61,6 @@ for i = 1:length(vars)
 end
 %build the table t to be plotted in the uitable
 t = fault_input(:,vars);
-%t.depth = NaN(1,length(t.fault_name))';
 t.depth = cell(1,length(t.fault_name))';
 t.slip_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
@@ -73,18 +72,14 @@ fig = uifigure('Name','Fault Input - 3D-Faults v.1.4','Position',[10 150 1316 56
 
 %text label:
 lbl = uilabel(fig,'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
-lbl.Position = [10 450 700 100];
-lbltext = sprintf([' 1 - Tick all faults to be plotted. Choose one slip fault (rupture plane).\n' ...
-    ' 2 - Press "Save Changes and Plot" to exit the dialog and build the 3D fault network.\n \n' ...
-    ' Make sure that dip, rake and dip_dir are specified for each fault to be plotted.\n' ...
-    ' Fault depth may be optionally specified.\n' ...
-    ' Fault length can be calculated from coordinates >>>']);
+lbl.Position = [10 460 700 20];
+lbltext = sprintf('Tick all faults to be plotted. Choose one slip fault (rupture plane).');
 lbl.Text = lbltext;
 
 %table
 uit = uitable(fig,'Data',t,'ColumnWidth',{265,60,60,60,60,60,67,45});
 uit.Position = [10 50 700, 400];
-uit.ColumnEditable = true;
+uit.ColumnEditable = [false true true true true true true true];
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
@@ -97,12 +92,14 @@ minx_lbl = uilabel(coord_pnl,'Position',[10 350 130 20],'Text','min_x       ____
 maxx_lbl = uilabel(coord_pnl,'Position',[10 320 130 20],'Text','max_x       _____   000');
 miny_lbl = uilabel(coord_pnl,'Position',[10 290 130 20],'Text','min_y       _____    000');
 maxy_lbl = uilabel(coord_pnl,'Position',[10 260 130 20],'Text','max_y       _____   000');
+margin_lbl = uilabel(coord_pnl,'Position',[10 180 130 20],'Text','margin    _____     %');
 
 minx_txt = uitextarea(coord_pnl,'Position',[60 350 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_x = str2double(minx_txt.Value{1});');
 maxx_txt = uitextarea(coord_pnl,'Position',[60 320 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_x = str2double(maxx_txt.Value{1});');
 miny_txt = uitextarea(coord_pnl,'Position',[60 290 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_y = str2double(miny_txt.Value{1});');
 maxy_txt = uitextarea(coord_pnl,'Position',[60 260 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_y = str2double(maxy_txt.Value{1});');
-autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt);
+margin_txt = uitextarea(coord_pnl,'Position',[60 180 50 20],'HorizontalAlignment','right','Value','10','ValueChangedFcn','mrg = str2double(margin_txt.Value{1})/100;');
+autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
 
 %buttons on coordinate panel
 coord_btn = uibutton(coord_pnl,'push',...
@@ -114,11 +111,11 @@ auto_btn = uibutton(coord_pnl,'push',...
                'Text','Auto',...
                'Position',[95 220 80 20],...
                'BackgroundColor',[.3 .8 .8],...
-               'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt));     
+               'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt));     
 
-%'Save and Plot' button
+%Plot button
 btn = uibutton(fig,'push',...
-               'Text','Save Changes and Plot',...
+               'Text','Build 3D faults',...
                'Position',[860, 10, 150, 30],...
                'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
                'ButtonPushedFcn','model_3D_variable_faults');
@@ -126,7 +123,7 @@ btn = uibutton(fig,'push',...
 %additional buttons
 len_btn = uibutton(fig,'push',...
                'Text','calculate length',...
-               'Position',[345, 457, 100, 20],...
+               'Position',[345, 20, 100, 20],...
                'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
                'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
 exp_btn = uibutton(fig,'push',...
@@ -134,12 +131,17 @@ exp_btn = uibutton(fig,'push',...
                'Position',[15, 20, 90, 20],...
                'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
                'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
+dip_btn = uibutton(fig,'push',...
+               'Text','Import variable dip',...
+               'Position',[120, 20, 130, 20],...
+               'BackgroundColor',[.3 .8 .8],'FontWeight','bold',...
+               'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit));
 
 set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
 axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
 
 %calculate well-fitting grid extends (Auto button):
-function [minx_txt, maxx_txt, miny_txt, maxy_txt] = autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt)
+function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_txt,maxx_txt,miny_txt,maxy_txt,margin_txt)
     rows = find(uit.Data.plot);
     faults = uit.Data(rows,:);
     faults.X = fault_input.X(rows);
@@ -154,10 +156,11 @@ function [minx_txt, maxx_txt, miny_txt, maxy_txt] = autogrid(uit,fault_input,min
     width = max(dim(:,2)) - min(dim(:,1));
     height = max(dim(:,4)) - min(dim(:,3));
     %set margins to width and height + 10% of size
-    set(minx_txt,'Value', num2str(round((min(dim(:,1)) - 0.1 * width),-3)/1000));
-    set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + 0.1 * width),-3)/1000));
-    set(miny_txt,'Value', num2str(round((min(dim(:,3)) - 0.1 * height),-3)/1000));
-    set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + 0.1 * height),-3)/1000));
+    mrg = str2double(margin_txt.Value{1})/100;
+    set(minx_txt,'Value', num2str(round((min(dim(:,1)) - mrg * width),-3)/1000));
+    set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + mrg * width),-3)/1000));
+    set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * height),-3)/1000));
+    set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
 end
 %function that plots the map
 function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt)
@@ -203,4 +206,27 @@ function table_export(uit)
     writetable(uit.Data,file)
     msg = sprintf('Table stored to %s',file);
     msgbox(msg)
+end
+%function to fetch variable dip data from table
+function [uit,vardip] = variable_dip(uit)
+    [file,path] = uigetfile('*.xlsx','Variable Dip Data');
+    dip_imp = readtable(fullfile(path,file));
+    vardip = table(cell(height(dip_imp),1),cell(height(dip_imp),1),cell(height(dip_imp),1));
+    vardip.Properties.VariableNames = {'fault_name','depth','dip'};
+    depth_dip = table2array(dip_imp(:,2:21));
+    s = uistyle('BackgroundColor',[.3 .8 .8]);
+    uit.Data.dip = num2cell(uit.Data.dip);
+    for i = 1:length(dip_imp.fault_name)
+        idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
+        if any(idx) == true
+            vardip.fault_name{i} = uit.Data.fault_name{idx};
+            vardip.depth{i} = depth_dip(i,[1 3 5 7 9]);
+            vardip.dip{i} = depth_dip(i,[2 4 6 8 10]);
+            addStyle(uit,s,'row',idx);
+            uit.Data.dip{idx} = 'var. dip';
+        else
+            vardip(end,:) = [];
+        end
+    end
+    vardip
 end

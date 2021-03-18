@@ -1,7 +1,6 @@
 %% import and define variables
 set(fig, 'HandleVisibility', 'off');
 close all                   %close all windows except the UI
-%set(fig, 'HandleVisibility', 'on');
 format long
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
@@ -17,6 +16,17 @@ end
 % build input table from selected faults
 rows = find(uit.Data.plot);
 faults = uit.Data(rows,:);
+
+%check for variable dip faults:
+dip_inp = uit.Data.dip(rows);
+for i = 1:length(dip_inp)
+    if isnumeric(dip_inp{i}) == true
+        faults.dip(i) = dip_inp{i};
+    else
+        %VARIABLE DIP!
+        faults.dip(i) = 90; %just here to avoid errors
+    end
+end
 
 faults.X = fault_input.X(rows);
 faults.Y = fault_input.Y(rows);
