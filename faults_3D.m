@@ -41,7 +41,7 @@ centre_vertical = 0;      % 0=default center of the fault.
 %                           This must be less than the rupture depth.
 
 % specify utm coordinates (only needed for kml import)
-utmzone = 32;
+utmzone = 33;
 utmhemi = 'n';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
