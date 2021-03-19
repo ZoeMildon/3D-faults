@@ -1,6 +1,8 @@
-%% import and define variables
-set(fig, 'HandleVisibility', 'off');
-close all                   %close all windows except the UI
+% configuration of tab 3 - 3D-plot
+tab3 = uitab(tabgp,'Title','3D-plot','BackgroundColor',[.98 .98 .98]);
+plt = uiaxes(tab3,'Position',[200 5 900 690],'Color',[.9 .9 .9],'Box','On');
+
+%import and define variables
 format long
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
@@ -18,15 +20,15 @@ rows = find(uit.Data.plot);
 faults = uit.Data(rows,:);
 
 %check for variable dip faults:
-dip_inp = uit.Data.dip(rows);
-for i = 1:length(dip_inp)
-    if isnumeric(dip_inp{i}) == true
-        faults.dip(i) = dip_inp{i};
-    else
-        %VARIABLE DIP!
-        faults.dip(i) = 90; %just here to avoid errors
-    end
-end
+% dip_inp = uit.Data.dip(rows);
+% for i = 1:length(dip_inp)
+%     if isnumeric(dip_inp{i}) == true
+%         faults.dip(i) = dip_inp{i};
+%     else
+%         %VARIABLE DIP!
+%         faults.dip(i) = 90; %just here to avoid errors
+%     end
+% end
 
 faults.X = fault_input.X(rows);
 faults.Y = fault_input.Y(rows);
@@ -82,7 +84,6 @@ if nnz(uit.Data.slip_fault) ~= 1    %checks if exactly 1 fault is selected as ru
 end
 slip_idx = faults.slip_fault == 1;
 fault_slip_name = faults.fault_name{slip_idx};  %extract the fault that slips
-%close(fig)                                      %closes UI, the variables of the UI elements are lost at this point
 
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
@@ -225,6 +226,7 @@ for i = 1:length(faults.fault_name)
         errordlg('Slip calculations have gone wrong')
     end    
     patch_plotting
+    set(tabgp,'SelectedTab',tab3);
     %% Writing the data to the Coulomb output file
     for n=1:length(z_points(:,1))-1
         for j=1:length(x_points(1,:))-1
@@ -237,7 +239,7 @@ for i = 1:length(faults.fault_name)
             end
         end
     end
-    clearvars -except fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface plotting slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
+    clearvars -except tabgp tab3 plt fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface plotting slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
 end
 %% Finishing off writing the Coulomb input file
 fprintf (fid,'\n');

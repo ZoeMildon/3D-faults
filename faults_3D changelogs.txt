@@ -31,3 +31,11 @@ Version 1.4
 	- check for missing data and wrong data types is now at the beginning of the script
 	- all error dialogs appear before the 3D-plot executes, so the user can change the input table and execute again
 	- the UI does not close anymore, so the 3D-plot can be repeated multiple times with changed parameters
+
+Version 1.5 - in preparation
+- restructured the user interface:
+	- the UI is now built up by 3 separate tabs
+	- the ui.m script was replaced by the uitab1 and uitab2 script
+	- definition of variables in the main 'faults_3D' script is now redundant
+- added import of variable dip for faults (NOT YET WORKING!)
+- made map margin size changeable in ui tab2

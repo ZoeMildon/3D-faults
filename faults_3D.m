@@ -12,40 +12,40 @@ format short
 
 % DATA TO CHANGE:
 
-grid_size = 5;      % Units in kilometres, the size of the rectangular elements along strike
+%grid_size = 5;      % Units in kilometres, the size of the rectangular elements along strike
 
-filename = 'example';      % Name of the outputfile that will be created
+%filename = 'example';      % Name of the outputfile that will be created
 
-COUL_GRID_SIZE = 10; % In kilometers, grid size for calculating the Coulomb stress transferred at a specified depth.
+%COUL_GRID_SIZE = 10; % In kilometers, grid size for calculating the Coulomb stress transferred at a specified depth.
 
 % INFORMATION TO BUILD THE SLIP DISTRIBUTION:
 
-slip_at_surface = 0.1; % what fraction of the maximum slip at depth occurs at the surface 0.1=10%
-maximum_slip = 3.5;  % defines the maximum slip at the center of the bulls eye slip distribution
+%slip_at_surface = 0.1; % what fraction of the maximum slip at depth occurs at the surface 0.1=10%
+%maximum_slip = 3.5;  % defines the maximum slip at the center of the bulls eye slip distribution
 
-seismo_depth = 15; % Depth of the seismogenic zone in kilometres
-rupture_depth = 0; % 0 = default - the fault ruptures the whole seismogenic zone
+%seismo_depth = 15; % Depth of the seismogenic zone in kilometres
+%rupture_depth = 0; % 0 = default - the fault ruptures the whole seismogenic zone
 %                  Change to down-dip extent (in km).
 
 % SETTING THE LOCATION OF MAXIMUM SLIP
 
 %       Default setting is the have the location of maximum slip in the
 %       centre of the fault to generate a symmetric concentric slip distribution.  
-centre_horizontal = 0;    % 0=default center of the fault.
+%centre_horizontal = 0;    % 0=default center of the fault.
 %                           Change to distance (in km) from the north/west end
 %                           to control the location of maximum slip along the fault.
 %                           This must be less than length of the fault that ruptures.
-centre_vertical = 0;      % 0=default center of the fault.
+%centre_vertical = 0;      % 0=default center of the fault.
 %                           Change to distance (in km) from the surface to control
 %                           the location of maximum slip down-dip of the fault.
 %                           This must be less than the rupture depth.
 
 % specify utm coordinates (only needed for kml import)
-utmzone = 32;
-utmhemi = 'n';
+%utmzone = 32;
+%utmhemi = 'n';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%    DO NOT CHANGE ANY OTHER FILES FOR NORMAL OPERATION   %%%%%%%%%%%
 addpath Code/
 addpath Fault_traces/
-ui
+uitab1
