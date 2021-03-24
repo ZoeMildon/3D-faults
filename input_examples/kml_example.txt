@@ -1,3 +1,0 @@
-fault_name	dip	rake	dip_dir	len
-Paganica	61	-90	231.1	
-Montereale	60	-90	239.3	15
