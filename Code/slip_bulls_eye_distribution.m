@@ -29,6 +29,8 @@ if length(x_points(:,1))>=3
         d(i)=d2+grid_sizem*i;
     end
 else
+    disp('length(x_points(:,1)) < 3')   %just for debugging!
+    return
 end
 
 length_last=sqrt((x_points(1,L-1)-x_points(1,L))^2+(y_points(1,L-1)-y_points(1,L))^2); % length of the last grid box
@@ -64,16 +66,27 @@ end
 
 if centre_vertical>0
     middle_vertical=centre_vertical*1000;
-else
 end
-
-depth_distances=[0;middle_vertical;depth_extent];
-given_slip_proportions=[slip_at_surface;1;0];
-C=[grid_size_to_depth/2:grid_size_to_depth:(m-1)*grid_size_to_depth+(grid_size_to_depth/2)];
-calc_depth_prop=([0,C,depth_extent]).';
-slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth_prop);
-
-slip_proportions=[slip_proportions(2:length(slip_proportions)-1)];
-
-slip_distribution=slip_proportions*slips;
-slip_distribution(isnan(slip_distribution))=0;
+switch geometry
+    case 'constant'
+        depth_distances=[0;middle_vertical;depth_extent];
+        given_slip_proportions=[slip_at_surface;1;0];
+        C=[grid_size_to_depth/2:grid_size_to_depth:(m-1)*grid_size_to_depth+(grid_size_to_depth/2)];
+        calc_depth_prop=([0,C,depth_extent]).';
+        slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth_prop);
+        
+        slip_proportions=[slip_proportions(2:length(slip_proportions)-1)];
+    
+        slip_distribution=slip_proportions*slips;
+        slip_distribution(isnan(slip_distribution))=0;
+    case 'variable'
+        depth_distances=[0;middle_vertical;depth_extent];
+        given_slip_proportions=[slip_at_surface;1;0];
+        for h=1:length(z_points(:,1))-1
+            calc_depth(h,1)=-(z_points(h,1)+z_points(h+1,1))/2;
+        end
+        slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
+        
+        slip_distribution=slip_proportions*slips;
+        slip_distribution(isnan(slip_distribution))=0;     
+end
