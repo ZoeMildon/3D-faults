@@ -19,6 +19,9 @@ faults.X = fault_input.X;
 faults.Y = fault_input.Y;
 faults(rows,:) = [];
 faults.plot = [];
+if iscell(faults.dip) == false
+    faults.dip = num2cell(faults.dip);
+end
 
 %save grid limits to workspace
 min_x = str2double(minx_txt.Value{1});
@@ -37,12 +40,14 @@ for j = 1:length(faults.dip)
         errordlg('Missing rake information!')
         return
     end
-    if all(faults.dip{j} ~= 90) && ismissing(faults.dip_dir(j)) == true
-        msg = sprintf('Missing projection direction information for %s.\n \tFault will not be plotted.',faults.fault_name{j});
-        answ = questdlg(msg,'Warning!','Cancel','Plot Anyway','Cancel');
-        switch answ
-            case 'Cancel'
-                return
+    if isnumeric(faults.dip{j})
+        if faults.dip{j} ~= 90 && ismissing(faults.dip_dir(j)) == true
+            msg = sprintf('Missing projection direction information for %s.\n \tFault will not be plotted.',faults.fault_name{j});
+            answ = questdlg(msg,'Warning!','Cancel','Plot Anyway','Cancel');
+            switch answ
+                case 'Cancel'
+                    return
+            end
         end
     end
     if faults.dip_dir(j) < 0 || faults.dip_dir(j) > 360
@@ -77,7 +82,6 @@ fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxx
 c = 1;  %counter for the variable dip table
 for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
-    %constant_dip = faults.dip(i);
     rake = faults.rake(i);
     dip_dir = faults.dip_dir(i);
     
@@ -249,7 +253,8 @@ for i = 1:length(faults.fault_name)
                 num_dip(j)=length(x_points(:,1));
             end
     end
-    % Calculating the bulls eye slip distribution. Options included 
+%%    
+    % Calculating the bulls eye slip distribution. Options included
     if strcmp(fault_name,fault_slip_name)==1
         slipq=questdlg('How much of the fault slips?','Slip distribution','All','Partial rupture','All');
         switch slipq
@@ -305,13 +310,11 @@ for i = 1:length(faults.fault_name)
             end
         end
     end
-    clearvars a amo A b C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength
-    clearvars given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth i I j k l L last_point lbl lbltext Ldist length_last
-    clearvars m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx
-    clearvars smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault x x_points y y_points z z_points
+    clearvars a amo A b c C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth i I j k l L last_point lbl lbltext
+    clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault x x_points y y_points z z_points
     %clearvars -except tabgp tab3 plt fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
 end
-%hold(plt,'off')
+
 %% Finishing off writing the Coulomb input file
 fprintf (fid,'\n');
 fprintf (fid,'\n');

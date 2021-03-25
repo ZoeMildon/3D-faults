@@ -38,3 +38,7 @@ xlabel(plt,'UTM x')
 ylabel(plt,'UTM y')
 zlabel(plt,'Depth (m)')
 clearvars x y z
+disp('x_points:')
+length(x_points(:,1))
+disp('slip_distribution:')
+length(slip_distribution(:,1))

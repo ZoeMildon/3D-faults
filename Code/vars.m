@@ -15,4 +15,6 @@ if rb1.Value == true
 else
     utmhemi = 's';
 end
+
+clearvars calc_depth
 %disp('Saved variables to workspace')

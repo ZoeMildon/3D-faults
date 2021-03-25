@@ -67,6 +67,7 @@ end
 if centre_vertical>0
     middle_vertical=centre_vertical*1000;
 end
+%%
 switch geometry
     case 'constant'
         depth_distances=[0;middle_vertical;depth_extent];

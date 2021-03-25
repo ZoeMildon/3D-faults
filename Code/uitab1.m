@@ -18,18 +18,18 @@ uilabel(p1,'Position',[10 20 130 20],'Text','File name:');
 uilabel(p1,'Position',[350 20 130 20],'Text','Grid Size:');
 uilabel(p1,'Position',[600 20 130 20],'Text','Coulomb Grid Size:');
 set_filename = uitextarea(p1,'Position',[80 20 200 20],'Value','filename');
-set_grid_size = uispinner(p1,'Position',[415 20 60 20],'Step',0.1,'Limits',[0 10],'Value',settings.value(1));
-set_coul_grid_size = uispinner(p1,'Position',[710 20 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(2));
+set_grid_size = uispinner(p1,'Position',[415 20 60 20],'Step',0.5,'Limits',[0 30],'Value',settings.value(1));
+set_coul_grid_size = uispinner(p1,'Position',[710 20 60 20],'Step',0.5,'Limits',[0 inf],'Value',settings.value(2));
 
 p2 = uipanel(pmain,'Title','Information to build the slip distribution','Position',[10 350 270 190],'BackgroundColor',[1 1 1]);
 uilabel(p2,'Position',[10 130 130 20],'Text','Slip at surface (%):');
 uilabel(p2,'Position',[10 100 130 20],'Text','Maximum slip (m):');
 uilabel(p2,'Position',[10 50 130 20],'Text','Seismogenic depth (km):');
 uilabel(p2,'Position',[10 20 130 20],'Text','Rupture depth (km):');
-set_surfSlip = uispinner(p2,'Position',[160 130 60 20],'Step',5,'Limits',[0 100],'Value',settings.value(3));
-set_maxSlip = uispinner(p2,'Position',[160 100 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(4));
-set_seismoDepth = uispinner(p2,'Position',[160 50 60 20],'Step',.1,'Limits',[0 inf],'Value',settings.value(5));
-set_ruptureDepth = uispinner(p2,'Position',[160 20 60 20],'Step',.1,'Limits',[0 inf],'Value',settings.value(6));
+set_surfSlip = uispinner(p2,'Position',[170 130 60 20],'Step',5,'Limits',[0 100],'Value',settings.value(3));
+set_maxSlip = uispinner(p2,'Position',[170 100 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(4));
+set_seismoDepth = uispinner(p2,'Position',[170 50 60 20],'Step',.5,'Limits',[0 inf],'Value',settings.value(5));
+set_ruptureDepth = uispinner(p2,'Position',[170 20 60 20],'Step',.1,'Limits',[0 inf],'Value',settings.value(6));
 
 p3 = uipanel(pmain,'Title','Setting the location of maximum slip','Position',[290 350 270 190],'BackgroundColor',[1 1 1]);
 uilabel(p3,'Position',[10 130 130 20],'Text','Horizontal centre:');

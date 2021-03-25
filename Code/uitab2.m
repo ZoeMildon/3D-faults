@@ -8,6 +8,11 @@ vars;   %fetch variables from first uitab
 if rb_shp.Value == true %shapefile
         [file,path] = uigetfile('*.shp','Choose a .shp-file');
         fault_input = struct2table(shaperead(fullfile(path,file)));
+        if iscell(fault_input.dip) == true
+            fault_input.dip = num2cell(str2double(fault_input.dip));
+        else
+            fault_input.dip = num2cell(fault_input.dip);
+        end %make sure that dip values are always double values in cell arrays
 elseif rb_kml.Value == true %kml file
         [file,path] = uigetfile({'*.txt';'*.csv';'*.xlsx';'*.xls';'*.dat'},'Choose an input table');
         fault_input = readtable(fullfile(path,file));
@@ -52,21 +57,27 @@ elseif rb_kmz.Value == true %kmz file
             end
         end
 end
+for i = 1:length(fault_input.Y)
+   if any(fault_input.Y{i} < 0) == true
+       fault_input.Y{i} = fault_input.Y{i}+10000000;
+   end
+end
 figure(fig);
+
 %check if variables in input files have correct names
-vars = {'fault_name','dip','rake','dip_dir','len'};  %variable names of the relevant fields
-for i = 1:length(vars)    
-    while any(strcmp(vars{i},fault_input.Properties.VariableNames)) == false
-        msg = sprintf('Enter the field name containing %s',vars{i});
+variables = {'fault_name','dip','rake','dip_dir','len'};  %variable names of the relevant fields
+for i = 1:length(variables)
+    while any(strcmp(variables{i},fault_input.Properties.VariableNames)) == false
+        msg = sprintf('Enter the field name containing %s',variables{i});
         var1 = inputdlg(msg,'Var not found');
         if any(strcmp(var1,fault_input.Properties.VariableNames)) == true
-            fault_input.Properties.VariableNames{var1} = vars{i};
+            fault_input.Properties.VariableNames{var1} = variables{i};
         end
     end
 end
 %build the table t to be plotted in the uitable (other data remains stored in fault_input)
-if isnumeric(fault_input.dip) == false
-    fault_input.dip = str2double(fault_input.dip);
+if iscell(fault_input.dip) == false
+    fault_input.dip = num2cell(fault_input.dip);
 end
 if isnumeric(fault_input.rake) == false
     fault_input.rake = str2double(fault_input.rake);
@@ -77,11 +88,11 @@ end
 if isnumeric(fault_input.len) == false
     fault_input.len = str2double(fault_input.len);
 end
-t = fault_input(:,vars);
+t = fault_input(:,variables);
 t.depth = cell(1,length(t.fault_name))';
 t.slip_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
-[row,col] = find(ismissing([t.dip, t.rake, t.dip_dir]));
+[row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
 t.plot(row) = false;
 
 %% configuration of ui tab 2
@@ -232,7 +243,6 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     dipdata.Properties.VariableNames = {'fault_name','depth','dip'};
     depth_dip = table2array(dip_imp(:,2:21));
     s = uistyle('BackgroundColor',[.3 .8 .8]);
-    uit.Data.dip = num2cell(uit.Data.dip);
     for i = 1:length(dip_imp.fault_name)
         idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
         if any(idx) == true
