@@ -51,4 +51,3 @@ Version 1.7 (changes made by Zoe Mildon)
 - removed "Coulomb Grid Size" from input GUI and set it to 10, as it is not integral to building the fault, potential for confusion, and it's very easy to change in Coulomb
 - Minor text changes for the GUI and changed the colours of buttons
 - attempted to re-write how the slip distribution is calculated - needs testing after the GUI has been rearranged
-- Demonstrating pull-request
