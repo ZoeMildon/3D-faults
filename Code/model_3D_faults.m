@@ -2,7 +2,7 @@
 format long
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
-rupture_depthm = rupture_depth*1000;
+%rupture_depthm = rupture_depth*1000;
 output_data_file = strcat('Output_files/',filename,num2str(maximum_slip),'m',num2str(grid_size),'km.inr');
 cla(plt)
 

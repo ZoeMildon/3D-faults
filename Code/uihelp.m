@@ -6,25 +6,25 @@ text = sprintf('\n\t\t\t\t\t\t\t3D - Faults v 1.6');
 helpbox = uitextarea(tab1,'Position',[855 355 485 270],'Value',text,'Editable','off');
 
 % '?' - buttons:
-help_general = uibutton(p1,'push','Text','?','Position',[800,20,20,20],'BackgroundColor',[.3 .8 .8],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox));
-help_slipdist = uibutton(p2,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.3 .8 .8],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_slipdist,event) uihelp_slipdist(helpbox));
-help_max_slip = uibutton(p3,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.3 .8 .8],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox));
-help_imp = uibutton(p5,'push','Text','?','Position',[250,10,40,40],'BackgroundColor',[.3 .8 .8],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_imp,event) uihelp_imp(helpbox));
+help_general = uibutton(p1,'push','Text','?','Position',[800,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox));
+help_slipdist = uibutton(p2,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_slipdist,event) uihelp_slipdist(helpbox));
+help_max_slip = uibutton(p3,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox));
+help_imp = uibutton(p5,'push','Text','?','Position',[250,10,40,40],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_imp,event) uihelp_imp(helpbox));
 
 %% functions
 function helpbox = uihelp_general(helpbox)
     helptext = sprintf(strcat(('GENERAL SETTINGS:\n\n'),...
-        ('File name: Name for the output file that will be created\n'),...
-        ('Grid size: The size of the rectangular elements along strike.\n'),...
-        ('Coulomb grid size: Grid size for calculating the Coulomb stress transferred at a specified depth.\n')));
+        ('Output file name: Name for the output file that will be created\n'),...
+        ('Grid size (km): The size of the rectangular elements along strike in kilometers.\n')));
+        %('Coulomb grid size: Grid size for calculating the Coulomb stress transferred at a specified depth.\n')));
     set(helpbox,'Value',helptext);
 end
 function helpbox = uihelp_slipdist(helpbox)
     helptext = sprintf(strcat(('INFORMATION TO BUILD THE SLIP DISTRIBUTION \n\n'),...
-        ('Slip at surface: What fraction of the maximum slip at depth occurs at the surface.\n'),...
+        ('Slip at surface: What percentage of the maximum slip at depth occurs at the surface.\n'),...
         ('Maximum slip (m): Defines the maximum slip at the center of the bulls eye slip distribution\n\n'),...
-        ('Seismogenic depth: Depth of the seismogenic zone in kilometres\n'),...
-        ('Rupture depth: 0 = default - the fault ruptures the whole seismogenic zone. Change to down-dip extent (in km).')));
+        ('Seismogenic depth (km): Depth of the seismogenic zone in kilometres\n'),...
+        ('Rupture depth (km): 0 = default - the fault ruptures the whole seismogenic zone. Change to down-dip extent (in km).')));
     set(helpbox,'Value',helptext);
 end
 function helpbox = uihelp_max_slip(helpbox)
