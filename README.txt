@@ -1,9 +1,7 @@
 # faults_3D
 Code to calculate and plot faults and project faults to depth for immediate use in Coulomb 3.4. 
 
-Version 1.1
-
-Written by Zoe Mildon, 2016
+Version 1.1 - Written by Zoe Mildon, 2016
 
 Updated in 2018
 
@@ -11,7 +9,7 @@ Code is free to use for research purposes, please cite the following paper:
 Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016), Evaluating models of Coulomb stress transfer- is variable fault geometry important?, Geophys. Res. Lett., 43, doi:10.1002/2016GL071128.
 
 UPDATED VERSION:
-Version 1.4 -  03/2021 - Manuel Diercks
+Version 1.6 -  03/2021
 
 # INPUTS:
 Three input formats are supported:
@@ -19,7 +17,7 @@ Three input formats are supported:
 2) kml-files of all faults (stored in the 'Fault_traces' folder) AND a table (txt, csv, xlsx,...) that contains the properties of the faults
 3) A kmz-file containing the fault traces and a table containing the fault properties
 
-If kml or kmz import is chosen please specify the utmzone (UTM zone number) and utmhemi (hemisphere,'n' or 's') variables in the faults_3D file.
+If kml or kmz import is chosen please specify the UTM zone and hemisphere in the user interface file.
 For shp-import, the file should also be projected in UTM coordinates.
 
 Required properties (either in the table or as attributes in the shape file) are:
@@ -33,8 +31,13 @@ len - length of the fault (km)
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
 A depth column may be optionally given. In the 3D-plot, faults will reach to that specified depth (km).
 
+Variable dip:
+
+To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx).
+The table can be imported via the 'import variable dip' button on the 'Import tab', fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
+
 # RUNNING THE CODE
-In MATLAB, navigate to the 'faults_3D_v1.4' folder. Open the faults_3D script and edit the necessary parameters, then execute the script by entering 'faults_3D' in the command line or pressing F5.
+In MATLAB, navigate to the 'faults_3D_v1.6' folder. Execute the script by entering 'faults_3D' in the command line or open the faults_3D script and press F5.
 
 # BUILDING SLIP DISTRIBUTIONS
 The code will build simple bulls eye slip distributions according to four different options (which are made as selections when the code is running).

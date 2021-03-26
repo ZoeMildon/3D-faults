@@ -29,6 +29,8 @@ if length(x_points(:,1))>=3
         d(i)=d2+grid_sizem*i;
     end
 else
+    disp('length(x_points(:,1)) < 3')   %just for debugging!
+    return
 end
 
 length_last=sqrt((x_points(1,L-1)-x_points(1,L))^2+(y_points(1,L-1)-y_points(1,L))^2); % length of the last grid box
@@ -54,26 +56,55 @@ slipsx=interp1(data_distances,slip_values,distances);
 slips=slipsx.';
 
 % Extending the slip distribution to depth, with a triangular profile
-if rupture_depth>0        
-    middle_vertical=(rupture_depthm/sind(constant_dip))/2;
-    depth_extent=rupture_depthm;
-else
-	middle_vertical=(seismo_depthm/sind(constant_dip))/2;
-    depth_extent=seismo_depthm/sind(constant_dip);
-end
 
-if centre_vertical>0
-    middle_vertical=centre_vertical*1000;
-else
-end
+% New code written by Zoe Mildon 26/3/21 - untested
 
-depth_distances=[0;middle_vertical;depth_extent];
+depth_distances=[0;centre_vertical;rupture_depth]; 
 given_slip_proportions=[slip_at_surface;1;0];
-C=[grid_size_to_depth/2:grid_size_to_depth:(m-1)*grid_size_to_depth+(grid_size_to_depth/2)];
-calc_depth_prop=([0,C,depth_extent]).';
-slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth_prop);
 
-slip_proportions=[slip_proportions(2:length(slip_proportions)-1)];
-
+%Calculating the depth of the middle of all the elements - should work for
+%both variable and planar dip cases
+for h=1:length(z_points(:,1))-1
+    calc_depth(h,1)=-(z_points(h,1)+z_points(h+1,1))/2;
+end
+slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
 slip_distribution=slip_proportions*slips;
-slip_distribution(isnan(slip_distribution))=0;
+slip_distribution(isnan(slip_distribution))=0; 
+
+% % Old code - left for reference, can be deleted when above lines are
+% tested and work
+%  if rupture_depth>0        
+%     middle_vertical=(rupture_depthm/sind(constant_dip))/2;
+%     depth_extent=rupture_depthm;
+%  else
+%  	middle_vertical=(seismo_depthm/sind(constant_dip))/2;
+%      depth_extent=seismo_depthm/sind(constant_dip);
+%  end
+% 
+% if centre_vertical>0
+%     middle_vertical=centre_vertical*1000;
+% end
+% %%
+% switch geometry
+%     case 'constant'
+%         depth_distances=[0;middle_vertical;depth_extent];
+%         given_slip_proportions=[slip_at_surface;1;0];
+%         C=[grid_size_to_depth/2:grid_size_to_depth:(m-1)*grid_size_to_depth+(grid_size_to_depth/2)];
+%         calc_depth_prop=([0,C,depth_extent]).';
+%         slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth_prop);
+%         
+%         slip_proportions=[slip_proportions(2:length(slip_proportions)-1)];
+%     
+%         slip_distribution=slip_proportions*slips;
+%         slip_distribution(isnan(slip_distribution))=0;
+%     case 'variable'
+%         depth_distances=[0;var_dip_length/2;var_dip_length];
+%         given_slip_proportions=[slip_at_surface;1;0];
+%         for h=1:length(z_points(:,1))-1
+%             calc_depth(h,1)=-(z_points(h,1)+z_points(h+1,1))/2;
+%         end
+%         slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
+%         
+%         slip_distribution=slip_proportions*slips;
+%         slip_distribution(isnan(slip_distribution))=0;     
+% end
