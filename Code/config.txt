@@ -4,7 +4,7 @@ COUL_GRID_SIZE,10
 slip_at_surface,10
 maximum_slip,3.5
 seismo_depth,15
-rupture_depth,0
+rupture_depth,15
 centre_horizontal,0
 centre_vertical,0
 utmzone,32
