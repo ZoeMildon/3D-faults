@@ -84,6 +84,7 @@ for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
     rake = faults.rake(i);
     dip_dir = faults.dip_dir(i);
+    fault_length=uit.Data.len(i);
     
     %decide between constant and variable dip:
     if isnumeric(faults.dip{i}) == true

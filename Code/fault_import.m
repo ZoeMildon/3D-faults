@@ -120,7 +120,7 @@ addStyle(uit,s,'row',row);
 autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
 axe = uiaxes(tab2,'Position',[700 10 400 400],'Color',[1 1 1],'Box','On');
 axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
-set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
+set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
 
 set(tabgp,'SelectedTab',tab2);
 
@@ -147,7 +147,17 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
 end
 %function that plots the map
-function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt)
+function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
+    %set the horizontal spinner to faultlength/2 and the vertical spinne to depth/2
+    idx = find(uit.Data.slip_fault);
+    if nnz(idx) == 1
+        len = uit.Data.len(idx)/2;
+        set(set_centre_hor,'Value',len)
+        if isempty(uit.Data.depth{2}) == false
+            dep = uit.Data.depth{idx}/2;
+            set(set_centre_ver,'Value',dep)
+        end
+    end
     min_x = str2double(minx_txt.Value{1});
     max_x = str2double(maxx_txt.Value{1});
     min_y = str2double(miny_txt.Value{1});

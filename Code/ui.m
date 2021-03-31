@@ -42,7 +42,7 @@ reset_btn = uibutton(pmain,'push','Text','Reset','Position',[740, 300, 60, 30],'
 opt_pnl = uipanel(tab2,'Title','Data options','Position',[10 470 180 180],'BackgroundColor',[1 1 1]);
 vardip = uitable(fig,'Visible','off');  %this table is just for storing variable dip values but is not shown in ui
 dip_btn = uibutton(opt_pnl,'push','Text','Import variable dip','Position',[10, 130, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
-len_btn = uibutton(opt_pnl,'push','Text','calculate length','Position',[10, 100, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
+len_btn = uibutton(opt_pnl,'push','Text','Calculate length','Position',[10, 100, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
 exp_btn = uibutton(opt_pnl,'push','Text','Export table','Position',[10, 20, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','ButtonPushedFcn', @(exp_btn,event) table_export(uit));
 
 %Slip distribution panel
@@ -54,14 +54,14 @@ uilabel(p2,'Position',[10 20 140 20],'Text','Rupture depth (km):');
 set_surfSlip = uispinner(p2,'Position',[160 130 60 20],'Step',5,'Limits',[0 100],'Value',settings.value(3),'ValueChangedFcn','vars');
 set_maxSlip = uispinner(p2,'Position',[160 100 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(4),'ValueChangedFcn','vars');
 set_seismoDepth = uispinner(p2,'Position',[160 50 60 20],'Step',.5,'Limits',[0 inf],'Value',settings.value(5),'ValueChangedFcn','vars');
-set_ruptureDepth = uispinner(p2,'Position',[160 20 60 20],'Step',.1,'Limits',[.1 inf],'Value',settings.value(6),'ValueChangedFcn','vars');
+set_ruptureDepth = uispinner(p2,'Position',[160 20 60 20],'Step',.1,'Limits',[.1 inf],'Value',settings.value(5),'ValueChangedFcn','vars');
 
 %Maximum slip panel
 p3 = uipanel(tab2,'Title','Setting the location of maximum slip','Position',[480 470 230 180],'BackgroundColor',[1 1 1]);
-uilabel(p3,'Position',[10 130 130 20],'Text','Horizontal centre:');
-uilabel(p3,'Position',[10 100 130 20],'Text','Vertical centre:');
-set_centre_hor = uispinner(p3,'Position',[120 130 60 20],'Step',.1,'Value',settings.value(7),'ValueChangedFcn','vars');
-set_centre_ver = uispinner(p3,'Position',[120 100 60 20],'Step',.1,'Value',settings.value(8),'ValueChangedFcn','vars');
+uilabel(p3,'Position',[10 130 130 20],'Text','Horizontal centre (km):');
+uilabel(p3,'Position',[10 100 130 20],'Text','Vertical centre (km):');
+set_centre_hor = uispinner(p3,'Position',[135 130 60 20],'Step',.1,'Value',settings.value(7),'ValueChangedFcn','vars');
+set_centre_ver = uispinner(p3,'Position',[135 100 60 20],'Step',.1,'Value',settings.value(5)/2,'ValueChangedFcn','vars');
 
 %grid size input
 uilabel(tab2,'Position',[720 600 130 20],'Text','Grid Size (km):');
