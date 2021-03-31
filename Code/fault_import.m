@@ -1,10 +1,19 @@
-%this code is triggered by the import button
-clearvars citation settings
-set(tabgp,'SelectedTab',tab2);
+%% This code is triggered by the import button
+clearvars settings
+tab2.Parent = tabgp;
+tab3.Parent = tabgp;
 set(imp_btn,'Enable','off')
-vars;   %fetch variables from first uitab
+%fetch variables from first uitab:
+vars;
+filename = cell2mat(set_filename.Value);
+utmzone = str2double(set_utmzone.Value);
+if rb1.Value == true
+    utmhemi = 'n';
+else
+    utmhemi = 's';
+end
 
-%import faults:
+%% Import faults:
 if rb_shp.Value == true %shapefile
         [file,path] = uigetfile('*.shp','Choose a .shp-file');
         fault_input = struct2table(shaperead(fullfile(path,file)));
@@ -57,13 +66,14 @@ elseif rb_kmz.Value == true %kmz file
             end
         end
 end
+figure(fig);
+%% check data and configure input table
+%check for southern hemishphere coordinates and add 'false northng' of 10M
 for i = 1:length(fault_input.Y)
    if any(fault_input.Y{i} < 0) == true
        fault_input.Y{i} = fault_input.Y{i}+10000000;
    end
 end
-figure(fig);
-
 %check if variables in input files have correct names
 variables = {'fault_name','dip','rake','dip_dir','len'};  %variable names of the relevant fields
 for i = 1:length(variables)
@@ -75,7 +85,7 @@ for i = 1:length(variables)
         end
     end
 end
-%build the table t to be plotted in the uitable (other data remains stored in fault_input)
+% check for correct data types
 if iscell(fault_input.dip) == false
     fault_input.dip = num2cell(fault_input.dip);
 end
@@ -88,6 +98,11 @@ end
 if isnumeric(fault_input.len) == false
     fault_input.len = str2double(fault_input.len);
 end
+for i = 1:length(fault_input.fault_name) %replace space by underscore in fault names
+    fault_input.fault_name{i} = strrep(fault_input.fault_name{i},' ','_');
+end
+
+%build the table t to be plotted in the uitable (other data remains stored in fault_input)
 t = fault_input(:,variables);
 t.depth = cell(1,length(t.fault_name))';
 t.slip_fault = false(1,length(t.fault_name))';
@@ -95,77 +110,19 @@ t.plot = true(1,length(t.fault_name))';
 [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
 t.plot(row) = false;
 
-%% configuration of ui tab 2
-lbl = uilabel(tab2,'Position',[10 420 700 20],'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
-lbltext = sprintf('Tick all faults to be plotted. Choose one fault that slips (rupture plane).');
-lbl.Text = lbltext;
-
-%table
-uit = uitable(tab2,'Data',t,'ColumnWidth',{215,60,60,60,60,60,67,45});
-uit.Position = [10 10 650, 410];
-uit.ColumnEditable = [false true true true true true true true];
+%% configuration of user interface elements
+%fill table with data
+set(uit,'Data',t,'ColumnWidth',{215,60,60,60,60,60,67,45});
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
 %initiate plot:
-axe = uiaxes(tab2,'Position',[700 10 400 400],'Color',[1 1 1],'Box','On');
-
-%coordinates panel:
-coord_pnl = uipanel(tab2,'Title','Grid Limits (UTM coordinates)','Position',[1130 10 180 400],'BackgroundColor',[1 1 1],'FontWeight','bold');
-uilabel(coord_pnl,'Position',[10 350 130 20],'Text','min_x       _____    000');
-uilabel(coord_pnl,'Position',[10 320 130 20],'Text','max_x       _____   000');
-uilabel(coord_pnl,'Position',[10 290 130 20],'Text','min_y       _____    000');
-uilabel(coord_pnl,'Position',[10 260 130 20],'Text','max_y       _____   000');
-uilabel(coord_pnl,'Position',[10 180 130 20],'Text','margin    _____     %');
-
-minx_txt = uitextarea(coord_pnl,'Position',[60 350 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_x = str2double(minx_txt.Value{1});');
-maxx_txt = uitextarea(coord_pnl,'Position',[60 320 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_x = str2double(maxx_txt.Value{1});');
-miny_txt = uitextarea(coord_pnl,'Position',[60 290 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_y = str2double(miny_txt.Value{1});');
-maxy_txt = uitextarea(coord_pnl,'Position',[60 260 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_y = str2double(maxy_txt.Value{1});');
-margin_txt = uitextarea(coord_pnl,'Position',[60 180 50 20],'HorizontalAlignment','right','Value','10','ValueChangedFcn','mrg = str2double(margin_txt.Value{1})/100;');
 autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
-
-%buttons on coordinate panel
-coord_btn = uibutton(coord_pnl,'push',...
-               'Text','Update Plot',...
-               'Position',[10 220 80 20],...
-               'BackgroundColor',[.8 .8 .8],...
-               'ButtonPushedFcn',@(coord_btn,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
-auto_btn = uibutton(coord_pnl,'push',...
-               'Text','Auto',...
-               'Position',[95 220 80 20],...
-               'BackgroundColor',[.8 .8 .8],...
-               'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt));
-
-opt_pnl = uipanel(tab2,'Title','Data options','Position',[10 470 430 180],'BackgroundColor',[1 1 1],'FontWeight','bold');
-%additional buttons
-len_btn = uibutton(opt_pnl,'push',...
-               'Text','Calc. fault lengths',...
-               'Position',[10, 100, 130, 20],...
-               'BackgroundColor',[.8 .8 .8],'FontWeight','bold',...
-               'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
-exp_btn = uibutton(opt_pnl,'push',...
-               'Text','Export table',...
-               'Position',[10, 50, 130, 20],...
-               'BackgroundColor',[.8 .8 .8],'FontWeight','bold',...
-               'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
-           
-vardip = uitable(fig,'Visible','off');  %this table is just for storing variable dip values but is not shown in ui
-dip_btn = uibutton(opt_pnl,'push',...
-               'Text','Import variable dip',...
-               'Position',[10, 130, 130, 20],...
-               'BackgroundColor',[.8 .8 .8],'FontWeight','bold',...
-               'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
-
-%Plot button
-btn = uibutton(tab2,'push',...
-               'Text','Build 3D faults',...
-               'Position',[480, 500, 150, 120],...
-               'BackgroundColor',[.5 .5 .5],'FontWeight','bold',...
-               'ButtonPushedFcn','model_3D_faults',...
-               'FontSize',18);
-set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
+axe = uiaxes(tab2,'Position',[700 10 400 400],'Color',[1 1 1],'Box','On');
 axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
+set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
+
+set(tabgp,'SelectedTab',tab2);
 
 %% ------------------ function space -------------------------
 %calculate well-fitting grid extends (Auto button):
@@ -190,7 +147,17 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
 end
 %function that plots the map
-function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt)
+function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
+    %set the horizontal spinner to faultlength/2 and the vertical spinne to depth/2
+    idx = find(uit.Data.slip_fault);
+    if nnz(idx) == 1
+        len = uit.Data.len(idx)/2;
+        set(set_centre_hor,'Value',len)
+        if isempty(uit.Data.depth{2}) == false
+            dep = uit.Data.depth{idx}/2;
+            set(set_centre_ver,'Value',dep)
+        end
+    end
     min_x = str2double(minx_txt.Value{1});
     max_x = str2double(maxx_txt.Value{1});
     min_y = str2double(miny_txt.Value{1});
@@ -258,3 +225,4 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     set(vardip,'Data',dipdata);
     disp('Variable dip information imported.')
 end
+
