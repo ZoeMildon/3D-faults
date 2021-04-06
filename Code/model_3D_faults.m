@@ -60,6 +60,13 @@ if nnz(uit.Data.slip_fault) ~= 1    %checks if exactly 1 fault is selected as ru
     errordlg('No fault or more than one faults are assigned as slip faults!')
     return
 end
+%check for senseless user input:
+if rupture_depth > seismo_depthm || centre_vertical > seismo_depthm
+    errordlg('Rupture depth or the vertical centre should not be deeper than the seismogenic depth')
+    return
+end
+
+
 slip_idx = faults.slip_fault == 1;
 fault_slip_name = faults.fault_name{slip_idx};  %extract the name of the fault that slips
 

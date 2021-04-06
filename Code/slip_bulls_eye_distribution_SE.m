@@ -97,4 +97,4 @@ else
             slip_distribution=[zeros([length(slip_distribution(:,1)),length(x_points(1,:))-1-length(slip_distribution(1,:))]),slip_distribution];
 end
 end
-
+clearvars calc_depth

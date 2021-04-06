@@ -55,3 +55,4 @@ end
 slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
 slip_distribution=slip_proportions*slips;
 slip_distribution(isnan(slip_distribution))=0; 
+clearvars calc_depth

@@ -81,8 +81,7 @@ slip_distribution=slip_proportions*slips;
 slip_distribution(isnan(slip_distribution))=0;
 for i=length(slips(1,:))+1:length(utm_x)-1
     slip_distribution(:,i)=0;
-end
-    
+end   
     
 % % Extending the slip distribution to depth, with a triangular profile - OLD
 % % VERSION
@@ -130,4 +129,4 @@ end
 %         end
 % end
 end
-
+clearvars calc_depth 

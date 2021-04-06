@@ -131,3 +131,4 @@ slip_distribution(isnan(slip_distribution))=0;
 %         slip_distribution(isnan(slip_distribution))=0;
 % end
 end
+clearvars calc_depth
