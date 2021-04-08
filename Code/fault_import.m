@@ -3,7 +3,7 @@ clearvars settings
 tab2.Parent = tabgp;
 tab3.Parent = tabgp;
 set(imp_btn,'Enable','off')
-%fetch variables from first uitab:
+%fetch variables from first ui tab:
 vars;
 filename = cell2mat(set_filename.Value);
 utmzone = str2double(set_utmzone.Value);
@@ -116,12 +116,18 @@ set(uit,'Data',t,'ColumnWidth',{215,60,60,60,60,60,67,45});
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
+set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
+set(len_btn,'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
+set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
+set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt));
+
 %initiate plot:
 autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
 axe = uiaxes(tab2,'Position',[700 10 400 400],'Color',[1 1 1],'Box','On');
 axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
 set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
 
+set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
 set(tabgp,'SelectedTab',tab2);
 
 %% ------------------ function space -------------------------
@@ -146,18 +152,23 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * height),-3)/1000));
     set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
 end
-%function that plots the map
+%function that plots the map and automatically sets the vertical and horizontal centre
 function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
-    %set the horizontal spinner to faultlength/2 and the vertical spinne to depth/2
+    %set the horizontal spinner to faultlength/2 and the vertical spinner to depth/2
     idx = find(uit.Data.slip_fault);
     if nnz(idx) == 1
         len = uit.Data.len(idx)/2;
-        set(set_centre_hor,'Value',len)
+        if isnan(len) == true
+            warndlg('No fault length given for slip fault. Make sure to set a sensible horizontal centre or fault length')
+        else
+            set(set_centre_hor,'Value',len)
+        end
         if isempty(uit.Data.depth{2}) == false
             dep = uit.Data.depth{idx}/2;
             set(set_centre_ver,'Value',dep)
         end
     end
+    %plot the overview map
     min_x = str2double(minx_txt.Value{1});
     max_x = str2double(maxx_txt.Value{1});
     min_y = str2double(miny_txt.Value{1});
@@ -174,6 +185,10 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,se
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'k')
         elseif uit.Data.plot(i) == true && uit.Data.slip_fault(i) == true
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'r','LineWidth',2)
+            xval=fault_input.X{1}(~isnan(fault_input.X{1}));
+            yval=fault_input.Y{1}(~isnan(fault_input.Y{1}));
+            scatter(axe,(xval(1))/1000,(yval(1))/1000,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','w')
+            scatter(axe,(xval(end))/1000,(yval(end))/1000,'Marker','o','MarkerFaceColor','w','MarkerEdgeColor','k')
         end
     end
 end
@@ -211,6 +226,7 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     depth_dip = table2array(dip_imp(:,2:21));
     s = uistyle('BackgroundColor',[.3 .8 .8]);
     for i = 1:length(dip_imp.fault_name)
+        dip_imp.fault_name{i} = strrep(dip_imp.fault_name{i},' ','_');
         idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
         if any(idx) == true
             dipdata.fault_name{i} = uit.Data.fault_name{idx};
