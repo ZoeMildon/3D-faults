@@ -269,21 +269,10 @@ for i = 1:length(faults.fault_name)
             case 'All'
                 slip_bulls_eye_distribution
             case 'Partial rupture'
-                slip_partq=questdlg('Which part of the fault ruptures?','Slip distribution','Central section','North or west end','South or east end','Central section');
-                switch slip_partq
-                    case 'Central section'
-                        slip_length1=inputdlg('What is the length of the fault that ruptures? (in km)');
-                        slip_length=str2double(slip_length1{1});
-                        slip_bulls_eye_distribution_C
-                    case 'North or west end'
-                        slip_length1=inputdlg('What is the length of the fault that ruptures? (in km)');
-                        slip_length=str2double(slip_length1{1});
-                        slip_bulls_eye_distribution_NW
-                    case 'South or east end'
-                        slip_length1=inputdlg('What is the length of the fault that ruptures? (in km)');
-                        slip_length=str2double(slip_length1{1});
-                        slip_bulls_eye_distribution_SE
-                end
+                partial_slip = inputdlg({'Start of rupture (km)','End of rupture (km)',},'Input', [1 20; 1 20]);
+                start_slip=str2double(partial_slip{1});
+                end_slip=str2double(partial_slip{2});
+                slip_bulls_eye_distribution_partial
         end
         seismic_moment
     elseif strcmp(fault_name,fault_slip_name)==0
