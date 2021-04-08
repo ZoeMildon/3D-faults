@@ -4,7 +4,6 @@ tab2.Parent = tabgp;
 tab3.Parent = tabgp;
 set(imp_btn,'Enable','off')
 %fetch variables from first ui tab:
-vars;
 filename = cell2mat(set_filename.Value);
 utmzone = str2double(set_utmzone.Value);
 if rb1.Value == true
@@ -112,7 +111,7 @@ t.plot(row) = false;
 
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,60,60,60,60,60,67,45});
+set(uit,'Data',t,'ColumnWidth',{215,50,50,80,80,80,67,45});
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
@@ -123,12 +122,14 @@ set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_t
 
 %initiate plot:
 autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
-axe = uiaxes(tab2,'Position',[700 10 400 400],'Color',[1 1 1],'Box','On');
-axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
-set(uit, 'CellEditCallback', @(uit,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
+axe = uiaxes(tab2,'Position',[710 10 400 400],'Color',[1 1 1],'Box','On');
+axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
+set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
 
-set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
+set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size));
+set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
 set(tabgp,'SelectedTab',tab2);
+
 
 %% ------------------ function space -------------------------
 %calculate well-fitting grid extends (Auto button):
@@ -153,7 +154,7 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
 end
 %function that plots the map and automatically sets the vertical and horizontal centre
-function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
+function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
     %set the horizontal spinner to faultlength/2 and the vertical spinner to depth/2
     idx = find(uit.Data.slip_fault);
     if nnz(idx) == 1
@@ -163,7 +164,7 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,se
         else
             set(set_centre_hor,'Value',len)
         end
-        if isempty(uit.Data.depth{2}) == false
+        if isempty(uit.Data.depth{idx}) == false && isnan(uit.Data.depth{idx}) == false
             dep = uit.Data.depth{idx}/2;
             set(set_centre_ver,'Value',dep)
         end
@@ -185,6 +186,10 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,se
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'k')
         elseif uit.Data.plot(i) == true && uit.Data.slip_fault(i) == true
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'r','LineWidth',2)
+            xval=fault_input.X{i}(~isnan(fault_input.X{i}));
+            yval=fault_input.Y{i}(~isnan(fault_input.Y{i}));
+            scatter(axe,(xval(1))/1000,(yval(1))/1000,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','w')
+            scatter(axe,(xval(end))/1000,(yval(end))/1000,'Marker','o','MarkerFaceColor','w','MarkerEdgeColor','k')
         end
     end
 end
@@ -236,5 +241,17 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     end
     set(vardip,'Data',dipdata);
     disp('Variable dip information imported.')
+end
+function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size)
+    set(uit,'Data',t);
+    settings = readtable('config.txt');
+    set(set_surfSlip,'Value',settings.value(3));
+    set(set_maxSlip,'Value',settings.value(4));
+    set(set_seismoDepth,'Value',settings.value(5));
+    set(set_ruptureDepth,'Value',settings.value(5));
+    set(set_centre_hor,'Value',settings.value(7));
+    set(set_centre_ver,'Value',settings.value(5)/2);
+    set(set_grid_size,'Value',settings.value(1));
+    vars
 end
 
