@@ -56,7 +56,11 @@ Version 1.7b (changes made by Manuel)
 - rearranged GUI and related code:
 	- GUI is built up in ui.m script, faults  are imported and input data configured in the fault_import.m script (replaced uitab1.m and uitab2.m)
 	- settings, fault preview etc. shifted to the 2nd ui tab (now called customisation)
-- multiple bugs fixed which occured after the recent changes of version 1.7 and 1.7b and extensive testing
+- multiple bugs fixed which occurred after the recent changes of version 1.7 and 1.7b and extensive testing
+
+Version 1.7c (changes made by Manuel)
+- rewritten code to calculate the slip-distribution for a partial fault rupture
+- minor changes to GUI
 
 
 

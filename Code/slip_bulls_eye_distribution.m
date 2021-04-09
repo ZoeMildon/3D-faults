@@ -34,8 +34,6 @@ end
 distances=sort(distances);
 distances=distances.';
 
-Ldist=length(distances);
-a=find(distances==centre_horizontal);
 slip_values=[0;maximum_slip;0];
 
 data_distances=[0;set_centre_hor.Value*1000;fault_length*1000];
@@ -47,12 +45,12 @@ slips=slipsx.';
 depth_distances=[0;centre_vertical;rupture_depth]; 
 given_slip_proportions=[slip_at_surface;1;0];
 
-%Calculating the depth of the middle of all the elements - should work for
-%both variable and planar dip cases
+%Calculating the depth of the middle of all the elements, works for both variable and planar dip cases
 for h=1:length(z_points(:,1))-1
     calc_depth(h,1)=-(z_points(h,1)+z_points(h+1,1))/2;
 end
+
 slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
 slip_distribution=slip_proportions*slips;
-slip_distribution(isnan(slip_distribution))=0; 
+slip_distribution(isnan(slip_distribution))=0; % changing any NaN values to zeros
 clearvars calc_depth

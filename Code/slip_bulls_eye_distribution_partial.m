@@ -8,7 +8,11 @@
 % Start and end points (in km) of ruptures are specified.
 % Identical for both variable and planar dip, and better functionality for changing the location of maximum slip
 
+
 slip_distribution=zeros((length(z_points(:,1))-1),(length(x_points(1,:))-1)); % generates a blank matrix for slip_distribution to be put into
+
+
+
 % Checking for potential issues
 if end_slip>fault_length
     errordlg('The specified slip length is longer than fault length!')
