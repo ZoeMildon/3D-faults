@@ -9,6 +9,5 @@ rupture_depth = set_ruptureDepth.Value*1000;
 centre_horizontal = set_centre_hor.Value*1000;
 centre_vertical = set_centre_ver.Value*1000;
 
-
 clearvars calc_depth
 %disp('Saved variables to workspace')

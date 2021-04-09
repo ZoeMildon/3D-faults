@@ -1,5 +1,6 @@
 %import and define variables
 format long
+vars;
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
 %rupture_depthm = rupture_depth*1000;

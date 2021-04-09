@@ -9,19 +9,21 @@
 % Identical for both variable and planar dip, and better functionality for changing the location of maximum slip
 
 
+slip_distribution=zeros((length(z_points(:,1))-1),(length(x_points(1,:))-1)); % generates a blank matrix for slip_distribution to be put into
+
+
+
 % Checking for potential issues
 if end_slip>fault_length
     errordlg('The specified slip length is longer than fault length!')
     return
-elseif set_centre_hor.Value>end_slip
+elseif set_centre_hor.Value>=end_slip
     errordlg('The location of maximum slip is outside the specified rupture!')
     return
 end
     
 mid_slip=(start_slip+end_slip)/2;
 rupture_length=abs(end_slip-start_slip);
-
-slip_distribution=zeros((length(z_points(:,1))-1),(length(x_points(1,:))-1)); % generates a blank matrix for slip_distribution to be put into
 
 L=length(x_points(1,:));
 d2=grid_sizem/2;
