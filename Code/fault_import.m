@@ -185,8 +185,8 @@ function axe = uiplot(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,se
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'k')
         elseif uit.Data.plot(i) == true && uit.Data.slip_fault(i) == true
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'r','LineWidth',2)
-            xval=fault_input.X{1}(~isnan(fault_input.X{1}));
-            yval=fault_input.Y{1}(~isnan(fault_input.Y{1}));
+            xval=fault_input.X{i}(~isnan(fault_input.X{i}));
+            yval=fault_input.Y{i}(~isnan(fault_input.Y{i}));
             scatter(axe,(xval(1))/1000,(yval(1))/1000,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','w')
             scatter(axe,(xval(end))/1000,(yval(end))/1000,'Marker','o','MarkerFaceColor','w','MarkerEdgeColor','k')
         end
