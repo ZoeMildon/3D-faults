@@ -1,7 +1,6 @@
 %% This code is triggered by the import button
 clearvars settings
 tab2.Parent = tabgp;
-tab3.Parent = tabgp;
 set(imp_btn,'Enable','off')
 %fetch variables from first ui tab:
 filename = cell2mat(set_filename.Value);
@@ -127,7 +126,7 @@ axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
 set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
 
 set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size));
-set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt));
+set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
 set(tabgp,'SelectedTab',tab2);
 
 
