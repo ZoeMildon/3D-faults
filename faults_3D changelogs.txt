@@ -58,9 +58,12 @@ Version 1.7b (changes made by Manuel)
 	- settings, fault preview etc. shifted to the 2nd ui tab (now called customisation)
 - multiple bugs fixed which occurred after the recent changes of version 1.7 and 1.7b and extensive testing
 
-Version 1.7c (changes made by Manuel)
+Version 1.7c
 - rewritten code to calculate the slip-distribution for a partial fault rupture
 - minor changes to GUI
 
-
+Version 1.8
+- added 'Open in new Window'-button to the plot tab (makes figure export easier)
+- added button to select UTM zone on map
+- several minor fixes, UI changes, changes to the uihelp.m
 

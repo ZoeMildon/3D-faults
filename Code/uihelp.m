@@ -7,9 +7,9 @@ helpbox1 = uitextarea(tab1,'Position',[855 385 485 270],'Value',text,'Editable',
 helpbox2 = uitextarea(tab2,'Position',[920 470 420 180],'Value',text,'Editable','off');
 
 % '?' - buttons tab 1:
-help_general = uibutton(p1,'push','Text','?','Position',[730,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox1));
+help_general = uibutton(p1,'push','Text','?','Position',[680,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox1));
 help_imp = uibutton(p5,'push','Text','?','Position',[255,20,40,40],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_imp,event) uihelp_imp(helpbox1));
-help_utm = uibutton(p4,'push','Text','?','Position',[270,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_utm,event) uihelp_utm(helpbox1));
+help_utm = uibutton(p4,'push','Text','?','Position',[270,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_utm,event) uihelp_utm(helpbox1));
 
 % ? - buttons tab2:
 help_vardip = uibutton(opt_pnl,'push','Text','?','Position',[150,130,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_vardip,event) uihelp_vardip(helpbox2));
@@ -31,7 +31,8 @@ end
 function helpbox1 = uihelp_utm(helpbox1)
     helptext = sprintf(strcat(('UTM coordinates:\n\n'),...
         ('If faults are imported from kml or kmz files, coordinates are converted to UTM. \n'),...
-        ('Therefore please specify the utm zone and hemisphere before the import.\n')));
+        ('Therefore please specify the utm zone and hemisphere before the import.\n\n'),...
+        ('If the region of interest covers more than one UTM zone, please specify the zone that includes the majority of the study area.')));
     set(helpbox1,'Value',helptext);
 end
 function helpbox1 = uihelp_imp(helpbox1)
@@ -92,8 +93,8 @@ function helpbox2 = uihelp_map(helpbox2)
     helptext = sprintf(strcat(('Key for Overview Map\n\n'),...
         ('Black lines = fault traces to be plotted\n'),...
         ('Red line = fault that slips\n'),...
-        ('White circle = start of the fault trace that slips (i.e. 0 km)\n'),...
-        ('Black circle = end of the fault trace that slips')));
+        ('Black circle = start of the fault trace that slips (i.e. 0 km)\n'),...
+        ('White circle = end of the fault trace that slips')));
     set(helpbox2,'Value',helptext);
 end
 function helpbox2 = uihelp_coords(helpbox2)
