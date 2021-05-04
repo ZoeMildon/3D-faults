@@ -1,7 +1,7 @@
 %% Build user interface
 clear
 close all
-fig = uifigure('Name','Fault Input - 3D-Faults v.1.6','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
+fig = uifigure('Name','Fault Input - 3D-Faults v.1.8','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
 
 tabgp = uitabgroup(fig,'Position',[1 1 1354 690]);
 tab1 = uitab(tabgp,'Title','Fault Import','BackgroundColor',[.98 .98 .98]);
@@ -11,9 +11,9 @@ plt = uiaxes(tab3,'Position',[200 5 900 690],'Color',[.9 .9 .9],'Box','On');
 settings = readtable('config.txt');
 
 %% Configuration of UI tab 1
-pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v 1.6','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
+pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v. 1.8','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
 
-p1 = uipanel(pmain,'Title','General Information','Position',[10 450 810 70],'BackgroundColor',[1 1 1]);
+p1 = uipanel(pmain,'Title','General Information','Position',[10 450 710 70],'BackgroundColor',[1 1 1]);
 uilabel(p1,'Position',[10 20 130 20],'Text','Output file name:');
 %uilabel(p1,'Position',[600 20 130 20],'Text','Coulomb Grid Size:');
 set_filename = uitextarea(p1,'Position',[110 20 200 20],'Value','filename');
@@ -26,7 +26,8 @@ set_utmzone = uitextarea(p4,'Position',[150 90 30 20],'Value',num2str(settings.v
 bg1 = uibuttongroup(p4,'Position',[150 60 150 20],'BackgroundColor',[1 1 1],'BorderType','none');
 rb1 = uiradiobutton(bg1,'Position',[3 3 30 15],'Text','N');
 rb2 = uiradiobutton(bg1,'Position',[43 3 30 15],'Text','S');
-%include pick function!
+utm_btn = uibutton(p4,'push','Text','Select UTM zone on map','Position',[10, 10, 150, 20],'BackgroundColor',[.8 .8 .8],'ButtonPushedFcn',@(utm_btn,event) utm_select(rb1,rb2,set_utmzone));
+
 
 p5 = uipanel(pmain,'Title','Import fault network','Position',[350 290 370 150],'BackgroundColor',[1 1 1]);
 bg2 = uibuttongroup(p5,'Position',[70 90 220 20],'BackgroundColor',[1 1 1],'BorderType','none');
@@ -67,6 +68,9 @@ set_centre_ver = uispinner(p3,'Position',[135 100 60 20],'Step',.1,'Limits',[0 i
 uilabel(tab2,'Position',[720 600 130 20],'Text','Grid Size (km):');
 set_grid_size = uispinner(tab2,'Position',[810 600 60 20],'Step',0.5,'Limits',[0 30],'Value',settings.value(1),'ValueChangedFcn','vars');
 
+%reset button (2nd)
+reset2_btn = uibutton(tab2,'push','Text','Reset','Position',[720, 550, 120, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','FontSize',12);
+
 %custom configuration buttons
 exp_config_btn = uibutton(tab2,'push','Text','Export custom config.','Position',[720, 480, 150, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','FontSize',12,...
     'ButtonPushedFcn',@(exp_config_btn,event) export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone));
@@ -75,8 +79,9 @@ imp_config_btn = uibutton(tab2,'push','Text','Load custom config.','Position',[7
 
 %table
 uit = uitable(tab2);
-uit.Position = [10 10 650, 410];
+uit.Position = [10 10 690, 410];
 uit.ColumnEditable = [false true true true true true true true];
+set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','length (km)','depth (km)','slip fault','plot'});
 %text label
 lbl = uilabel(tab2,'Position',[10 420 700 20],'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
 lbltext = sprintf('Tick all faults to be plotted. Choose one slip fault (rupture plane).');
@@ -97,23 +102,16 @@ maxy_txt = uitextarea(coord_pnl,'Position',[60 100 50 20],'HorizontalAlignment',
 margin_txt = uitextarea(coord_pnl,'Position',[60 20 50 20],'HorizontalAlignment','right','Value','10','ValueChangedFcn','mrg = str2double(margin_txt.Value{1})/100;');
 
 %buttons on coordinate panel
-coord_btn = uibutton(coord_pnl,'push',...
-               'Text','Update Plot',...
-               'Position',[10 60 80 20],...
-               'BackgroundColor',[.8 .8 .8]);
-auto_btn = uibutton(coord_pnl,'push',...
-               'Text','Auto',...
-               'Position',[95 60 80 20],...
-               'BackgroundColor',[.8 .8 .8]);
+coord_btn = uibutton(coord_pnl,'push','Text','Update Plot','Position',[10 60 80 20],'BackgroundColor',[.8 .8 .8]);
+auto_btn = uibutton(coord_pnl,'push','Text','Auto','Position',[95 60 80 20],'BackgroundColor',[.8 .8 .8]);
 
 %Plot button
-btn = uibutton(tab2,'push',...
-               'Text','Build 3D faults',...
-               'Position',[1130, 20, 200, 100],...
-               'BackgroundColor',[.5 .5 .5],'FontWeight','bold',...
-               'ButtonPushedFcn','model_3D_faults',...
-               'FontSize',18);
-           
+btn = uibutton(tab2,'push','Text','Build 3D faults','Position',[1130, 20, 200, 100],'BackgroundColor',[.5 .5 .5],'FontWeight','bold','ButtonPushedFcn','model_3D_faults','FontSize',18);
+
+
+%% Finish building UI
+newfig_btn = uibutton(tab3,'push','Text','Open in new window','Position',[1200 20 150 30],'ButtonPushedFcn',@(newfig_btn,event) newfig(plt));
+
 tab2.Parent = []; %makes tab 2 and 3 invisible as long as nothing is imported
 tab3.Parent = [];
 citation(tab1)
@@ -153,4 +151,26 @@ function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDept
     set(set_centre_hor,'Value',custom_config.value(7));
     set(set_centre_ver,'Value',custom_config.value(8));
     set(set_utmzone,'Value',num2str(custom_config.value(9)));
+end
+function newfig(plt)
+    plot3d = figure('WindowState','maximized');
+    copyobj(plt,plot3d)
+    cla(plt)
+    tab3.Parent = [];
+end
+function [rb1,rb2,set_utmzone] = utm_select(rb1,rb2,set_utmzone)
+    zone = utmzone;
+    if double(zone(end)) - 64 < 14
+        set(rb2,'Value',true)
+    elseif double(zone(end)) - 64 >= 14
+        set(rb1,'Value',true)
+    else
+        errordlg('UTM zone cannot be assigned')
+        return
+    end
+    if length(zone) == 3
+        set(set_utmzone,'Value',zone(1:2))
+    else
+        set(set_utmzone,'Value',zone(1))
+    end
 end

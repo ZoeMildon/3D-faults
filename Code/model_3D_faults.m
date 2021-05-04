@@ -1,5 +1,8 @@
+% This script is triggered by the 'Build 3D Faults' button
 %import and define variables
 format long
+tab3.Parent = tabgp;
+vars;
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
 %rupture_depthm = rupture_depth*1000;
@@ -307,7 +310,7 @@ for i = 1:length(faults.fault_name)
             end
         end
     end
-    clearvars a amo A b c C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth i I j k l L last_point lbl lbltext
+    clearvars a amo A b c C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I j k l L last_point lbl lbltext
     clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault x x_points y y_points z z_points
     %clearvars -except tabgp tab3 plt fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
 end

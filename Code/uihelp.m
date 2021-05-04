@@ -1,15 +1,15 @@
-function [helpbox1,helpbox2,help_general,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_calclen,help_table,help_grid_size,help_config,help_coords] = uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl)
+function [helpbox1,helpbox2,help_general,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_calclen,help_table,help_grid_size,help_config,help_map,help_coords] = uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl)
 %this script only contains functions for the ? - buttons on the ui
 %set up helpbox:
-text = sprintf('\n\t\t\t\t\t\t3D - Faults v 1.6');
+text = sprintf('\n\t\t\t\t\t\t3D - Faults v 1.8');
 
 helpbox1 = uitextarea(tab1,'Position',[855 385 485 270],'Value',text,'Editable','off');
 helpbox2 = uitextarea(tab2,'Position',[920 470 420 180],'Value',text,'Editable','off');
 
 % '?' - buttons tab 1:
-help_general = uibutton(p1,'push','Text','?','Position',[730,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox1));
+help_general = uibutton(p1,'push','Text','?','Position',[680,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox1));
 help_imp = uibutton(p5,'push','Text','?','Position',[255,20,40,40],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_imp,event) uihelp_imp(helpbox1));
-help_utm = uibutton(p4,'push','Text','?','Position',[270,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_utm,event) uihelp_utm(helpbox1));
+help_utm = uibutton(p4,'push','Text','?','Position',[270,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_utm,event) uihelp_utm(helpbox1));
 
 % ? - buttons tab2:
 help_vardip = uibutton(opt_pnl,'push','Text','?','Position',[150,130,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_vardip,event) uihelp_vardip(helpbox2));
@@ -19,6 +19,7 @@ help_slipdist = uibutton(p2,'push','Text','?','Position',[240,10,20,20],'Backgro
 help_max_slip = uibutton(p3,'push','Text','?','Position',[200,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox2));
 help_grid_size = uibutton(tab2,'push','Text','?','Position',[880,600,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_grid_size,event) uihelp_grid_size(helpbox2));
 help_config = uibutton(tab2,'push','Text','?','Position',[880,480,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_config,event) uihelp_config(helpbox2));
+help_map = uibutton(tab2,'push','Text','?','Position',[1085,395,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_map,event) uihelp_map(helpbox2));
 help_coords = uibutton(coord_pnl,'push','Text','?','Position',[160,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_coords,event) uihelp_coords(helpbox2));
 
 
@@ -30,7 +31,8 @@ end
 function helpbox1 = uihelp_utm(helpbox1)
     helptext = sprintf(strcat(('UTM coordinates:\n\n'),...
         ('If faults are imported from kml or kmz files, coordinates are converted to UTM. \n'),...
-        ('Therefore please specify the utm zone and hemisphere before the import.\n')));
+        ('Therefore please specify the utm zone and hemisphere before the import.\n\n'),...
+        ('If the region of interest covers more than one UTM zone, please specify the zone that includes the majority of the study area.')));
     set(helpbox1,'Value',helptext);
 end
 function helpbox1 = uihelp_imp(helpbox1)
@@ -85,6 +87,14 @@ function helpbox2 = uihelp_config(helpbox2)
     helptext = sprintf(strcat(('Custom configuration:\n\n'),...
         ('Export the current settings as custom configuration by pressing "Export custom config."\n'),...
         ('The custom configuration can be loaded by clicking "Load custom config." even after the program was closed.')));
+    set(helpbox2,'Value',helptext);
+end
+function helpbox2 = uihelp_map(helpbox2)
+    helptext = sprintf(strcat(('Key for Overview Map\n\n'),...
+        ('Black lines = fault traces to be plotted\n'),...
+        ('Red line = fault that slips\n'),...
+        ('Black circle = start of the fault trace that slips (i.e. 0 km)\n'),...
+        ('White circle = end of the fault trace that slips')));
     set(helpbox2,'Value',helptext);
 end
 function helpbox2 = uihelp_coords(helpbox2)
