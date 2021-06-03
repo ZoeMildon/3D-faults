@@ -15,6 +15,7 @@ if end_slip>fault_length
     return
 elseif set_centre_hor.Value>=end_slip
     errordlg('The location of maximum slip is outside the specified rupture!')
+    set(tabgp,'SelectedTab',tab2);
     return
 end
     

@@ -110,7 +110,7 @@ t.plot(row) = false;
 
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,50,50,80,80,80,67,45});
+set(uit,'Data',t,'ColumnWidth',{215,50,50,73,80,78,75,45});
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
