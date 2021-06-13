@@ -67,3 +67,8 @@ Version 1.8
 - added button to select UTM zone on map
 - several minor fixes, UI changes, changes to the uihelp.m
 
+Version 1.8b
+- source fault is now plotted first and always appears on top of the .inr output
+- magnitude is displayed in plot tab in UI
+- some changes to help box texts
+

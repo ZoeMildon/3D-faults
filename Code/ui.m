@@ -81,7 +81,7 @@ imp_config_btn = uibutton(tab2,'push','Text','Load custom config.','Position',[7
 uit = uitable(tab2);
 uit.Position = [10 10 690, 410];
 uit.ColumnEditable = [false true true true true true true true];
-set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','length (km)','depth (km)','slip fault','plot'});
+set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','length (km)','depth (km)','source ft.','plot'});
 %text label
 lbl = uilabel(tab2,'Position',[10 420 700 20],'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
 lbltext = sprintf('Tick all faults to be plotted. Choose one slip fault (rupture plane).');

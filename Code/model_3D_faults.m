@@ -69,9 +69,11 @@ if rupture_depth > seismo_depthm || centre_vertical > seismo_depthm
     return
 end
 
-
-slip_idx = faults.slip_fault == 1;
+slip_idx = find(faults.slip_fault == 1);
 fault_slip_name = faults.fault_name{slip_idx};  %extract the name of the fault that slips
+source = faults(slip_idx,:);                    %rearranging the table so that source fault is on top
+faults = [source;faults];
+faults(slip_idx+1,:) = [];
 
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
@@ -141,7 +143,7 @@ for i = 1:length(faults.fault_name)
         case 'constant'
             utm_z(:,length(utm_x))=0; % Assuming all faults come to the surface (0m depth)
 
-            % extracting the relevant depth to use. If length<15km then aspect ratio=1
+            % extracting the relevant depth to use. If length < seismo_depth then aspect ratio=1
             if isempty(faults.depth{i}) == true
                 if ismissing(faults.len(i)) == true
                     fault_down_dip_length = -seismo_depthm/sind(constant_dip);
