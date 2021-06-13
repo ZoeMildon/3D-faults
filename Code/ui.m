@@ -44,6 +44,7 @@ opt_pnl = uipanel(tab2,'Title','Data options','Position',[10 470 180 180],'Backg
 vardip = uitable(fig,'Visible','off');  %this table is just for storing variable dip values but is not shown in ui
 dip_btn = uibutton(opt_pnl,'push','Text','Import variable dip','Position',[10, 130, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 len_btn = uibutton(opt_pnl,'push','Text','Calculate length','Position',[10, 100, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
+depth_btn = uibutton(opt_pnl,'push','Text','Calculate depth','Position',[10, 70, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 exp_btn = uibutton(opt_pnl,'push','Text','Export table','Position',[10, 20, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 
 %Slip distribution panel
@@ -81,7 +82,7 @@ imp_config_btn = uibutton(tab2,'push','Text','Load custom config.','Position',[7
 uit = uitable(tab2);
 uit.Position = [10 10 690, 410];
 uit.ColumnEditable = [false true true true true true true true];
-set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','length (km)','depth (km)','source ft.','plot'});
+set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','length (km)','depth (km)','source fault','plot'});
 %text label
 lbl = uilabel(tab2,'Position',[10 420 700 20],'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
 lbltext = sprintf('Tick all faults to be plotted. Choose one slip fault (rupture plane).');

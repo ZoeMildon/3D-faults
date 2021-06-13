@@ -73,7 +73,7 @@ for i = 1:length(fault_input.Y)
    end
 end
 %check if variables in input files have correct names
-variables = {'fault_name','dip','rake','dip_dir','len'};  %variable names of the relevant fields
+variables = {'fault_name','dip','rake','dip_dir','down_dip_len'};  %variable names of the relevant fields
 for i = 1:length(variables)
     while any(strcmp(variables{i},fault_input.Properties.VariableNames)) == false
         msg = sprintf('Enter the field name containing %s',variables{i});
@@ -93,7 +93,7 @@ end
 if isnumeric(fault_input.dip_dir) == false
     fault_input.dip_dir = str2double(fault_input.dip_dir);
 end
-if isnumeric(fault_input.len) == false
+if isnumeric(fault_input.down_dip_len) == false
     fault_input.len = str2double(fault_input.len);
 end
 for i = 1:length(fault_input.fault_name) %replace space by underscore in fault names
@@ -101,8 +101,19 @@ for i = 1:length(fault_input.fault_name) %replace space by underscore in fault n
 end
 
 %build the table t to be plotted in the uitable (other data remains stored in fault_input)
-t = fault_input(:,variables);
-t.depth = cell(1,length(t.fault_name))';
+% t = fault_input(:,variables);
+% t.depth = cell(1,length(t.fault_name))';
+% t.slip_fault = false(1,length(t.fault_name))';
+% t.plot = true(1,length(t.fault_name))';
+% [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
+% t.plot(row) = false;
+
+%build the table t to be plotted in the uitable (other data remains stored
+%in fault_input) - Major changes by ZKM 13/06/21
+t = fault_input(:,variables(1:4)); % only drawing a table with fault name, dip_rake, dip direction
+t.len = cell(1,length(t.fault_name))'; % adding length column
+%calc_length(fault_input,uit);
+t.depth = cell(1,length(t.fault_name))'; % adding depth column - NEED to write a script to do this!!
 t.slip_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
 [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
@@ -116,6 +127,7 @@ addStyle(uit,s,'row',row);
 
 set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
 set(len_btn,'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
+set(depth_btn,'ButtonPushedFcn', @(depth_btn,event) calc_depth(fault_input,uit)); %% new line!!!
 set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
 set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt));
 
@@ -208,6 +220,23 @@ function uit = calc_length(fault_input,uit)
     uit.Data.len = round(uit.Data.len);
     close(f)
 end
+%function to calculate the fault depth to maintain aspect ratio for short
+%faults
+function uit = calc_depth(fault_input,uit)
+    f = waitbar(0,'Please wait for the calculation of fault depths...');
+    uit.Data.depth = zeros(length(uit.Data.depth),1);
+    for i = 1:length(fault_input.X)
+        if isnan(fault_input.down_dip_len(i))==1
+            uit.Data.depth(i) = 15; %set_seismoDepth.Value - I NEED MANUEL's HELP
+        else
+            depth = fault_input.down_dip_len(i) * sind(fault_input.dip{i});
+            uit.Data.depth(i) = depth;
+        end
+        waitbar(i/length(fault_input.X));
+    end
+    close(f)
+end
+
 %function for table export to .csv
 function table_export(uit)
     output_file = inputdlg('Output file name:');

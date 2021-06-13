@@ -14,6 +14,7 @@ help_utm = uibutton(p4,'push','Text','?','Position',[270,10,20,20],'BackgroundCo
 % ? - buttons tab2:
 help_vardip = uibutton(opt_pnl,'push','Text','?','Position',[150,130,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_vardip,event) uihelp_vardip(helpbox2));
 help_calclen = uibutton(opt_pnl,'push','Text','?','Position',[150,100,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_calclen,event) uihelp_calclen(helpbox2));
+help_calcdepth = uibutton(opt_pnl,'push','Text','?','Position',[150,70,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_calcdepth,event) uihelp_calcdepth(helpbox2));
 help_table = uibutton(opt_pnl,'push','Text','?','Position',[150,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_table,event) uihelp_table(helpbox2));
 help_slipdist = uibutton(p2,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_slipdist,event) uihelp_slipdist(helpbox2));
 help_max_slip = uibutton(p3,'push','Text','?','Position',[200,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox2));
@@ -54,7 +55,11 @@ function helpbox2 = uihelp_vardip(helpbox2)
     set(helpbox2,'Value',helptext);
 end
 function helpbox2 = uihelp_calclen(helpbox2)
-    helptext = sprintf(strcat(('Calculate length along the fault trace. Overwrites the entire length column of the table.')));
+    helptext = sprintf(strcat(('Calculates the length along the fault trace (i.e. not tip-to-tip length). \n\nOverwrites the entire length column of the table.')));
+    set(helpbox2,'Value',helptext);
+end
+function helpbox2 = uihelp_calcdepth(helpbox2)
+    helptext = sprintf(strcat(('Calculates the vertical depth extent of the fault, assuming short faults maintain 1:1 aspect ratio (i.e. down dip length = fault trace length). \n\nOverwrites the entire depth column of the table.')));
     set(helpbox2,'Value',helptext);
 end
 function helpbox2 = uihelp_table(helpbox2)
