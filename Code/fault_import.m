@@ -208,6 +208,23 @@ function t = calc_length(fault_input,t)
     t.len = round(t.len);
     close(f)
 end
+%function to calculate the fault depth to maintain aspect ratio for short
+%faults
+function uit = calc_depth(fault_input,uit)
+    f = waitbar(0,'Please wait for the calculation of fault depths...');
+    uit.Data.depth = zeros(length(uit.Data.depth),1);
+    for i = 1:length(fault_input.X)
+        if isnan(fault_input.down_dip_len(i))==1
+            uit.Data.depth(i) = 15; %set_seismoDepth.Value - I NEED MANUEL's HELP
+        else
+            depth = fault_input.down_dip_len(i) * sind(fault_input.dip{i});
+            uit.Data.depth(i) = depth;
+        end
+        waitbar(i/length(fault_input.X));
+    end
+    close(f)
+end
+
 %function for table export to .csv
 function table_export(uit)
     output_file = inputdlg('Output file name:');
