@@ -72,3 +72,13 @@ Version 1.8b
 - magnitude is displayed in plot tab in UI
 - some changes to help box texts
 
+Version 1.9
+- removed 'calculate length' button
+- length is now always calculated from input coordinates, 'len' column in input files is no longer used
+- depth may now be (optionally) specified in input files
+- changed the use of the depth for down-dip length claculation:
+	- if depth is given, it is used to calculated down-dip length of the fault from the dp angle
+	- if depth is not given, the seismogenic depth is used instead
+	- if the fault is shorter than the seismogenic depth, a 'real' (down dip) aspect ratio of 1 is applied
+- minor changes in the UI, some variables and code comments
+

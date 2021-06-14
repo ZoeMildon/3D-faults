@@ -66,7 +66,7 @@ elseif rb_kmz.Value == true %kmz file
 end
 figure(fig);
 %% check data and configure input table
-%check for southern hemishphere coordinates and add 'false northing' of 10M
+%check for southern hemishphere coordinates and add 'false northng' of 10M
 for i = 1:length(fault_input.Y)
    if any(fault_input.Y{i} < 0) == true
        fault_input.Y{i} = fault_input.Y{i}+10000000;
@@ -75,10 +75,6 @@ end
 %check if variables in input files have correct names
 variables = {'fault_name','dip','rake','dip_dir','depth'};  %variable names of the relevant fields
 for i = 1:length(variables)
-    %check if input contains depth column. If not, add empty column:
-    if any(strcmp('depth',fault_input.Properties.VariableNames)) == false
-        fault_input.depth = NaN(length(fault_input.fault_name),1);
-    end
     while any(strcmp(variables{i},fault_input.Properties.VariableNames)) == false
         msg = sprintf('Enter the field name containing %s',variables{i});
         var1 = inputdlg(msg,'Var not found');
@@ -112,7 +108,7 @@ t.plot(row) = false;
 
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,50,50,73,78,80,75,45});
+set(uit,'Data',t,'ColumnWidth',{215,50,50,73,80,78,75,45});
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 

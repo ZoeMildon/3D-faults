@@ -59,7 +59,7 @@ for j = 1:length(faults.dip)
         return
     end
 end
-if nnz(uit.Data.source_fault) ~= 1    %checks if exactly 1 fault is selected as source fault
+if nnz(uit.Data.slip_fault) ~= 1    %checks if exactly 1 fault is selected as source fault
     errordlg('No fault or more than one faults are assigned as slip faults!')
     return
 end
@@ -69,11 +69,11 @@ if rupture_depth > seismo_depthm || centre_vertical > seismo_depthm
     return
 end
 
-source_idx = find(faults.source_fault == 1);
-fault_slip_name = faults.fault_name{source_idx};  %extract the name of the fault that slips
-source = faults(source_idx,:);                    %rearranging the table so that source fault is on top
+slip_idx = find(faults.slip_fault == 1);
+fault_slip_name = faults.fault_name{slip_idx};  %extract the name of the fault that slips
+source = faults(slip_idx,:);                    %rearranging the table so that source fault is on top
 faults = [source;faults];
-faults(source_idx+1,:) = [];
+faults(slip_idx+1,:) = [];
 
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
@@ -142,15 +142,21 @@ for i = 1:length(faults.fault_name)
     switch geometry
         case 'constant'
             utm_z(:,length(utm_x))=0; % Assuming all faults come to the surface (0m depth)
-            % calculate the fault down dip length:
-            if isempty(faults.depth(i)) == true || isnan(faults.depth(i)) == true %no depth specified --> use seismogenic depth
-                if faults.len(i) > seismo_depth
+            % calculated the fault down dip length:
+            % if depth is specified, calculate from depth and dip angle. If
+            % not, use seismo_depth instead.
+            %if length < seismo_depth then aspect ratio = 1
+            
+            if isempty(faults.depth{i}) == true || isnan(faults.depth{i}) == true %no depth specified --> use seismogenic depth
+                if ismissing(faults.len(i)) == true
+                    fault_down_dip_length = -seismo_depthm/sind(constant_dip);
+                elseif faults.len(i) > seismo_depth
                     fault_down_dip_length = -seismo_depthm/sind(constant_dip);
                 elseif faults.len(i) <= seismo_depth
-                    fault_down_dip_length = (faults.len(i)*-1000)/sind(constant_dip); %short faults --> aspect ratio 1
+                    fault_down_dip_length = faults.len(i)*-1000;
                 end
             else
-                fault_down_dip_length = faults.depth(i)*-1000/sind(constant_dip);
+                fault_down_dip_length = faults.depth{i}*-1000;
             end
 
             % calculating the grid size to use to depth (to ensure a whole number
@@ -309,7 +315,7 @@ for i = 1:length(faults.fault_name)
             end
         end
     end
-    clearvars a amo A b C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I j k l L last_point lbl lbltext
+    clearvars a amo A b c C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I j k l L last_point lbl lbltext
     clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault x x_points y y_points z z_points
     %clearvars -except tabgp tab3 plt fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
 end

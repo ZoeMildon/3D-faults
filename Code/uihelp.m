@@ -1,7 +1,7 @@
-function [helpbox1,helpbox2,help_general,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_calclen,help_table,help_grid_size,help_config,help_map,help_coords] = uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl)
+function [helpbox1,helpbox2,help_general,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_table,help_grid_size,help_config,help_map,help_coords] = uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl)
 %this script only contains functions for the ? - buttons on the ui
 %set up helpbox:
-text = sprintf('\n\t\t\t\t\t\t3D - Faults v 1.8');
+text = sprintf('\n\t\t\t\t\t\t3D - Faults v 1.9');
 
 helpbox1 = uitextarea(tab1,'Position',[855 385 485 270],'Value',text,'Editable','off');
 helpbox2 = uitextarea(tab2,'Position',[920 470 420 180],'Value',text,'Editable','off');
@@ -13,7 +13,6 @@ help_utm = uibutton(p4,'push','Text','?','Position',[270,10,20,20],'BackgroundCo
 
 % ? - buttons tab2:
 help_vardip = uibutton(opt_pnl,'push','Text','?','Position',[150,130,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_vardip,event) uihelp_vardip(helpbox2));
-help_calclen = uibutton(opt_pnl,'push','Text','?','Position',[150,100,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_calclen,event) uihelp_calclen(helpbox2));
 help_table = uibutton(opt_pnl,'push','Text','?','Position',[150,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_table,event) uihelp_table(helpbox2));
 help_slipdist = uibutton(p2,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_slipdist,event) uihelp_slipdist(helpbox2));
 help_max_slip = uibutton(p3,'push','Text','?','Position',[200,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox2));
@@ -21,7 +20,6 @@ help_grid_size = uibutton(tab2,'push','Text','?','Position',[880,600,20,20],'Bac
 help_config = uibutton(tab2,'push','Text','?','Position',[880,480,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_config,event) uihelp_config(helpbox2));
 help_map = uibutton(tab2,'push','Text','?','Position',[1085,395,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_map,event) uihelp_map(helpbox2));
 help_coords = uibutton(coord_pnl,'push','Text','?','Position',[160,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_coords,event) uihelp_coords(helpbox2));
-
 
 %% functions
 function helpbox1 = uihelp_general(helpbox1)
@@ -51,10 +49,6 @@ function helpbox2 = uihelp_vardip(helpbox2)
         ('To model variable dip faults, dip/depth profiles must be imported. Variable dip profiles for all faults are stored in a single table.\n'),...
         ('Make sure that the table is formatted in the same way as the given example (variable_dip_example.xlsx).\n'),...
         ('For each fault up to 10 dip/depth pairs can be specified. Faults in the table are recognised by their names, so make sure that these are spelled correctly.')));
-    set(helpbox2,'Value',helptext);
-end
-function helpbox2 = uihelp_calclen(helpbox2)
-    helptext = sprintf(strcat(('Calculate length along the fault trace. Overwrites the entire length column of the table.')));
     set(helpbox2,'Value',helptext);
 end
 function helpbox2 = uihelp_table(helpbox2)

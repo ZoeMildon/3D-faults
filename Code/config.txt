@@ -7,4 +7,4 @@ seismo_depth,15
 rupture_depth,NaN
 centre_horizontal,0.1
 centre_vertical,NaN
-utmzone,32
+utmzone,33
