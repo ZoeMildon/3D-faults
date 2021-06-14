@@ -1,7 +1,7 @@
 %% Build user interface
 clear
 close all
-fig = uifigure('Name','Fault Input - 3D-Faults v.1.8','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
+fig = uifigure('Name','Fault Input - 3D-Faults v.1.9','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
 
 tabgp = uitabgroup(fig,'Position',[1 1 1354 690]);
 tab1 = uitab(tabgp,'Title','Fault Import','BackgroundColor',[.98 .98 .98]);
@@ -11,14 +11,14 @@ plt = uiaxes(tab3,'Position',[200 5 900 690],'Color',[.9 .9 .9],'Box','On');
 settings = readtable('config.txt');
 
 %% Configuration of UI tab 1
-pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v. 1.8','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
+pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v. 1.9','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
 
+% general info panel
 p1 = uipanel(pmain,'Title','General Information','Position',[10 450 710 70],'BackgroundColor',[1 1 1]);
 uilabel(p1,'Position',[10 20 130 20],'Text','Output file name:');
-%uilabel(p1,'Position',[600 20 130 20],'Text','Coulomb Grid Size:');
 set_filename = uitextarea(p1,'Position',[110 20 200 20],'Value','filename');
-%set_coul_grid_size = uispinner(p1,'Position',[710 20 60 20],'Step',0.5,'Limits',[0 inf],'Value',settings.value(2));
 
+% UTM zone/hemisphere panel
 p4 = uipanel(pmain,'Title','UTM zone (only for kml/kmz import)','Position',[10 290 320 150],'BackgroundColor',[1 1 1]);
 uilabel(p4,'Position',[10 90 130 20],'Text','UTM zone:');
 uilabel(p4,'Position',[10 60 130 20],'Text','UTM hemisphere:');
@@ -28,7 +28,7 @@ rb1 = uiradiobutton(bg1,'Position',[3 3 30 15],'Text','N');
 rb2 = uiradiobutton(bg1,'Position',[43 3 30 15],'Text','S');
 utm_btn = uibutton(p4,'push','Text','Select UTM zone on map','Position',[10, 10, 150, 20],'BackgroundColor',[.8 .8 .8],'ButtonPushedFcn',@(utm_btn,event) utm_select(rb1,rb2,set_utmzone));
 
-
+%import button panel
 p5 = uipanel(pmain,'Title','Import fault network','Position',[350 290 370 150],'BackgroundColor',[1 1 1]);
 bg2 = uibuttongroup(p5,'Position',[70 90 220 20],'BackgroundColor',[1 1 1],'BorderType','none');
 rb_shp = uiradiobutton(bg2,'Position',[3 3 50 15],'Text','.shp');
@@ -43,8 +43,6 @@ reset_btn = uibutton(pmain,'push','Text','Reset','Position',[740, 300, 60, 30],'
 opt_pnl = uipanel(tab2,'Title','Data options','Position',[10 470 180 180],'BackgroundColor',[1 1 1]);
 vardip = uitable(fig,'Visible','off');  %this table is just for storing variable dip values but is not shown in ui
 dip_btn = uibutton(opt_pnl,'push','Text','Import variable dip','Position',[10, 130, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
-len_btn = uibutton(opt_pnl,'push','Text','Calculate length','Position',[10, 100, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
-depth_btn = uibutton(opt_pnl,'push','Text','Calculate depth','Position',[10, 70, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 exp_btn = uibutton(opt_pnl,'push','Text','Export table','Position',[10, 20, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 
 %Slip distribution panel
@@ -82,10 +80,11 @@ imp_config_btn = uibutton(tab2,'push','Text','Load custom config.','Position',[7
 uit = uitable(tab2);
 uit.Position = [10 10 690, 410];
 uit.ColumnEditable = [false true true true true true true true];
-set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','length (km)','depth (km)','source fault','plot'});
+set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','depth (km)','length (km)','source ft.','plot'});
+
 %text label
 lbl = uilabel(tab2,'Position',[10 420 700 20],'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
-lbltext = sprintf('Tick all faults to be plotted. Choose one slip fault (rupture plane).');
+lbltext = sprintf('Tick all faults to be plotted. Choose one source fault.');
 lbl.Text = lbltext;
 
 %coordinates panel:
@@ -95,7 +94,6 @@ uilabel(coord_pnl,'Position',[10 160 130 20],'Text','max_x       _____   000');
 uilabel(coord_pnl,'Position',[10 130 130 20],'Text','min_y       _____    000');
 uilabel(coord_pnl,'Position',[10 100 130 20],'Text','max_y       _____   000');
 uilabel(coord_pnl,'Position',[10 20 130 20],'Text','margin    _____     %');
-
 minx_txt = uitextarea(coord_pnl,'Position',[60 190 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_x = str2double(minx_txt.Value{1});');
 maxx_txt = uitextarea(coord_pnl,'Position',[60 160 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_x = str2double(maxx_txt.Value{1});');
 miny_txt = uitextarea(coord_pnl,'Position',[60 130 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_y = str2double(miny_txt.Value{1});');
@@ -109,7 +107,6 @@ auto_btn = uibutton(coord_pnl,'push','Text','Auto','Position',[95 60 80 20],'Bac
 %Plot button
 btn = uibutton(tab2,'push','Text','Build 3D faults','Position',[1130, 20, 200, 100],'BackgroundColor',[.5 .5 .5],'FontWeight','bold','ButtonPushedFcn','model_3D_faults','FontSize',18);
 
-
 %% Finish building UI
 newfig_btn = uibutton(tab3,'push','Text','Open in new window','Position',[1200 20 150 30],'ButtonPushedFcn',@(newfig_btn,event) newfig(plt));
 
@@ -119,6 +116,7 @@ citation(tab1)
 set(fig,'HandleVisibility', 'on')
 uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl);   %set up help box
 %% ------------ function space --------------
+% paper citation (first tab)
 function citation(tab1)
     citation = sprintf(strcat(('This code is free to use for research purposes, please cite the following paper: \n'),...
     ('Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016) '),...
@@ -127,11 +125,10 @@ function citation(tab1)
     ('and github.com/ZoeMildon/3D-faults')));
     uitextarea(tab1,'Position',[10 20 830 70],'Value',citation,'Editable','off');
 end
-
+% export custom config button
 function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone)
     custom_config = readtable('config.txt');
     custom_config.value(1) = set_grid_size.Value;
-    %custom_config.value(2) = set_coul_grid_size.Value;
     custom_config.value(3) = set_surfSlip.Value;
     custom_config.value(4) = set_maxSlip.Value;
     custom_config.value(5) = set_seismoDepth.Value;
@@ -141,10 +138,10 @@ function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoD
     custom_config.value(9) = str2double(cell2mat(set_utmzone.Value));
     writetable(custom_config,'Code/custom_config.txt');
 end
+% load custom configuration button
 function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone] = import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone)
     custom_config = readtable('custom_config.txt');
     set(set_grid_size,'Value',custom_config.value(1));
-    %set(set_coul_grid_size,'Value',custom_config.value(2));
     set(set_surfSlip,'Value',custom_config.value(3));
     set(set_maxSlip,'Value',custom_config.value(4));
     set(set_seismoDepth,'Value',custom_config.value(5));
@@ -153,12 +150,14 @@ function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDept
     set(set_centre_ver,'Value',custom_config.value(8));
     set(set_utmzone,'Value',num2str(custom_config.value(9)));
 end
+% open plot in external window:
 function newfig(plt)
     plot3d = figure('WindowState','maximized');
     copyobj(plt,plot3d)
     cla(plt)
     tab3.Parent = [];
 end
+% convert output from 'utmzone' function to a useful format:
 function [rb1,rb2,set_utmzone] = utm_select(rb1,rb2,set_utmzone)
     zone = utmzone;
     if double(zone(end)) - 64 < 14

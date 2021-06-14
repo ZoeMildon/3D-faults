@@ -9,7 +9,7 @@ Code is free to use for research purposes, please cite the following paper:
 Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016), Evaluating models of Coulomb stress transfer- is variable fault geometry important?, Geophys. Res. Lett., 43, doi:10.1002/2016GL071128.
 
 UPDATED VERSION:
-Version 1.7b -  04/2021
+Version 1.9 -  06/2021
 
 # INPUTS:
 Three input formats are supported:
@@ -18,7 +18,7 @@ Three input formats are supported:
 3) A kmz-file containing the fault traces and a table containing the fault properties
 
 If kml or kmz import is chosen please specify the UTM zone and hemisphere in the user interface.
-For shp-import, the file should also be projected in UTM coordinates.
+For shp-import, the file should be projected in UTM coordinates.
 
 Required properties (either in the table or as attributes in the shape file) are:
 
@@ -26,27 +26,26 @@ fault_name - for kml import the name of the kml file must be the same as the fau
 dip - dip angle
 rake
 dip_dir - dip direction (projection direction)
-len - length of the fault (km)
 
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
-A depth column may be optionally given. In the 3D-plot, faults will reach to that specified depth (km). Length may be empty and can be calculating in the user interface.
+A depth column may be optionally given. In the 3D-plot, faults will reach to that specified depth (km).
 
 Variable dip:
 
 To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx).
-The table can be imported via the 'import variable dip' button on the 'Import tab', fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
+The table can be imported via the 'import variable dip' button on the 'Customisation' tab, fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
 # RUNNING THE CODE
-In MATLAB, navigate to the 'faults_3D_v1.7' folder (or similarly named). Execute the script by entering 'faults_3D' in the command line or open the faults_3D script and press F5.
+In MATLAB, navigate to the 'faults_3D_v1.9' folder (or similarly named). Execute the script by entering 'faults_3D' in the command line or open the faults_3D script and press F5.
 
 # BUILDING SLIP DISTRIBUTIONS
-The code will build simple bulls eye slip distributions according to four different options (which are made as selections when the code is running).
+The code will build simple bulls eye slip distributions according to two different options (which are made as selections when the code is running).
 The down-dip extent of the rupture can be controlled by changing the 'rupture_depth' variable.
-For all options, the default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed by altering the 'centre_vertical' and 'centre_horizontal' variables.
+The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed by altering the 'centre_vertical' and 'centre_horizontal' variables.
 1. The whole fault slips. This assumes the slip is zero at the base, zero at the edges and a specified proportion of maximum slip reaches the surface. 
-2. Only the central section of the fault slips, a length of rupture will be requested by the code. 
-3. Only the north or west end of the fault slips, a length of rupture will be requested by the code. 
-4. Only the south or east end of the fault slips, a length of rupture will be requested by the code. 
+2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the 
+   fault is arbitrary, it is indicated with a black circle on the overview map. Make sure that the specified horizontal center of the slip distribution is within
+   the specified segment.
 
 Alternatively, slip distributions can be manually assigned to each element in the Coulomb input file created from running this code.
 

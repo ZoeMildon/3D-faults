@@ -66,15 +66,19 @@ elseif rb_kmz.Value == true %kmz file
 end
 figure(fig);
 %% check data and configure input table
-%check for southern hemishphere coordinates and add 'false northng' of 10M
+%check for southern hemishphere coordinates and add 'false northing' of 10M
 for i = 1:length(fault_input.Y)
    if any(fault_input.Y{i} < 0) == true
        fault_input.Y{i} = fault_input.Y{i}+10000000;
    end
 end
 %check if variables in input files have correct names
-variables = {'fault_name','dip','rake','dip_dir','down_dip_len'};  %variable names of the relevant fields
+variables = {'fault_name','dip','rake','dip_dir','depth'};  %variable names of the relevant fields
 for i = 1:length(variables)
+    %check if input contains depth column. If not, add empty column:
+    if any(strcmp('depth',fault_input.Properties.VariableNames)) == false
+        fault_input.depth = NaN(length(fault_input.fault_name),1);
+    end
     while any(strcmp(variables{i},fault_input.Properties.VariableNames)) == false
         msg = sprintf('Enter the field name containing %s',variables{i});
         var1 = inputdlg(msg,'Var not found');
@@ -93,41 +97,26 @@ end
 if isnumeric(fault_input.dip_dir) == false
     fault_input.dip_dir = str2double(fault_input.dip_dir);
 end
-if isnumeric(fault_input.down_dip_len) == false
-    fault_input.len = str2double(fault_input.len);
-end
 for i = 1:length(fault_input.fault_name) %replace space by underscore in fault names
     fault_input.fault_name{i} = strrep(fault_input.fault_name{i},' ','_');
 end
 
 %build the table t to be plotted in the uitable (other data remains stored in fault_input)
-% t = fault_input(:,variables);
-% t.depth = cell(1,length(t.fault_name))';
-% t.slip_fault = false(1,length(t.fault_name))';
-% t.plot = true(1,length(t.fault_name))';
-% [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
-% t.plot(row) = false;
-
-%build the table t to be plotted in the uitable (other data remains stored
-%in fault_input) - Major changes by ZKM 13/06/21
-t = fault_input(:,variables(1:4)); % only drawing a table with fault name, dip_rake, dip direction
-t.len = cell(1,length(t.fault_name))'; % adding length column
-%calc_length(fault_input,uit);
-t.depth = cell(1,length(t.fault_name))'; % adding depth column - NEED to write a script to do this!!
-t.slip_fault = false(1,length(t.fault_name))';
+t = fault_input(:,variables);
+t.len = zeros(length(t.fault_name),1);
+t.source_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
+t = calc_length(fault_input,t);
 [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
 t.plot(row) = false;
 
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,50,50,73,80,78,75,45});
+set(uit,'Data',t,'ColumnWidth',{215,50,50,73,78,80,75,45});
 s = uistyle('BackgroundColor','[.95 .5 .3]');
 addStyle(uit,s,'row',row);
 
 set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
-set(len_btn,'ButtonPushedFcn', @(len_btn,event) calc_length(fault_input,uit));
-set(depth_btn,'ButtonPushedFcn', @(depth_btn,event) calc_depth(fault_input,uit)); %% new line!!!
 set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
 set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt));
 
@@ -167,7 +156,7 @@ end
 %function that plots the map and automatically sets the vertical and horizontal centre
 function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
     %set the horizontal spinner to faultlength/2 and the vertical spinner to depth/2
-    idx = find(uit.Data.slip_fault);
+    idx = find(uit.Data.source_fault);
     if nnz(idx) == 1
         len = uit.Data.len(idx)/2;
         if isnan(len) == true
@@ -175,8 +164,8 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
         else
             set(set_centre_hor,'Value',len)
         end
-        if isempty(uit.Data.depth{idx}) == false && isnan(uit.Data.depth{idx}) == false
-            dep = uit.Data.depth{idx}/2;
+        if isempty(uit.Data.depth(idx)) == false && isnan(uit.Data.depth(idx)) == false
+            dep = uit.Data.depth(idx)/2;
             set(set_centre_ver,'Value',dep)
         end
     end
@@ -193,9 +182,9 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
     xlabel(axe,'UTM x')
     ylabel(axe,'UTM y')
     for i = 1:length(fault_input.X)
-        if uit.Data.plot(i) == true && uit.Data.slip_fault(i) == false
+        if uit.Data.plot(i) == true && uit.Data.source_fault(i) == false
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'k')
-        elseif uit.Data.plot(i) == true && uit.Data.slip_fault(i) == true
+        elseif uit.Data.plot(i) == true && uit.Data.source_fault(i) == true
             plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'r','LineWidth',2)
             xval=fault_input.X{i}(~isnan(fault_input.X{i}));
             yval=fault_input.Y{i}(~isnan(fault_input.Y{i}));
@@ -205,19 +194,18 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
     end
 end
 %function to calculate fault length from X and Y data
-function uit = calc_length(fault_input,uit)
-    f = waitbar(0,'Please wait for the calculation of fault lengths...');
-    uit.Data.len = zeros(length(uit.Data.len),1);
+function t = calc_length(fault_input,t)
+    f = waitbar(0,'Importing fault network...');
     for i = 1:length(fault_input.X)
         fault_input.X{i}(ismissing(fault_input.X{i})) = [];
         fault_input.Y{i}(ismissing(fault_input.Y{i})) = [];
         for j = 1:length(fault_input.X{i})-1
             dist = sqrt((fault_input.X{i}(j)-fault_input.X{i}(j+1))^2 + (fault_input.Y{i}(j)-fault_input.Y{i}(j+1))^2)/1000;
-            uit.Data.len(i) = uit.Data.len(i) + dist;
+            t.len(i) = t.len(i) + dist;
         end
         waitbar(i/length(fault_input.X));
     end
-    uit.Data.len = round(uit.Data.len);
+    t.len = round(t.len);
     close(f)
 end
 %function to calculate the fault depth to maintain aspect ratio for short
