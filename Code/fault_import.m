@@ -104,6 +104,8 @@ end
 %build the table t to be plotted in the uitable (other data remains stored in fault_input)
 t = fault_input(:,variables);
 t.len = zeros(length(t.fault_name),1);
+depth_idx = isnan(fault_input.depth);
+t.depth(depth_idx) = set_seismoDepth.Value; %fill all NaN values in the depth column with the seismo_depth
 t.source_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
 t = calc_length(fault_input,t);
