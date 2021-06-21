@@ -104,8 +104,12 @@ end
 %build the table t to be plotted in the uitable (other data remains stored in fault_input)
 t = fault_input(:,variables);
 t.len = zeros(length(t.fault_name),1);
-depth_idx = isnan(fault_input.depth);
-t.depth(depth_idx) = set_seismoDepth.Value; %fill all NaN values in the depth column with the seismo_depth
+t.depth = num2cell(t.depth);
+for i = 1:length(t.depth)
+    if isnan(fault_input.depth(i)) == true
+        t.depth{i} = 'seism. dep.';
+    end
+end
 t.source_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
 t = calc_length(fault_input,t);
@@ -126,12 +130,12 @@ set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_t
 autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
 axe = uiaxes(tab2,'Position',[710 10 400 400],'Color',[1 1 1],'Box','On');
 axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
-set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
+set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 
 set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size));
-set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver));
+set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 set(tabgp,'SelectedTab',tab2);
-
+%set(set_seismoDepth,'ValueChangingFcn',@(set_seismoDepth,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 
 %% ------------------ function space -------------------------
 %calculate well-fitting grid extends (Auto button):
@@ -156,8 +160,9 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
 end
 %function that plots the map and automatically sets the vertical and horizontal centre
-function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver)
-    %set the horizontal spinner to faultlength/2 and the vertical spinner to depth/2
+function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth)
+    %set the horizontal spinner to faultlength/2 and the vertical spinner
+    %to depth/2
     idx = find(uit.Data.source_fault);
     if nnz(idx) == 1
         len = uit.Data.len(idx)/2;
@@ -166,10 +171,18 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
         else
             set(set_centre_hor,'Value',len)
         end
-        if isempty(uit.Data.depth(idx)) == false && isnan(uit.Data.depth(idx)) == false
-            dep = uit.Data.depth(idx)/2;
-            set(set_centre_ver,'Value',dep)
+        if isempty(uit.Data.depth{idx}) == false && strcmp(uit.Data.depth{idx},'seism. dep.') == false
+            if isnumeric(uit.Data.depth{idx}) == false
+                dep = str2double(uit.Data.depth{idx});
+            else
+                dep = uit.Data.depth{idx}/2;
+            end
+        elseif isempty(uit.Data.depth{idx}) == true || strcmp(uit.Data.depth{idx},'seism. dep.') == true
+            dep = set_seismoDepth.Value/2;
+        else
+            dep = 17;
         end
+        set(set_centre_ver,'Value',dep);
     end
     %plot the overview map
     min_x = str2double(minx_txt.Value{1});
@@ -210,8 +223,7 @@ function t = calc_length(fault_input,t)
     t.len = round(t.len);
     close(f)
 end
-%function to calculate the fault depth to maintain aspect ratio for short
-%faults
+%function to calculate the fault depth to maintain aspect ratio for short faults
 function uit = calc_depth(fault_input,uit)
     f = waitbar(0,'Please wait for the calculation of fault depths...');
     uit.Data.depth = zeros(length(uit.Data.depth),1);
@@ -272,4 +284,3 @@ function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptu
     set(set_grid_size,'Value',settings.value(1));
     vars
 end
-

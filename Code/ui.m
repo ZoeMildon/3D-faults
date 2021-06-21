@@ -55,7 +55,7 @@ set_surfSlip = uispinner(p2,'Position',[160 130 60 20],'Step',5,'Limits',[0 100]
 set_maxSlip = uispinner(p2,'Position',[160 100 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(4),'ValueChangedFcn','vars');
 set_seismoDepth = uispinner(p2,'Position',[160 50 60 20],'Step',.5,'Limits',[0 inf],'Value',settings.value(5),'ValueChangedFcn','vars');
 set_ruptureDepth = uispinner(p2,'Position',[160 20 60 20],'Step',.1,'Limits',[.1 inf],'Value',settings.value(5),'ValueChangedFcn','vars');
-
+prev_seismodepth = settings.value(5);
 %Maximum slip panel
 p3 = uipanel(tab2,'Title','Setting the location of maximum slip','Position',[480 470 230 180],'BackgroundColor',[1 1 1]);
 uilabel(p3,'Position',[10 130 130 20],'Text','Horizontal centre (km):');
@@ -174,3 +174,4 @@ function [rb1,rb2,set_utmzone] = utm_select(rb1,rb2,set_utmzone)
         set(set_utmzone,'Value',zone(1))
     end
 end
+
