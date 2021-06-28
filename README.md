@@ -1,15 +1,15 @@
 # faults_3D
 Code to generate 3D strike- and dip-variable faults from surface traces for use in Coulomb 3.4. 
 
-Code is free to use for research purposes, please cite the following paper:
-Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016), Evaluating models of Coulomb stress transfer- is variable fault geometry important?, Geophys. Res. Lett., 43, doi:10.1002/2016GL071128
+Code is free to use for research purposes, please cite the following paper:\
+Mildon, Z. K., Toda, S., Faure Walker, J. P. and Roberts, G. P. (2016), [Evaluating models of Coulomb stress transfer- is variable fault geometry important?](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016GL071128), Geophys. Res. Lett., 43
 
-MATLAB mapping toolbox is required.
+MATLAB Mapping Toolbox is required to run this code. This can be installed from MathWorks. To check if Mapping Tooolbox is installed, type `ver` in Matlab Command Window.
 
 ## Inputs:
 Three input formats are supported:
 1) A shapefile (in UTM coordinates) that contains all faults. It may contain more faults than to be modelled, faults can be selected within the workflow.
-2) kml-files of all faults (stored in the 'Fault_traces' folder) AND a table (txt, csv, xlsx,...) that contains the properties of the faults
+2) kml-files of all faults (stored in the 'Fault_traces' folder) AND a table (.txt, .csv, .xlsx,...) that contains the properties of the faults
 3) A kmz-file containing the fault traces and a table containing the fault properties
 
 If kml or kmz import is chosen please specify the UTM zone and hemisphere in the user interface.
@@ -31,12 +31,12 @@ To model faults with variable dip, the depth intervals and respective dip values
 The table can be imported via the 'import variable dip' button on the 'Customisation' tab, fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
 ## Running the code
-In MATLAB, navigate to the 'faults_3D_v1.9' folder (or similarly named). Execute the script by entering 'faults_3D' in the command line or open the faults_3D script and press F5.
+In MATLAB, navigate to the 'faults_3D_v1.9' folder (or similarly named). Execute the script by entering `faults_3D` in the command line or open the faults_3D script and press F5.
 
 ### Building slip distributions
 The code will build simple bulls eye slip distributions according to two different options (which are made as selections when the code is running).
-The down-dip extent of the rupture can be controlled by changing the 'rupture_depth' variable.
-The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed by altering the 'centre_vertical' and 'centre_horizontal' variables.
+The down-dip extent of the rupture can be controlled by changing the `rupture_depth` variable.
+The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed by altering the `centre_vertical` and `centre_horizontal` variables.
 1. The whole fault slips. This assumes the slip is zero at the base, zero at the edges and a specified proportion of maximum slip reaches the surface. 
 2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the 
    fault is arbitrary, it is indicated with a black circle on the overview map. Make sure that the specified horizontal center of the slip distribution is within
