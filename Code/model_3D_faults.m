@@ -400,4 +400,4 @@ fprintf (fid,'  7  ------------------------  Z-increment =      %2.4f\n',COUL_GR
 fclose(fid);
 fclose('all');
 fprintf('Output file: %s \n',output_data_file);
-fprintf('Number of fault elements: %d \n',patch_count);
+fprintf('Number of fault elements (#fixed): %d \n',patch_count);
