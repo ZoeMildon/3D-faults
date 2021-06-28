@@ -1,17 +1,12 @@
 # faults_3D
-Code to calculate and plot faults and project faults to depth for immediate use in Coulomb 3.4. 
-
-Version 1.1 - Written by Zoe Mildon, 2016
-
-Updated in 2018
+Code to generate 3D strike- and dip-variable faults from surface traces for use in Coulomb 3.4. 
 
 Code is free to use for research purposes, please cite the following paper:
-Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016), Evaluating models of Coulomb stress transfer- is variable fault geometry important?, Geophys. Res. Lett., 43, doi:10.1002/2016GL071128.
+Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016), Evaluating models of Coulomb stress transfer- is variable fault geometry important?, Geophys. Res. Lett., 43, doi:10.1002/2016GL071128
 
-UPDATED VERSION:
-Version 1.9 -  06/2021
+MATLAB mapping toolbox is required.
 
-# INPUTS:
+## Inputs:
 Three input formats are supported:
 1) A shapefile (in UTM coordinates) that contains all faults. It may contain more faults than to be modelled, faults can be selected within the workflow.
 2) kml-files of all faults (stored in the 'Fault_traces' folder) AND a table (txt, csv, xlsx,...) that contains the properties of the faults
@@ -22,10 +17,10 @@ For shp-import, the file should be projected in UTM coordinates.
 
 Required properties (either in the table or as attributes in the shape file) are:
 
-fault_name - for kml import the name of the kml file must be the same as the fault_name
-dip - dip angle
-rake
-dip_dir - dip direction (projection direction)
+* fault_name - for kml import the name of the kml file must be the same as the fault_name
+* dip - dip angle
+* rake - using the Aki and Richards (1980) conventions (normal = -90, reverse = 90, left-lateral = 0, right-lateral = 180)
+* dip_dir - dip direction (projection direction)
 
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
 A depth column may be optionally given. In the 3D-plot, faults will reach to that specified depth (km).
@@ -35,10 +30,10 @@ Variable dip:
 To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx).
 The table can be imported via the 'import variable dip' button on the 'Customisation' tab, fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
-# RUNNING THE CODE
+## Running the code
 In MATLAB, navigate to the 'faults_3D_v1.9' folder (or similarly named). Execute the script by entering 'faults_3D' in the command line or open the faults_3D script and press F5.
 
-# BUILDING SLIP DISTRIBUTIONS
+### Building slip distributions
 The code will build simple bulls eye slip distributions according to two different options (which are made as selections when the code is running).
 The down-dip extent of the rupture can be controlled by changing the 'rupture_depth' variable.
 The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed by altering the 'centre_vertical' and 'centre_horizontal' variables.
@@ -49,12 +44,12 @@ The default is that the location of maximum slip is at the centre of the fault. 
 
 Alternatively, slip distributions can be manually assigned to each element in the Coulomb input file created from running this code.
 
-# OUTPUTS:
+## Outputs:
 Writes a .inr file which can be used directly in Coulomb 3.4. HOWEVER BEFORE using in Coulomb, the #fixed value needs to be changed in the third line of the file. This file is created in the "Output_files" folder.
 
 The code also calculates the total seismic moment released by the calculated slip distribution, and displays this in the Matlab Command Window. 
 
-# ASSUMPTIONS:
+## Assumptions:
   - the slip vector is preserved down dip
   - the trace at the surface continues to depth
   - the dip of the faults are consistent with depth (i.e. planar, not listric geometry)
@@ -62,9 +57,20 @@ The code also calculates the total seismic moment released by the calculated sli
 
 For further information, please see the published GRL paper.
 
-Please report any issues or bugs to Zoe Mildon (zoe.mildon.13@ucl.ac.uk, zoe.mildon@plymouth.ac.uk).
+## Version information
+Version 1.1 - Written by Zoe Mildon, 2016
 
-# REFERENCES:
+Functionality to model dip-variable faults added in 2018.
+
+Version 2.0 -  06/2021 written by Manuel Diercks and Zoe Mildon
+New features include:
+- input files can be .shp, .kml or .kmz
+- planar and non-planar (e.g. listric, ramp-flat) geometries can be generated at the same time
+- new user interface
+
+Please report any issues or bugs to Zoe Mildon (zoe.mildon@plymouth.ac.uk).
+
+# References:
 This code uses the following functions:
 
 kml2struct_multi version 1.2.1 by Reno Filla (https://uk.mathworks.com/matlabcentral/fileexchange/80083-kml2struct_multi)
@@ -73,5 +79,4 @@ kmz2struct version 1.0.0 by Nathan Ellingson (https://uk.mathworks.com/matlabcen
 
 wgs2utm version 1.2.0.0 by Alexandre Schimel (https://uk.mathworks.com/matlabcentral/fileexchange/14804-wgs2utm-version-2)
 
-MATLAB mapping toolbox is required.
 
