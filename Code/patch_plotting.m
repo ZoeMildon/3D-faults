@@ -38,3 +38,4 @@ xlabel(plt,'UTM x')
 ylabel(plt,'UTM y')
 zlabel(plt,'Depth (m)')
 clearvars x y z
+patch_count = patch_count + numel(slip_distribution);

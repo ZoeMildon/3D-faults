@@ -25,6 +25,14 @@ faults.plot = [];
 if iscell(faults.dip) == false
     faults.dip = num2cell(faults.dip);
 end
+for i = 1:length(faults.depth)
+    if strcmp(faults.depth{i},'seism. dep.') == true
+        faults.depth{i} = seismo_depth;
+    else
+        faults.depth{i} = str2double(faults.depth{i});
+    end
+end
+faults.depth = cell2mat(faults.depth);
 
 %save grid limits to workspace
 min_x = str2double(minx_txt.Value{1});
@@ -92,6 +100,7 @@ fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxx
 
 %% calculate grid for each fault
 c = 1;  %counter for the variable dip table
+patch_count = 0;
 for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
     rake = faults.rake(i);
@@ -246,7 +255,6 @@ for i = 1:length(faults.fault_name)
                     dy=1;
                end
                a = length(x_points(:,1));
-               %a = 1;
                for k=1:length(utm_x)
                     for l=1:m
                         if j==1
@@ -391,3 +399,5 @@ fprintf (fid,'  6  ----------------------------  Z-depth =     20.00000\n');
 fprintf (fid,'  7  ------------------------  Z-increment =      %2.4f\n',COUL_GRID_SIZE);
 fclose(fid);
 fclose('all');
+fprintf('Output file: %s \n',output_data_file);
+fprintf('Number of fault elements: %d \n',patch_count);
