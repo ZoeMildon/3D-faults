@@ -4,6 +4,8 @@
 % Mildon, Z. K., S. Toda, J. P. Faure Walker, and G. P. Roberts (2016) 
 % Evaluating models of Coulomb stress transfer- is variable fault geometry important?
 % Geophys. Res. Lett., 43, doi:10.1002/2016GL071128.
+% 
+% v2.0 written in 2021 by Manuel Diercks and Zoe Mildon
 %
 % To execute the code press F5 or enter 'faults_3D' in the comand line.
 %

@@ -1,7 +1,7 @@
 %% Build user interface
 clear
 close all
-fig = uifigure('Name','Fault Input - 3D-Faults v.1.9','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
+fig = uifigure('Name','Fault Input - 3D-Faults v2.0','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
 
 tabgp = uitabgroup(fig,'Position',[1 1 1354 690]);
 tab1 = uitab(tabgp,'Title','Fault Import','BackgroundColor',[.98 .98 .98]);
@@ -11,7 +11,7 @@ plt = uiaxes(tab3,'Position',[200 5 900 690],'Color',[.9 .9 .9],'Box','On');
 settings = readtable('config.txt');
 
 %% Configuration of UI tab 1
-pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v. 1.9','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
+pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v2.0','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
 
 % general info panel
 p1 = uipanel(pmain,'Title','General Information','Position',[10 450 710 70],'BackgroundColor',[1 1 1]);

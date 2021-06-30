@@ -1,7 +1,7 @@
 function [helpbox1,helpbox2,help_general,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_table,help_grid_size,help_config,help_map,help_coords] = uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl)
 %this script only contains functions for the ? - buttons on the ui
 %set up helpbox:
-text = sprintf('\n\t\t\t\t\t\t3D - Faults v 1.9');
+text = sprintf('\n\t\t\t\t\t\t3D - Faults v2.0');
 
 helpbox1 = uitextarea(tab1,'Position',[855 385 485 270],'Value',text,'Editable','off');
 helpbox2 = uitextarea(tab2,'Position',[920 470 420 180],'Value',text,'Editable','off');
