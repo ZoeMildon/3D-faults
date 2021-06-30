@@ -13,7 +13,8 @@ end
 
 %% Import faults:
 if rb_shp.Value == true %shapefile
-        [file,path] = uigetfile('*.shp','Choose a .shp-file');
+        disp('Choose a .shp file')
+        [file,path] = uigetfile('*.shp','Choose a .shp file');
         fault_input = struct2table(shaperead(fullfile(path,file)));
         if iscell(fault_input.dip) == true
             fault_input.dip = num2cell(str2double(fault_input.dip));
@@ -21,6 +22,7 @@ if rb_shp.Value == true %shapefile
             fault_input.dip = num2cell(fault_input.dip);
         end %make sure that dip values are always double values in cell arrays
 elseif rb_kml.Value == true %kml file
+        disp('Choose an input table')
         [file,path] = uigetfile({'*.txt';'*.csv';'*.xlsx';'*.xls';'*.dat'},'Choose an input table');
         fault_input = readtable(fullfile(path,file));
         fault_input.X = cell(length(fault_input.fault_name),1);
@@ -39,8 +41,10 @@ elseif rb_kml.Value == true %kml file
             end
         end
 elseif rb_kmz.Value == true %kmz file
+        disp('Choose an input table')
         [file,path] = uigetfile({'*.xlsx';'*.csv';'*.txt';'*.xls';'*.dat'},'Choose an input table');
         props = readtable(fullfile(path,file));
+        disp('Choose a .kmz file')
         [file,path] = uigetfile('*.kmz','Choose a .kmz file');
         kmlStruct = kmz2struct(fullfile(path,file));
         kmz_table = struct2table(kmlStruct);

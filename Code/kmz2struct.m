@@ -1,18 +1,27 @@
 function kmlStruct = kmz2struct(filename)
+% Adapted June 2021 from kmz2struct version 1.0.0 by Nathan Ellingson (https://uk.mathworks.com/matlabcentral/fileexchange/70450-kmz2struct)
+% 
     [~,~,ext] = fileparts(filename);
     
     if strcmpi(ext,'.kmz')
-        userDir = [char(java.lang.System.getProperty('user.home')) '\.kml2struct\'];
+%         userDir = 'Fault_traces\.kml2struct\';
+%         userDir = [char(java.lang.System.getProperty('user.home')) '\.kml2struct\'];
+        userDir = fullfile( ...
+            char(java.lang.System.getProperty('user.home')), ...
+            '.kml2struct');
         if ~exist(userDir,'dir')
             mkdir(userDir);
         end
         unzip(filename, userDir);
         
-        files = dir([userDir '**\*.kml']);
+        %files = dir([userDir '**\*.kml']); %'**\*.kml']);
+        files = dir(fullfile(userDir, '**', '*.kml'));
         N = length(files);
         kmlStructs = cell([1 N]);
         for i = 1:length(files)
-            kmlStructs{i} = readKMLfile([files(i).folder '\' files(i).name]);
+            %kmlStructs{i} = readKMLfile([files(i).folder '\' files(i).name]);
+            kmlStructs{i} = readKMLfile( ...
+            fullfile(files(i).folder, files(i).name));
         end
         kmlStruct = vertcat(kmlStructs{:});
         

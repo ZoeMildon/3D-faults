@@ -334,41 +334,6 @@ for i = 1:length(faults.fault_name)
             end
     end
     end
-%     %%% OLD INR WRITING OUT CODE
-%     for n=1:length(z_points(:,1))-1
-%         switch geometry
-%             case 'variable'
-%                 % working out what value of dip to use
-%                 found=0;
-%                 v=1;
-%                 while found==0
-%                     if -dip_depth(v+1)*1000<z_points(n,1)
-%                         found=1;
-%                     else
-%                         v=v+1;
-%                     end
-%                 end
-%         end
-%         for j=1:length(x_points(1,:))-1
-%             if isempty(dip_dir)==1 %for faults which are vertical
-%                 fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j)/1000,y_points(n,j)/1000,x_points(n,j+1)/1000,y_points(n,j+1)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
-%             %south dipping faults
-%             elseif  dip_dir>=90 && dip_dir<=270 && x_points(1,1)<x_points(1,end) %%dip_dir>=90 && dip_dir<=270 % for south dipping faults
-%                 fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j)/1000,y_points(n,j)/1000,x_points(n,j+1)/1000,y_points(n,j+1)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
-%                 fprintf('%s %1.0f\n',fault_name,1)
-%             elseif  dip_dir>=90 && dip_dir<=270 && x_points(1,1)>x_points(1,end) %%dip_dir>=90 && dip_dir<=270 % for south dipping faults
-%                 fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j+1)/1000,y_points(n,j+1)/1000,x_points(n,j)/1000,y_points(n,j)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
-%                 fprintf('%s %1.0f\n',fault_name,2)
-%             % north dipping faults
-%             elseif x_points(1,1)>x_points(1,end) % for north dipping faults
-%                 fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j)/1000,y_points(n,j)/1000,x_points(n,j+1)/1000,y_points(n,j+1)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
-%                 fprintf('%s %1.0f\n',fault_name,3)
-%             elseif x_points(1,1)<x_points(1,end) % for north dipping faults
-%                 fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j+1)/1000,y_points(n,j+1)/1000,x_points(n,j)/1000,y_points(n,j)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
-%                 fprintf('%s %1.0f \n',fault_name,4)
-%             end
-%         end
-%     end
     clearvars a amo A b C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I j k l L last_point lbl lbltext
     clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault x x_points y y_points z z_points
     %clearvars -except tabgp tab3 plt fig uit fault_input minx_txt maxx_txt miny_txt maxy_txt faults grid_size grid_sizem seismo_depth rupture_depth rupture_depthm seismo_depthm maximum_slip fault_names fault_slip_name fid output_data_file filename min_x max_x min_y max_y COUL_GRID_SIZE slip_at_surface slip_distribution centre_horizontal centre_vertical% clears all data except variables required for each loop
