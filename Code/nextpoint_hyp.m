@@ -6,6 +6,7 @@ function [x_next,y_next,last_point,a] = nextpoint_hyp2_ZKM(x_start,y_start,grid_
 %   the fault to the SE to grid the fault according to the distance as the
 %   crow flies.   
 
+
 % Finding the next value in the kml file which is greater than the start location
 kml_cut=utm_lon;
 
