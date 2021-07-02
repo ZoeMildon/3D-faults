@@ -13,3 +13,7 @@ for i=1:length(slip_distribution(:,1))
 end
 mw = (2/3) * log10(amo) - 10.7;
 disp(['   Total seismic moment = ' num2str(amo,'%6.2e') ' dyne cm (Mw = ', num2str(mw,'%4.2f') ')']);
+
+% add-on for display in UI:
+seis_txt = strcat('   Total seismic moment = ',num2str(amo,'%6.2e'),' dyne cm (Mw = ',num2str(mw,'%4.2f'),')');
+seis_disp = uitextarea(tab3,'Position',[20 610 400 30],'Editable','off','Value',seis_txt,'FontSize',14);
