@@ -1,7 +1,7 @@
 %% Build user interface
 clear
 close all
-fig = uifigure('Name','Fault Input - 3D-Faults v.1.9','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
+fig = uifigure('Name','Fault Input - 3D-Faults v2.1','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
 
 tabgp = uitabgroup(fig,'Position',[1 1 1354 690]);
 tab1 = uitab(tabgp,'Title','Fault Import','BackgroundColor',[.98 .98 .98]);
@@ -11,7 +11,7 @@ plt = uiaxes(tab3,'Position',[200 5 900 690],'Color',[.9 .9 .9],'Box','On');
 settings = readtable('config.txt');
 
 %% Configuration of UI tab 1
-pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v. 1.9','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
+pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v2.1','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
 
 % general info panel
 p1 = uipanel(pmain,'Title','General Information','Position',[10 450 710 70],'BackgroundColor',[1 1 1]);
@@ -76,36 +76,47 @@ exp_config_btn = uibutton(tab2,'push','Text','Export custom config.','Position',
 imp_config_btn = uibutton(tab2,'push','Text','Load custom config.','Position',[720, 510, 150, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','FontSize',12,...
     'ButtonPushedFcn',@(imp_config_btn,event) import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone));
 
-%table
-uit = uitable(tab2);
-uit.Position = [10 10 690, 410];
-uit.ColumnEditable = [false true true true true true true true];
+%TABLE:
+uit = uitable(tab2,'Position',[10 10 690, 410],'ColumnEditable',[false true true true true true true true]);
 set(uit,'ColumnName',{'Fault name','dip','rake','dip direct.','depth (km)','length (km)','source ft.','plot'});
-
-%text label
+%text label above table
 lbl = uilabel(tab2,'Position',[10 420 700 20],'FontSize',13,'BackgroundColor',[.98 .98 .98],'FontWeight','bold','HorizontalAlignment','left','VerticalAlignment','top');
-lbltext = sprintf('Tick all faults to be plotted. Choose one source fault.');
-lbl.Text = lbltext;
+lbl.Text = sprintf('Tick all faults to be plotted. Choose one source fault.       Sort by:');
+%sort drop-down menu:
+sort_dd = uidropdown(tab2,'Position',[420 423 100 20],'Items',{'---','name A-Z','name Z-A','length asc.','length desc.'});
+% select 'all' or 'none' buttons
+plot_all_btn = uibutton(tab2,'push','Text','All','Position',[620 423 30 20],'BackgroundColor',[1 1 1],'FontWeight','bold','Fontsize',12,'ButtonPushedFcn','uit.Data.plot(1:end) = 1;');
+plot_none_btn = uibutton(tab2,'push','Text','None','Position',[650 423 40 20],'BackgroundColor',[1 1 1],'FontWeight','bold','Fontsize',12,'ButtonPushedFcn','uit.Data.plot(1:end) = 0;');
 
 %coordinates panel:
-coord_pnl = uipanel(tab2,'Title','Grid Limits (UTM coordinates)','Position',[1130 170 200 240],'BackgroundColor',[1 1 1],'FontWeight','bold');
-uilabel(coord_pnl,'Position',[10 190 130 20],'Text','min_x       _____    000');
-uilabel(coord_pnl,'Position',[10 160 130 20],'Text','max_x       _____   000');
-uilabel(coord_pnl,'Position',[10 130 130 20],'Text','min_y       _____    000');
-uilabel(coord_pnl,'Position',[10 100 130 20],'Text','max_y       _____   000');
-uilabel(coord_pnl,'Position',[10 20 130 20],'Text','margin    _____     %');
-minx_txt = uitextarea(coord_pnl,'Position',[60 190 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_x = str2double(minx_txt.Value{1});');
-maxx_txt = uitextarea(coord_pnl,'Position',[60 160 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_x = str2double(maxx_txt.Value{1});');
-miny_txt = uitextarea(coord_pnl,'Position',[60 130 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_y = str2double(miny_txt.Value{1});');
-maxy_txt = uitextarea(coord_pnl,'Position',[60 100 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_y = str2double(maxy_txt.Value{1});');
-margin_txt = uitextarea(coord_pnl,'Position',[60 20 50 20],'HorizontalAlignment','right','Value','10','ValueChangedFcn','mrg = str2double(margin_txt.Value{1})/100;');
+coord_pnl = uipanel(tab2,'Title','Grid Limits (UTM coordinates)','Position',[1130 210 200 210],'BackgroundColor',[1 1 1],'FontWeight','bold');
+uilabel(coord_pnl,'Position',[10 160 130 20],'Text','min_x       _____    000');
+uilabel(coord_pnl,'Position',[10 130 130 20],'Text','max_x       _____   000');
+uilabel(coord_pnl,'Position',[10 100 130 20],'Text','min_y       _____    000');
+uilabel(coord_pnl,'Position',[10 70 130 20],'Text','max_y       _____   000');
+uilabel(coord_pnl,'Position',[10 10 130 20],'Text','margin    _____     %');
+minx_txt = uitextarea(coord_pnl,'Position',[60 160 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_x = str2double(minx_txt.Value{1});');
+maxx_txt = uitextarea(coord_pnl,'Position',[60 130 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_x = str2double(maxx_txt.Value{1});');
+miny_txt = uitextarea(coord_pnl,'Position',[60 100 50 20],'HorizontalAlignment','right','ValueChangedFcn','min_y = str2double(miny_txt.Value{1});');
+maxy_txt = uitextarea(coord_pnl,'Position',[60 70 50 20],'HorizontalAlignment','right','ValueChangedFcn','max_y = str2double(maxy_txt.Value{1});');
+margin_txt = uitextarea(coord_pnl,'Position',[60 10 50 20],'HorizontalAlignment','right','Value','10','ValueChangedFcn','mrg = str2double(margin_txt.Value{1})/100;');
 
 %buttons on coordinate panel
-coord_btn = uibutton(coord_pnl,'push','Text','Update Plot','Position',[10 60 80 20],'BackgroundColor',[.8 .8 .8]);
-auto_btn = uibutton(coord_pnl,'push','Text','Auto','Position',[95 60 80 20],'BackgroundColor',[.8 .8 .8]);
+coord_btn = uibutton(coord_pnl,'push','Text','Update Plot','Position',[10 40 80 20],'BackgroundColor',[.8 .8 .8]);
+auto_btn = uibutton(coord_pnl,'push','Text','Auto','Position',[95 40 80 20],'BackgroundColor',[.8 .8 .8]);
+
+%detect intersecting faults buttons
+bg_cut = uibuttongroup(tab2,'Position',[1130 160 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Cut intersecting faults:');
+rb_cut_on = uiradiobutton(bg_cut,'Position',[10 3 80 15],'Text','on');
+rb_cut_off = uiradiobutton(bg_cut,'Position',[90 3 80 15],'Text','off');
+uilabel(tab2,'Position',[1130 130 200 20],'Text','Intersection distance (km):');
+int_thresh = uispinner(tab2,'Position',[1280 130 50 20],'Step',.1,'Limits',[0 10],'Value',1);
 
 %Plot button
-btn = uibutton(tab2,'push','Text','Build 3D faults','Position',[1130, 20, 200, 100],'BackgroundColor',[.5 .5 .5],'FontWeight','bold','ButtonPushedFcn','model_3D_faults','FontSize',18);
+plot_bg = uibuttongroup(tab2,'Position',[1130 10 200 20]);
+plot_ext_btn = uitogglebutton(plot_bg,'Position',[0 0 100 20],'Text','external');
+plot_int_btn = uitogglebutton(plot_bg,'Position',[100 0 100 20],'Text','internal');
+btn = uibutton(tab2,'push','Text','Build 3D faults','Position',[1130, 28, 200, 80],'BackgroundColor',[.5 .5 .5],'FontWeight','bold','ButtonPushedFcn','model_3D_faults','FontSize',18);
 
 %% Finish building UI
 newfig_btn = uibutton(tab3,'push','Text','Open in new window','Position',[1200 20 150 30],'ButtonPushedFcn',@(newfig_btn,event) newfig(plt));
