@@ -82,3 +82,11 @@ Version 1.9
 	- if the fault is shorter than the seismogenic depth, a 'real' (down dip) aspect ratio of 1 is applied
 - minor changes in the UI, some variables and code comments
 
+Version 2.0
+- basically the same as v. 1.9 with minor changes to the UI and few bugs fixed
+- version released on github.com/ZoeMildon/3D-faults main
+
+Version 2.1
+- added buttons to select/deselect all faults to be plotted
+- added dropdown menu to sort the fault table by name, depth or length
+- added option to automatically detect faults that intersect other faults and cut them at the matching depth
