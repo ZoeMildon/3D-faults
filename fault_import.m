@@ -204,21 +204,9 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
             else                                        %faults shorter than seismo_depth
                 dep = (uit.Data.len(idx)*cosd(uit.Data.dip{idx}))/2;
             end
-        else                                                                                        %use specified depth
+        else %use specified depth
             dep = uit.Data.depth{idx}/2;
         end
-                
-%         if isempty(uit.Data.depth{idx}) == false && strcmp(uit.Data.depth{idx},'seism. dep.') == false %no depth specified
-%             if isnumeric(uit.Data.depth{idx}) == false
-%                 dep = str2double(uit.Data.depth{idx});
-%             else
-%                 dep = uit.Data.depth{idx}/2;
-%             end
-%         elseif isempty(uit.Data.depth{idx}) == true || strcmp(uit.Data.depth{idx},'seism. dep.') == true
-%             dep = set_seismoDepth.Value/2;
-%         else
-%             dep = 17; %WHAT ????
-%         end
         set(set_centre_ver,'Value',dep);
     end
     %plot the overview map
