@@ -90,3 +90,8 @@ Version 2.1
 - added buttons to select/deselect all faults to be plotted
 - added dropdown menu to sort the fault table by name, depth or length
 - added option to automatically detect faults that intersect other faults and cut them at the matching depth
+	--> faults are plotted in the order they occur in the table, source fault is always first; at intersections faults that are plotted later will be cut
+- added back the option to plot faults in an external figure instead of the user interface (better performance)
+- bug fixes:
+	- calculation of fault down dip length for short faults
+	- automatic calculation of vertical centre for short source faults
