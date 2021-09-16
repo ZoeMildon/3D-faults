@@ -95,3 +95,12 @@ Version 2.1
 - bug fixes:
 	- calculation of fault down dip length for short faults
 	- automatic calculation of vertical centre for short source faults
+
+Version 2.2
+- improvements of the function to cut intersecting faults:
+	- added option to define major and minor faults by setting a priority in the uitable
+	- added option to import priority values from the input files (table or shapefile attributes)
+	- plotting of source fault as the first fault is now optional, as it may interfere with the intersecting faults functionality
+	- restructured user interface to add new functionality
+	- added help texts
+	- fixed the plot of intersecting faults (plotted patches were not identical with exported patches)
