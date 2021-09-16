@@ -1,5 +1,6 @@
 % This script is triggered by the 'Build 3D Faults' button
 %import and define variables
+set(fig,'HandleVisibility','off');
 close all
 figure(1);
 set(figure(1),'Visible','off','WindowState','maximized');
@@ -9,7 +10,6 @@ clearvars lbltext variables utmzone utmhemi i imp_btn lbl pmain s set_filename
 vars;
 grid_sizem = grid_size*1000;
 seismo_depthm = seismo_depth*1000;
-%rupture_depthm = rupture_depth*1000;
 output_data_file = strcat('Output_files/',filename,num2str(maximum_slip),'m',num2str(grid_size),'km.inr');
 cla(plt)
 
@@ -88,12 +88,20 @@ if rupture_depth > seismo_depthm || centre_vertical > seismo_depthm
     return
 end
 
+%rearrange the table for correct plot order: (important for interseting faults):
+if rb_cut_on.Value == true
+    switch priority_dd.Value
+        case 'by priority'
+            faults = sortrows(faults,8,'descend');
+    end
+end
 source_idx = find(faults.source_fault == 1);
 fault_slip_name = faults.fault_name{source_idx};  %extract the name of the fault that slips
-source = faults(source_idx,:);                    %rearranging the table so that source fault is on top
-faults = [source;faults];
-faults(source_idx+1,:) = [];
-
+if rb_source_on.Value == true
+    source = faults(source_idx,:);                    %rearranging the table so that source fault is on top
+    faults = [source;faults];
+    faults(source_idx+1,:) = [];
+end
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
 fprintf (fid,'Fault with slip is %s, the grid size of faults is %2.0f km\n',fault_slip_name,(grid_size));
@@ -110,7 +118,7 @@ fprintf (fid,'  #   X-start    Y-start     X-fin      Y-fin   Kode  rake    net 
 fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx\n');
 
 %% calculate grid for each fault
-c = 1;  %counter for the variable dip table
+count = 1;  %counter for the variable dip table
 patch_count = 0;
 last_elem = 0;
 ccmatrix = nan(100000,3);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
@@ -125,11 +133,11 @@ for i = 1:length(faults.fault_name)
         constant_dip = faults.dip{i};
         geometry = 'constant';
     else
-        dip_depth = vardip.Data.depth{c}';
-        dip_values = vardip.Data.dip{c}';
+        dip_depth = vardip.Data.depth{count}';
+        dip_values = vardip.Data.dip{count}';
         dip_depth(ismissing(dip_depth)) = [];
         dip_values(ismissing(dip_values)) = [];
-        c = c+1;
+        count = count+1;
         geometry = 'variable';
     end    
     
@@ -361,6 +369,7 @@ for i = 1:length(faults.fault_name)
     %% Writing the data to the Coulomb output file
     % New Code written by ZKM on 17/6/21 to account for planar vs variable
     % dips, and correcting for the direction of the digitised fault trace
+    %(edited 09/21 for intersecting faults - MD)
     for n=1:length(z_points(:,1))-1
     switch geometry
         case 'constant'
@@ -452,4 +461,5 @@ fclose(fid);
 fclose('all');
 fprintf('Output file: %s \n',output_data_file);
 fprintf('Number of fault elements (#fixed): %d \n',patch_count);
+set(fig,'HandleVisibility','on');
 toc

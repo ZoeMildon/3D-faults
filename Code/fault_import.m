@@ -119,10 +119,15 @@ t.plot = true(1,length(t.fault_name))';
 t = calc_length(fault_input,t); %calling calc_length function
 [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
 t.plot(row) = false;
-
+if any(ismember(fault_input.Properties.VariableNames,'priority'))
+    t.priority = fault_input.priority;
+    t.priority(find(isnan(t.priority))) = 0;
+else
+    t.priority = zeros(length(t.plot),1);
+end
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,50,50,73,78,80,75,45});
+set(uit,'Data',t,'ColumnWidth',{215,40,40,55,78,80,70,40,60});
 %s = uistyle('BackgroundColor','[.95 .5 .3]');
 %addStyle(uit,s,'row',row);
 
@@ -133,15 +138,16 @@ set(sort_dd,'ValueChangedFcn', @(sort_dd,event) tablesort(uit,sort_dd));
 
 %initiate plot:
 autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
-axe = uiaxes(tab2,'Position',[710 10 400 400],'Color',[1 1 1],'Box','On');
+axe = uiaxes(tab2,'Position',[720 10 400 400],'Color',[1 1 1],'Box','On');
 axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
 set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 
 set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size));
 set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 set(tabgp,'SelectedTab',tab2);
-set(fig,'HandleVisibility','off');
 %set(set_seismoDepth,'ValueChangingFcn',@(set_seismoDepth,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
+set(exp_config_btn,'ButtonPushedFcn',@(exp_config_btn,event) export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone,margin_txt));
+set(imp_config_btn,'ButtonPushedFcn',@(imp_config_btn,event) import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone,margin_txt));
 
 %% ------------------ function space -------------------------
 %function to calculate fault length from X and Y data (when faults are imported)
@@ -241,20 +247,20 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
     end
 end
 %function to calculate the fault depth to maintain aspect ratio for short faults
-function uit = calc_depth(fault_input,uit)
-    f = waitbar(0,'Please wait for the calculation of fault depths...');
-    uit.Data.depth = zeros(length(uit.Data.depth),1);
-    for i = 1:length(fault_input.X)
-        if isnan(fault_input.down_dip_len(i))==1
-            uit.Data.depth(i) = 15; %set_seismoDepth.Value - I NEED MANUEL's HELP
-        else
-            depth = fault_input.down_dip_len(i) * sind(fault_input.dip{i});
-            uit.Data.depth(i) = depth;
-        end
-        waitbar(i/length(fault_input.X));
-    end
-    close(f)
-end
+% function uit = calc_depth(fault_input,uit) %OUTDATED: THIS IS NOW DONE IN THE "model_3D-faults" CODE!
+%     f = waitbar(0,'Please wait for the calculation of fault depths...');
+%     uit.Data.depth = zeros(length(uit.Data.depth),1);
+%     for i = 1:length(fault_input.X)
+%         if isnan(fault_input.down_dip_len(i))==1
+%             uit.Data.depth(i) = 15; %set_seismoDepth.Value - I NEED MANUEL's HELP
+%         else
+%             depth = fault_input.down_dip_len(i) * sind(fault_input.dip{i});
+%             uit.Data.depth(i) = depth;
+%         end
+%         waitbar(i/length(fault_input.X));
+%     end
+%     close(f)
+% end
 
 %function for table export to .csv
 function table_export(uit)
@@ -289,6 +295,7 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     set(vardip,'Data',dipdata);
     disp('Variable dip information imported.')
 end
+%reset all values to standard config
 function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size)
     set(uit,'Data',t);
     settings = readtable('config.txt');
@@ -313,4 +320,31 @@ function [uit] = tablesort(uit,sort_dd)
         case 'length desc.'
             uit.Data = sortrows(uit.Data,6,'descend');
     end
+end
+% export custom config button
+function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone,margin_txt)
+    custom_config = readtable('config.txt');
+    custom_config.value(1) = set_grid_size.Value;
+    custom_config.value(3) = set_surfSlip.Value;
+    custom_config.value(4) = set_maxSlip.Value;
+    custom_config.value(5) = set_seismoDepth.Value;
+    custom_config.value(6) = set_ruptureDepth.Value;
+    custom_config.value(7) = set_centre_hor.Value;
+    custom_config.value(8) = set_centre_ver.Value;
+    custom_config.value(9) = str2double(cell2mat(set_utmzone.Value));
+    custom_config.value(10) = str2double(cell2mat(margin_txt.Value));
+    writetable(custom_config,'Code/custom_config.txt');
+end
+% load custom configuration button
+function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone] = import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone,margin_txt)
+    custom_config = readtable('custom_config.txt');
+    set(set_grid_size,'Value',custom_config.value(1));
+    set(set_surfSlip,'Value',custom_config.value(3));
+    set(set_maxSlip,'Value',custom_config.value(4));
+    set(set_seismoDepth,'Value',custom_config.value(5));
+    set(set_ruptureDepth,'Value',custom_config.value(6));
+    %set(set_centre_hor,'Value',custom_config.value(7));
+    %set(set_centre_ver,'Value',custom_config.value(8));
+    %set(set_utmzone,'Value',num2str(custom_config.value(9)));
+    set(margin_txt,'Value',num2str(custom_config.value(10)));
 end
