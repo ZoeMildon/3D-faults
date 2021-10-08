@@ -99,8 +99,16 @@ Version 2.1
 Version 2.2
 - improvements of the function to cut intersecting faults:
 	- added option to define major and minor faults by setting a priority in the uitable
-	- added option to import priority values from the input files (table or shapefile attributes)
+	- priority values can now be imported from the input files (table or shapefile attributes)
 	- plotting of source fault as the first fault is now optional, as it may interfere with the intersecting faults functionality
-	- restructured user interface to add new functionality
+	- restructured UI to add new interface elements
+	- refining the intersection grid to erase artifacts. Enables the distance threshold to be smaller (~0.5*grid size advised)
+	- added option (incl. button) to plot only the source fault (saves time)
 	- added help texts
 	- fixed the plot of intersecting faults (plotted patches were not identical with exported patches)
+	- fixed bugs causing erroneous seismic moment and slip distribution calculation for intersecting faults
+- fixed important bug in the variable dip import
+- fixed an issue with slip distribution calculation for faults with variable dip
+- fixed the style for uitable (highlighting faults with missing data or variable dip)
+- various other bug fixes
+
