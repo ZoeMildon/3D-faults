@@ -40,7 +40,7 @@ for i = 1:length(faults.depth)
         faults.depth{i} = seismo_depth;
         use_seismo_depth(i) = 1; %store indices of all faults where no depth was specified
     else
-        faults.depth{i} = str2double(faults.depth{i});
+        faults.depth{i} = uit.Data.depth{i};
     end
 end
 faults.depth = cell2mat(faults.depth);
@@ -88,7 +88,7 @@ if rupture_depth > seismo_depthm || centre_vertical > seismo_depthm
     return
 end
 
-%rearrange the table for correct plot order: (important for interseting faults):
+%rearrange the table for correct plot order (important for interseting faults):
 if rb_cut_on.Value == true
     switch priority_dd.Value
         case 'by priority'
@@ -120,7 +120,6 @@ fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxx
 %% calculate grid for each fault
 count = 1;  %counter for the variable dip table
 patch_count = 0;
-last_elem = 0;
 ccmatrix = nan(100000,3);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
 for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
@@ -294,41 +293,75 @@ for i = 1:length(faults.fault_name)
             end
     end
     
-    %detect cross-cutting faults:    
+    %% detect intersecting faults:   
+    %copy x_points, y_points, z_points to complete patches that are only
+    %half-deleted (for intersecting faults)
+    x_points_copy = x_points;
+    y_points_copy = y_points;
+    z_points_copy = z_points;
     if rb_cut_on.Value == true
-        %copy x_points, y_points, z_points to complete patches that are only half-deleted:
-        x_points_copy = x_points;
-        y_points_copy = y_points;
-        z_points_copy = z_points;
         %find all values that are close to an existing x, y and z-coordinate triplet:
-        for i = 1:numel(x_points)
-            x_dist = abs(ccmatrix(:,1) - abs(x_points(i)));
-            y_dist = abs(ccmatrix(:,2) - abs(y_points(i)));
-            z_dist = abs(ccmatrix(:,3) - abs(z_points(i)));
+        for k = 1:numel(x_points)
+            x_dist = abs(ccmatrix(:,1) - abs(x_points(k)));
+            y_dist = abs(ccmatrix(:,2) - abs(y_points(k)));
+            z_dist = abs(ccmatrix(:,3) - abs(z_points(k)));
             near_x = find(x_dist < (int_thresh.Value*1000));
+            if isempty(near_x) == false
             for j = 1:length(near_x)
                 if any(y_dist(near_x(j)) < (int_thresh.Value*1000)) == true && any(z_dist(near_x(j)) < (int_thresh.Value*1000)) == true
-                    [ccrow,cccol] = find(x_points-x_points(i) == 0);
+                    [ccrow,cccol] = find(x_points-x_points(k) == 0);
                     for n = 1:numel(ccrow)                    
-                        x_points(ccrow(n):end,cccol(n)) = NaN;
+                        x_points(ccrow(n):end,cccol(n)) = NaN; %delete intersecting points
                         y_points(ccrow(n):end,cccol(n)) = NaN;
                         z_points(ccrow(n):end,cccol(n)) = NaN;
                     end
                 end
             end
+            end
         end
         %writing the cross-cut matrix that stores all existing x-y-z coordinate triplets
-        for j = 1:(numel(x_points)-nnz(isnan(x_points)))      %convert x_points, y_points and z_points to lists and attach them to the cross-cut matrix
+        last_elem = nnz(~isnan(ccmatrix(:,1)));
+        for j = 1:(numel(x_points))%-nnz(isnan(x_points)))      %convert x_points, y_points and z_points to lists and attach them to the cross-cut matrix
             if isnan(x_points(j)) == false
                 ccmatrix(last_elem + j,1) = abs(x_points(j));
                 ccmatrix(last_elem + j,2) = abs(y_points(j)); %[abs could cause problems when the study area crosses the equator]
                 ccmatrix(last_elem + j,3) = abs(z_points(j));
-            else
+            elseif isnan(x_points(j))
                 last_elem = last_elem-1;
             end
         end
-        last_elem = last_elem + numel(x_points);
-        clearvars ccrow cccol ccidx x_dist y_dist z_dist near_x
+        
+        %refine the grid for less artifacts:
+        [nr,nc] = size(x_points);
+        mx_points = nan((nr-1)*(nc-1),1);
+        my_points = nan((nr-1)*(nc-1),1);
+        mz_points = nan((nr-1)*(nc-1),1);
+        np = 1;
+        for r = 1:nr-1
+            for c = 1:nc-1
+                if x_points(r,c) > x_points(r+1,c+1)
+                    mx_points(np) = x_points(r,c) + (x_points(r+1,c+1)-x_points(r,c))/2;
+                else
+                    mx_points(np) = x_points(r,c) - (x_points(r,c)-x_points(r+1,c+1))/2;
+                end
+                if y_points(r,c) > y_points(r+1,c+1)
+                    my_points(np) = y_points(r,c) + (y_points(r+1,c+1)-y_points(r,c))/2;
+                else
+                    my_points(np) = y_points(r,c) - (y_points(r,c)-y_points(r+1,c+1))/2;
+                end
+                mz_points(np) = z_points(r,c) - abs(z_points(r+1,c+1)-z_points(r,c))/2;
+                np = np+1;
+            end
+        end
+        last_idx = nnz(~isnan(ccmatrix(:,1)));
+        mx_points(isnan(mx_points)) = [];
+        my_points(isnan(my_points)) = [];
+        mz_points(isnan(mz_points)) = [];
+        ccmatrix(last_idx+1:last_idx+numel(mx_points),1) = mx_points;
+        ccmatrix(last_idx+1:last_idx+numel(mx_points),2) = my_points;
+        ccmatrix(last_idx+1:last_idx+numel(mx_points),3) = abs(mz_points);
+        clearvars ccrow cccol ccidx x_dist y_dist z_dist near_x nr nc np mx_points my_points mz_points
+        %scatter3(ccmatrix(1:last_idx,1),ccmatrix(1:last_idx,2),-ccmatrix(1:last_idx,3),'k','filled'); %plot the intersection grid (for debugging)
     end
 %% Calculating the bulls eye slip distribution. Options included
     if strcmp(fault_name,fault_slip_name)==1
@@ -344,7 +377,7 @@ for i = 1:length(faults.fault_name)
         end
         seismic_moment
     elseif strcmp(fault_name,fault_slip_name)==0
-        slip_distribution=zeros((length(z_points(:,1))-1),(length(x_points(1,:))-1)); % creates a slip of 0 for faults without movement
+        slip_distribution=zeros((length(z_points_copy(:,1))-1),(length(x_points_copy(1,:))-1)); % creates a slip of 0 for faults without movement
     else
         errordlg('Slip calculations have gone wrong')
     end
@@ -357,7 +390,7 @@ for i = 1:length(faults.fault_name)
             end            
         end
     end
-    if plot_int_btn.Value == 1
+    if plot_int_btn.Value == 1 %plot in internal or external window
         tab3.Parent = tabgp;
         patch_plotting
         set(tabgp,'SelectedTab',tab3);
@@ -429,9 +462,9 @@ for i = 1:length(faults.fault_name)
             end
     end
     end
-        
+       
     clearvars a amo A b C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I j k l L last_point lbl lbltext
-    clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault %x x_points y y_points z z_points
+    clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault% x x_points y y_points z z_points
 end
 
 %% Finishing off writing the Coulomb input file

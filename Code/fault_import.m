@@ -127,9 +127,7 @@ else
 end
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,40,40,55,78,80,70,40,60});
-%s = uistyle('BackgroundColor','[.95 .5 .3]');
-%addStyle(uit,s,'row',row);
+set(uit,'Data',t,'ColumnWidth',{215,40,40,55,78,80,70,40,55});
 
 set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
 set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
@@ -245,6 +243,18 @@ function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,ma
             scatter(axe,(xval(end))/1000,(yval(end))/1000,'Marker','o','MarkerFaceColor','w','MarkerEdgeColor','k')
         end
     end
+    %set style for table rows
+    s = uistyle('BackgroundColor',[.3 .8 .8]);
+    s2 = uistyle('BackgroundColor',[.95 .5 .3]);
+    removeStyle(uit);
+    for i = 1:length(uit.Data.dip)
+        if any(isnan(uit.Data.dip{i})) || isnan(uit.Data.rake(i)) || isnan(uit.Data.dip_dir(i)) || ismissing(uit.Data.rake(i)) || ismissing(uit.Data.dip_dir(i)) %highlight rows with missing data
+            uit.Data.plot(i) = false;
+            addStyle(uit,s2,'row',i);
+        elseif ~isnumeric(uit.Data.dip{i}) %highlight variable dip faults
+            addStyle(uit,s,'row',i);            
+        end
+    end        
 end
 %function to calculate the fault depth to maintain aspect ratio for short faults
 % function uit = calc_depth(fault_input,uit) %OUTDATED: THIS IS NOW DONE IN THE "model_3D-faults" CODE!
@@ -277,15 +287,15 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     dip_imp = readtable(fullfile(path,file));
     dipdata = table(cell(height(dip_imp),1),cell(height(dip_imp),1),cell(height(dip_imp),1));
     dipdata.Properties.VariableNames = {'fault_name','depth','dip'};
-    depth_dip = table2array(dip_imp(:,2:21));
+    depth_dip = table2array(dip_imp(:,2:22));
     s = uistyle('BackgroundColor',[.3 .8 .8]);
     for i = 1:length(dip_imp.fault_name)
         dip_imp.fault_name{i} = strrep(dip_imp.fault_name{i},' ','_');
         idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
         if any(idx) == true
             dipdata.fault_name{i} = uit.Data.fault_name{idx};
-            dipdata.depth{i} = depth_dip(i,[1 3 5 7 9]);
-            dipdata.dip{i} = depth_dip(i,[2 4 6 8 10]);
+            dipdata.depth{i} = depth_dip(i,[1 3 5 7 9 11 13 15 17 19 21]);
+            dipdata.dip{i} = depth_dip(i,[2 4 6 8 10 12 14 16 18 20]);
             addStyle(uit,s,'row',idx);
             uit.Data.dip{idx} = 'var. dip';
         else
@@ -320,20 +330,31 @@ function [uit] = tablesort(uit,sort_dd)
         case 'length desc.'
             uit.Data = sortrows(uit.Data,6,'descend');
     end
+    %update uitable style (same code as in tableChangedFun function)
+    s = uistyle('BackgroundColor',[.3 .8 .8]);
+    s2 = uistyle('BackgroundColor',[.95 .5 .3]);
+    removeStyle(uit);
+    for i = 1:length(uit.Data.dip)
+        if any(isnan(uit.Data.dip{i})) || isnan(uit.Data.rake(i)) || isnan(uit.Data.dip_dir(i)) || ismissing(uit.Data.rake(i)) || ismissing(uit.Data.dip_dir(i)) %highlight rows with missing data
+            uit.Data.plot(i) = false;
+            addStyle(uit,s2,'row',i);
+        elseif ~isnumeric(uit.Data.dip{i}) %highlight variable dip faults
+            addStyle(uit,s,'row',i);            
+        end
+    end      
 end
 % export custom config button
-function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone,margin_txt)
+function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_utmzone,margin_txt)
     custom_config = readtable('config.txt');
     custom_config.value(1) = set_grid_size.Value;
     custom_config.value(3) = set_surfSlip.Value;
     custom_config.value(4) = set_maxSlip.Value;
     custom_config.value(5) = set_seismoDepth.Value;
     custom_config.value(6) = set_ruptureDepth.Value;
-    custom_config.value(7) = set_centre_hor.Value;
-    custom_config.value(8) = set_centre_ver.Value;
     custom_config.value(9) = str2double(cell2mat(set_utmzone.Value));
     custom_config.value(10) = str2double(cell2mat(margin_txt.Value));
     writetable(custom_config,'Code/custom_config.txt');
+    disp('Custom configuration saved.')
 end
 % load custom configuration button
 function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone] = import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_utmzone,margin_txt)
@@ -343,8 +364,6 @@ function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDept
     set(set_maxSlip,'Value',custom_config.value(4));
     set(set_seismoDepth,'Value',custom_config.value(5));
     set(set_ruptureDepth,'Value',custom_config.value(6));
-    %set(set_centre_hor,'Value',custom_config.value(7));
-    %set(set_centre_ver,'Value',custom_config.value(8));
-    %set(set_utmzone,'Value',num2str(custom_config.value(9)));
     set(margin_txt,'Value',num2str(custom_config.value(10)));
+    disp('Loaded custom configuration. Make sure all settings are correct before plotting.')
 end

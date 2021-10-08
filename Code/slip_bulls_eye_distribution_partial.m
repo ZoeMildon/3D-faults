@@ -57,12 +57,18 @@ slipsx=interp1(data_distances,slip_values,slip_distances);
 slips=slipsx.';
     
 % Extending the slip distribution to depth, with a triangular profile
+switch geometry %make sure that rupture depth is not larger than the deepest portion of the fault
+    case 'variable'
+        if rupture_depth > dip_depth(end)*1000
+            rupture_depth = dip_depth(end)*1000;
+        end
+end
 depth_distances=[0;centre_vertical;rupture_depth]; 
 given_slip_proportions=[slip_at_surface;1;0];
        
 % Calculating the depth of the middle of all the elements, works for both variable and planar dip cases
 for h=1:length(z_points(:,1))-1
-	calc_depth(h,1)=-(z_points(h,1)+z_points(h+1,1))/2;
+	calc_depth(h,1)=-(z_points_copy(h,1)+z_points_copy(h+1,1))/2;
 end
 
 calc_depth=calc_depth(find(calc_depth<rupture_depth)); % remove depths below the specified rupture depth
@@ -71,6 +77,13 @@ slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
 slip_dist=slip_proportions*slips;
     
 b=find((calc_depth <= rupture_depth)); % find the indicies that are with the area of slip down the fault
-
 slip_distribution(b(1):b(end),a(1):a(end))=slip_dist; % Putting slip_dist matrix into the zeros matrix previously set up
 
+% %check size of slip_distribution (to avoid errors for interseting faults)
+% size_dif = size(x_points) - size(slip_distribution);
+% if size_dif(1) < 1
+%     slip_distribution(end,:) = [];
+% end
+% if size_dif(2) < 1
+%     slip_distribution(:,end) = [];
+% end

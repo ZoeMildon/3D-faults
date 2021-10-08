@@ -1,6 +1,6 @@
 %function plt = patch_plotting(plt,x_points,y_points,z_points,utm_lat,utm_lon, maximum_slip, slip_distribution)
 % Plotting 3D fault planes with patch approach, colour coded by slip distribution
-if plot3d == true || patch_count == 0
+if subplot_on.Value == true || strcmp(fault_name,fault_slip_name)==1
 for i=1:length(x_points(:,1))-1
     for j=1:length(x_points(1,:))-1
         x(1)=x_points(i,j);

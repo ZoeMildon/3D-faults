@@ -2,7 +2,7 @@
 clear
 close all
 plot3d = true;
-fig = uifigure('Name','Fault Input - 3D-Faults v2.1','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
+fig = uifigure('Name','Fault Input - 3D-Faults v2.2','Position',[5 45 1356 690],'Color',[.98 .98 .98],'Resize','off');
 
 tabgp = uitabgroup(fig,'Position',[1 1 1354 690]);
 tab1 = uitab(tabgp,'Title','Fault Import','BackgroundColor',[.98 .98 .98]);
@@ -12,7 +12,7 @@ plt = uiaxes(tab3,'Position',[200 5 900 690],'Color',[.9 .9 .9],'Box','On');
 settings = readtable('config.txt');
 
 %% Configuration of UI tab 1
-pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v2.1','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
+pmain = uipanel(tab1,'Title','INPUT PARAMETERS  -  3D-Faults v2.2','Position',[10 105 830 550],'BackgroundColor',[.98 .98 .98],'FontWeight','bold');
 
 % general info panel
 p1 = uipanel(pmain,'Title','General Information','Position',[10 450 710 70],'BackgroundColor',[1 1 1]);
@@ -56,11 +56,11 @@ prev_seismodepth = settings.value(5);
 p3 = uipanel(tab2,'Title','Setting the location of maximum slip','Position',[270 575 230 85],'BackgroundColor',[1 1 1]);
 uilabel(p3,'Position',[10 40 130 20],'Text','Horizontal centre (km):');
 uilabel(p3,'Position',[10 10 130 20],'Text','Vertical centre (km):');
-set_centre_hor = uispinner(p3,'Position',[135 40 60 20],'Step',.1,'Limits',[0 inf],'Value',settings.value(7),'ValueChangedFcn','vars');
+set_centre_hor = uispinner(p3,'Position',[135 40 60 20],'Step',.5,'Limits',[0 inf],'Value',settings.value(7),'ValueChangedFcn','vars');
 set_centre_ver = uispinner(p3,'Position',[135 10 60 20],'Step',.1,'Limits',[0 inf],'Value',settings.value(5)/2,'ValueChangedFcn','vars');
 %options panel
 opt_pnl = uipanel(tab2,'Title','Data options','Position',[270 480 230 85],'BackgroundColor',[1 1 1]);
-vardip = uitable(fig,'Visible','off');  %this table is just for storing variable dip values but is not shown in ui
+vardip = uitable(fig,'Visible','off'); %this table is just for storing variable dip values but is not shown in ui
 dip_btn = uibutton(opt_pnl,'push','Text','Import variable dip','Position',[10, 40, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 exp_btn = uibutton(opt_pnl,'push','Text','Export table','Position',[10, 10, 130, 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold');
 %intersecting faults panel:
@@ -72,7 +72,6 @@ uilabel(intersect_pnl,'Position',[10 90 200 20],'Text','Intersection distance (k
 int_thresh = uispinner(intersect_pnl,'Position',[160 90 50 20],'Step',.1,'Limits',[0 10],'Value',1);
 uilabel(intersect_pnl,'Position',[10 60 200 20],'Text','Select major/minor faults:');
 priority_dd = uidropdown(intersect_pnl,'Position',[150 60 90 20],'Items',{'in table order','by priority'});
-%uilabel(intersect_pnl,'Position',[10 40 100 20],'Text','Always plot source fault first');
 bg_source = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Always plot source fault first:');
 rb_source_on = uiradiobutton(bg_source,'Position',[10 3 80 15],'Text','yes');
 rb_source_off = uiradiobutton(bg_source,'Position',[90 3 80 15],'Text','no');
@@ -117,6 +116,10 @@ coord_btn = uibutton(coord_pnl,'push','Text','Update Plot','Position',[10 40 80 
 auto_btn = uibutton(coord_pnl,'push','Text','Auto','Position',[95 40 80 20],'BackgroundColor',[.8 .8 .8]);
 
 %Plot button
+subplot_btn = uibuttongroup(tab2,'Position',[1130 120 200 40],'Title','Display entire network?','BorderType','none','BackgroundColor',[.95 .95 .95]);
+subplot_on = uiradiobutton(subplot_btn,'Position',[3 3 40 15],'Text','Yes');
+subplot_off = uiradiobutton(subplot_btn,'Position',[63 3 40 15],'Text','No');
+
 plot_bg = uibuttongroup(tab2,'Position',[1130 10 200 20]);
 plot_ext_btn = uitogglebutton(plot_bg,'Position',[0 0 100 20],'Text','external');
 plot_int_btn = uitogglebutton(plot_bg,'Position',[100 0 100 20],'Text','internal');
