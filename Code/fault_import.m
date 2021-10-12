@@ -140,7 +140,7 @@ axe = uiaxes(tab2,'Position',[720 10 400 400],'Color',[1 1 1],'Box','On');
 axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
 set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 
-set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size));
+set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size,sort_dd));
 set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
 set(tabgp,'SelectedTab',tab2);
 %set(set_seismoDepth,'ValueChangingFcn',@(set_seismoDepth,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
@@ -306,7 +306,7 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     disp('Variable dip information imported.')
 end
 %reset all values to standard config
-function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size)
+function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size,sort_dd)
     set(uit,'Data',t);
     settings = readtable('config.txt');
     set(set_surfSlip,'Value',settings.value(3));
@@ -316,6 +316,7 @@ function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptu
     set(set_centre_hor,'Value',settings.value(7));
     set(set_centre_ver,'Value',settings.value(5)/2);
     set(set_grid_size,'Value',settings.value(1));
+    set(sort_dd,'Value','---');
     vars
 end
 %function to sort table based on drop-down menu selection

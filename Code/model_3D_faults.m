@@ -131,7 +131,7 @@ for i = 1:length(faults.fault_name)
     if isnumeric(faults.dip{i}) == true
         constant_dip = faults.dip{i};
         geometry = 'constant';
-    else
+    elseif strcmp(faults.dip{i},'var. dip') == true
         dip_depth = vardip.Data.depth{count}';
         dip_values = vardip.Data.dip{count}';
         dip_depth(ismissing(dip_depth)) = [];
@@ -294,8 +294,7 @@ for i = 1:length(faults.fault_name)
     end
     
     %% detect intersecting faults:   
-    %copy x_points, y_points, z_points to complete patches that are only
-    %half-deleted (for intersecting faults)
+    %copy x_points, y_points, z_points (needed in other parts of the code)
     x_points_copy = x_points;
     y_points_copy = y_points;
     z_points_copy = z_points;
@@ -410,7 +409,7 @@ for i = 1:length(faults.fault_name)
                 %checking completeness of each patch: if one top corner or both bottom corners are missing, patch is deleted (not plotted)
                 %                                     if one bottom corner is missing, it is replaced by a copied value
                 %if isnan(x_points(n,j)) || isnan(x_points(n,j+1))
-                if ~isnan(x_points(n,j)) && ~isnan(x_points(n,j+1)) && ~isnan(x_points(n+1,j)) && ~isnan(x_points(n+1,j+1))
+                if ~isnan(x_points(n,j)) && ~isnan(x_points(n,j+1)) && ~isnan(x_points(n+1,j)) && ~isnan(x_points(n+1,j+1)) %no corners missing
                     if isempty(dip_dir)==1 %for faults which are vertical
                         fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j)/1000,y_points(n,j)/1000,x_points(n,j+1)/1000,y_points(n,j+1)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
                     %south dipping faults
@@ -424,7 +423,7 @@ for i = 1:length(faults.fault_name)
                     elseif x_points(1,1)<x_points(1,end) % x_points section corrects for the direction that the fault trace is drawn
                         fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points(n,j+1)/1000,y_points(n,j+1)/1000,x_points(n,j)/1000,y_points(n,j)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points(n,j)/1000),abs(z_points(n+1,j)/1000),fault_name);
                     end
-                elseif (~isnan(x_points(n,j)) && ~isnan(x_points(n,j+1))) && (isnan(x_points(n+1,j)) && ~isnan(x_points(n+1,j+1))) || (~isnan(x_points(n+1,j)) && isnan(x_points(n+1,j+1)))
+                elseif (~isnan(x_points(n,j)) && ~isnan(x_points(n,j+1))) && ((isnan(x_points(n+1,j)) && ~isnan(x_points(n+1,j+1))) || (~isnan(x_points(n+1,j)) && isnan(x_points(n+1,j+1)))) %both top corners complete and one bottom corner missing 
                     if isempty(dip_dir)==1 %for faults which are vertical
                         fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points_copy(n,j)/1000,y_points_copy(n,j)/1000,x_points_copy(n,j+1)/1000,y_points_copy(n,j+1)/1000,rake,slip_distribution(n,j),constant_dip,abs(z_points_copy(n,j)/1000),abs(z_points_copy(n+1,j)/1000),fault_name);
                     %south dipping faults
@@ -444,7 +443,7 @@ for i = 1:length(faults.fault_name)
         case 'variable'
         %creating a matrix of dip values to use for the output file
         for k=1:length(z_points(1,:))-1
-            a = find(abs(z_points(n,k))>=(dip_depth*1000)-1,1,'last');
+            a = find(abs(z_points_copy(n,k))>=(dip_depth*1000)-1,1,'last');
             dip_matrix(n,k) = dip_values(a);
         end
             for j=1:length(x_points(1,:))-1
@@ -463,8 +462,8 @@ for i = 1:length(faults.fault_name)
     end
     end
        
-    clearvars a amo A b C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I j k l L last_point lbl lbltext
-    clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault% x x_points y y_points z z_points
+    clearvars a amo A b C calc_depth_prop cb col constant_dip d d2 data_distances delta_x delta_y delta_z depth_extent depth_distances dip_dir distances dx dy fault_down_dip_length fault_name file flength geometry given_slip_proportions grid_size_depth grid_size_surface grid_size_to_depth h i I idx j k l L last_point lbl lbltext
+    clearvars Ldist length_last m middle_dist middle_vertical mw n path rake row rows s seg_length shearmod slip slip_dist slip_idx slip_proportions slip_values slipq slips slipsx smo sum_length T total_length tp utm_lat utm_lon utm_x utm_y utm_z vars wfault x x_points y y_points z z_points
 end
 
 %% Finishing off writing the Coulomb input file
