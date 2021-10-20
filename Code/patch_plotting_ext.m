@@ -52,3 +52,4 @@ zlabel('Depth (m)')
 clearvars x y z
 end
 patch_count = patch_count + numel(slip_distribution) - nnz(isnan(slip_distribution));
+clearvars A T slip_dist x y z
