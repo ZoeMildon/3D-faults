@@ -34,16 +34,16 @@ uilabel(slipdist_pnl,'Position',[10 130 140 20],'Text','Slip at surface (%):');
 uilabel(slipdist_pnl,'Position',[10 100 140 20],'Text','Maximum slip (m):');
 uilabel(slipdist_pnl,'Position',[10 50 140 20],'Text','Seismogenic depth (km):');
 uilabel(slipdist_pnl,'Position',[10 20 140 20],'Text','Rupture depth (km):');
-set_surfSlip = uispinner(slipdist_pnl,'Position',[150 130 60 20],'Step',5,'Limits',[0 100],'Value',settings.value(1),'ValueChangedFcn','slip_at_surface = set_surfSlip.Value');
-set_maxSlip = uispinner(slipdist_pnl,'Position',[150 100 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(2),'ValueChangedFcn','maximum_slip = set_maxSlip.Value');
-set_seismoDepth = uispinner(slipdist_pnl,'Position',[150 50 60 20],'Step',.5,'Limits',[0 inf],'Value',settings.value(3),'ValueChangedFcn','seismo_depthm = set_seismoDepth.Value');
-set_ruptureDepth = uispinner(slipdist_pnl,'Position',[150 20 60 20],'Step',.1,'Limits',[.1 inf],'Value',settings.value(4),'ValueChangedFcn','rupture_depth = set_ruptureDepth.Value');
+set_surfSlip = uispinner(slipdist_pnl,'Position',[150 130 60 20],'Step',5,'Limits',[0 100],'Value',settings.value(1),'ValueChangedFcn','slip_at_surface = set_surfSlip.Value;');
+set_maxSlip = uispinner(slipdist_pnl,'Position',[150 100 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(2),'ValueChangedFcn','maximum_slip = set_maxSlip.Value;');
+set_seismoDepth = uispinner(slipdist_pnl,'Position',[150 50 60 20],'Step',.5,'Limits',[0 inf],'Value',settings.value(3),'ValueChangedFcn','seismo_depthm = set_seismoDepth.Value;');
+set_ruptureDepth = uispinner(slipdist_pnl,'Position',[150 20 60 20],'Step',.1,'Limits',[.1 inf],'Value',settings.value(4),'ValueChangedFcn','rupture_depth = set_ruptureDepth.Value;');
 %Maximum slip panel
 maxslip_pnl = uipanel(fig,'Title','Setting the location of maximum slip','Position',[270 575 230 85],'BackgroundColor',[1 1 1]);
 uilabel(maxslip_pnl,'Position',[10 40 130 20],'Text','Horizontal centre (km):');
 uilabel(maxslip_pnl,'Position',[10 10 130 20],'Text','Vertical centre (km):');
-set_centre_hor = uispinner(maxslip_pnl,'Position',[135 40 60 20],'Step',.5,'Limits',[0 inf],'ValueChangedFcn','centre_horizontal = set_centre_hor.Value');
-set_centre_ver = uispinner(maxslip_pnl,'Position',[135 10 60 20],'Step',.1,'Limits',[0 inf],'ValueChangedFcn','centre_vertical = set_centre_ver.Value');
+set_centre_hor = uispinner(maxslip_pnl,'Position',[135 40 60 20],'Step',.5,'Limits',[0 inf],'ValueChangedFcn','centre_horizontal = set_centre_hor.Value;');
+set_centre_ver = uispinner(maxslip_pnl,'Position',[135 10 60 20],'Step',.1,'Limits',[0 inf],'ValueChangedFcn','centre_vertical = set_centre_ver.Value;');
 %options panel
 opt_pnl = uipanel(fig,'Title','Data options','Position',[270 480 230 85],'BackgroundColor',[1 1 1]);
 vardip = uitable(fig,'Visible','off'); %this table is just for storing variable dip values but is not shown in ui
@@ -64,7 +64,7 @@ rb_source_off = uiradiobutton(bg_source,'Position',[90 3 80 15],'Text','no','Val
 
 %grid size input
 uilabel(fig,'Position',[770 620 130 20],'Text','Grid Size (km):');
-set_grid_size = uispinner(fig,'Position',[855 620 50 20],'Step',0.5,'Limits',[0 30],'Value',settings.value(6),'ValueChangedFcn','grid_size = set_grid_size.Value');
+set_grid_size = uispinner(fig,'Position',[855 620 50 20],'Step',0.5,'Limits',[0 30],'Value',settings.value(6),'ValueChangedFcn','grid_size = set_grid_size.Value;');
 %reset buttons
 reset_btn = uibutton(fig,'push','Text','Reset','Position',[770 490 70 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','FontSize',12);
 restart_btn = uibutton(fig,'push','Text','Restart','Position',[850 490 70 20],'BackgroundColor',[.8 .8 .8],'FontWeight','bold','FontSize',12,'ButtonPushedFcn','ui');

@@ -127,7 +127,6 @@ fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxx
 count = 1;  %counter for the variable dip table
 patch_count = 0;
 ccmatrix = nan(100000,3);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
-mkdir('Output_files',strcat(filename,'_coords')); %directory for exporting fault geometry data
 for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
     rake = faults.rake(i);
@@ -307,14 +306,6 @@ for i = 1:length(faults.fault_name)
         [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh); %call intersecting faults function
     end
     
-    %store fault geometry for stress plots:
-    writematrix(x_points,strcat('Output_files/',filename,'_coords/x_points_',num2str(i),'.csv'));
-    writematrix(y_points,strcat('Output_files/',filename,'_coords/y_points_',num2str(i),'.csv'));
-    writematrix(z_points,strcat('Output_files/',filename,'_coords/z_points_',num2str(i),'.csv'));
-    writematrix(x_points_copy,strcat('Output_files/',filename,'_coords/x_points_copy_',num2str(i),'.csv'));
-    writematrix(y_points_copy,strcat('Output_files/',filename,'_coords/y_points_copy_',num2str(i),'.csv'));
-    writematrix(z_points_copy,strcat('Output_files/',filename,'_coords/z_points_copy_',num2str(i),'.csv'));
-    
 %% Calculating the bulls eye slip distribution. Options included
     if strcmp(fault_name,fault_slip_name)==1
         slipq=questdlg('How much of the fault slips?','Slip distribution','All','Partial rupture','All');
@@ -347,7 +338,7 @@ for i = 1:length(faults.fault_name)
     set(figure(1),'Visible','on');
     gcf = figure(1);
     patch_plotting_ext
-        
+    
     %% Writing the data to the Coulomb output file
     % New Code written by ZKM on 17/6/21 to account for planar vs variable
     % dips, and correcting for the direction of the digitised fault trace
