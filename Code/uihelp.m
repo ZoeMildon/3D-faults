@@ -1,31 +1,30 @@
-function [helpbox1,helpbox2,help_general,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_table,help_grid_size,help_config,help_map,help_coords] = uihelp(tab1,tab2,p1,p2,p3,p4,p5,opt_pnl,coord_pnl)
+function [helpbox1,helpbox2,help_filename,help_utm,help_max_slip,help_slipdist,help_imp,help_vardip,help_table,help_grid_size,help_config,help_map,help_coords,help_intersect,help_subplot] = uihelp(helpbox2,imp_fig,fig,utm_pnl,imp_pnl,slipdist_pnl,maxslip_pnl,opt_pnl,coord_pnl,intersect_pnl)
 %this script only contains functions for the ? - buttons on the ui
 %set up helpbox:
-text = sprintf('\n\t\t\t\t\t\t3D - Faults v2.0');
 
-helpbox1 = uitextarea(tab1,'Position',[855 385 485 270],'Value',text,'Editable','off');
-helpbox2 = uitextarea(tab2,'Position',[920 470 420 180],'Value',text,'Editable','off');
+text = sprintf('\n\t\t\t\t\t 3D - Faults v2.3');
 
-% '?' - buttons tab 1:
-help_general = uibutton(p1,'push','Text','?','Position',[680,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_general,event) uihelp_general(helpbox1));
-help_imp = uibutton(p5,'push','Text','?','Position',[255,20,40,40],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_imp,event) uihelp_imp(helpbox1));
-help_utm = uibutton(p4,'push','Text','?','Position',[270,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_utm,event) uihelp_utm(helpbox1));
+helpbox1 = uitextarea(imp_fig,'Position',[10 90 710 100],'Editable','off');
+%helpbox2 = uitextarea(fig,'Position',[940 480 400 180],'Value',text,'Editable','off');
 
-% ? - buttons tab2:
-help_vardip = uibutton(opt_pnl,'push','Text','?','Position',[150,130,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_vardip,event) uihelp_vardip(helpbox2));
-help_table = uibutton(opt_pnl,'push','Text','?','Position',[150,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_table,event) uihelp_table(helpbox2));
-help_slipdist = uibutton(p2,'push','Text','?','Position',[240,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_slipdist,event) uihelp_slipdist(helpbox2));
-help_max_slip = uibutton(p3,'push','Text','?','Position',[200,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox2));
-help_grid_size = uibutton(tab2,'push','Text','?','Position',[880,600,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_grid_size,event) uihelp_grid_size(helpbox2));
-help_config = uibutton(tab2,'push','Text','?','Position',[880,480,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_config,event) uihelp_config(helpbox2));
-help_map = uibutton(tab2,'push','Text','?','Position',[1085,395,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_map,event) uihelp_map(helpbox2));
-help_coords = uibutton(coord_pnl,'push','Text','?','Position',[160,20,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_coords,event) uihelp_coords(helpbox2));
+% '?' - buttons import window:
+help_imp = uibutton(imp_pnl,'push','Text','?','Position',[255,20,40,40],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_imp,event) uihelp_imp(helpbox1));
+help_utm = uibutton(utm_pnl,'push','Text','?','Position',[270,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',14,'ButtonPushedFcn',@(help_utm,event) uihelp_utm(helpbox1));
+
+% ? - buttons main window:
+help_vardip = uibutton(opt_pnl,'push','Text','?','Position',[150,40,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_vardip,event) uihelp_vardip(helpbox2));
+help_table = uibutton(opt_pnl,'push','Text','?','Position',[150,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_table,event) uihelp_table(helpbox2));
+help_slipdist = uibutton(slipdist_pnl,'push','Text','?','Position',[220,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_slipdist,event) uihelp_slipdist(helpbox2));
+help_max_slip = uibutton(maxslip_pnl,'push','Text','?','Position',[200,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_max_slip,event) uihelp_max_slip(helpbox2));
+help_grid_size = uibutton(fig,'push','Text','?','Position',[910,620,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_grid_size,event) uihelp_grid_size(helpbox2));
+help_config = uibutton(fig,'push','Text','?','Position',[890,530,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_config,event) uihelp_config(helpbox2));
+help_map = uibutton(fig,'push','Text','?','Position',[1085,395,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_map,event) uihelp_map(helpbox2));
+help_coords = uibutton(coord_pnl,'push','Text','?','Position',[170,10,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_coords,event) uihelp_coords(helpbox2));
+help_intersect = uibutton(intersect_pnl,'push','Text','?','Position',[220 10 20 20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_intersect,event) uihelp_intersect(helpbox2));
+help_subplot = uibutton(fig,'push','Text','?','Position',[1320,115,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_subplot,event) uihelp_subplot(helpbox2));
+help_filename = uibutton(fig,'push','Text','?','Position',[1320,160,20,20],'BackgroundColor',[.6 .6 .6],'FontWeight','bold','FontSize',12,'ButtonPushedFcn',@(help_filename,event) uihelp_filename(helpbox2));
 
 %% functions
-function helpbox1 = uihelp_general(helpbox1)
-    helptext = sprintf('Output file name: Name for the output file that will be created\n');
-    set(helpbox1,'Value',helptext);
-end
 function helpbox1 = uihelp_utm(helpbox1)
     helptext = sprintf(strcat(('UTM coordinates:\n\n'),...
         ('If faults are imported from kml or kmz files, coordinates are converted to UTM. \n'),...
@@ -43,7 +42,7 @@ function helpbox1 = uihelp_imp(helpbox1)
         ('  Fields may be empty if data is missing. See README and input examples.')));
     set(helpbox1,'Value',helptext);
 end
-%tab 2:
+%main window:
 function helpbox2 = uihelp_vardip(helpbox2)
     helptext = sprintf(strcat(('FAULTS WITH VARIABLE DIP \n\n'),...
         ('To model variable dip faults, dip/depth profiles must be imported. Variable dip profiles for all faults are stored in a single table.\n'),...
@@ -81,8 +80,8 @@ function helpbox2 = uihelp_grid_size(helpbox2)
 end
 function helpbox2 = uihelp_config(helpbox2)
     helptext = sprintf(strcat(('Custom configuration:\n\n'),...
-        ('Export the current settings as custom configuration by pressing "Export custom config."\n'),...
-        ('The custom configuration can be loaded by clicking "Load custom config." even after the program was closed.')));
+        ('Save: Export the current settings as custom configuration for later use. (Saved to /Code/custom_config.txt)"\n'),...
+        ('Load: Load the previously saved custom configuration to avoid changing all parameters at each use of the software.')));
     set(helpbox2,'Value',helptext);
 end
 function helpbox2 = uihelp_map(helpbox2)
@@ -96,8 +95,26 @@ end
 function helpbox2 = uihelp_coords(helpbox2)
     helptext = sprintf(strcat(('Grid limits\n\n'),...
         ('Define the map extent of the output:\n'),...
-        ('The "Auto" button automatically calculates grid extends that fit the given faults with the defined margin (default 10 percent).'),...
-        ('After changing the extent or using the "Auto" button, press "Update plot" to re-plot the map and save the changes.')));
+        ('"Auto" button: Calculates grid extents that fit the given faults, leaving a margin around the maximum extents of the fault network.\n'),...
+        ('"Update Plot" button: update the overview map without changing x-and y-coordinates.')));
+    set(helpbox2,'Value',helptext);
+end
+function helpbox2 = uihelp_intersect(helpbox2)
+    helptext = sprintf(strcat(('If enabled, faults that are closer than the specified distance to another fault will be cut. '),...
+        ('To avoid errors/artifacts, the distance threshold should usually be about half of the grid size or larger (testing advised).\n'),...
+        ('Which fault remains complete (major) and which one to cut (minor) is decided either by:\n'),...
+        (' - Priority: Higher numbers are plotted first, lower numbers are cut. Only enter numbers (whole numbers or decimal)!\n'),...
+        (' - Table order: Faults that come later in the table are cut at faults that came earlier.\n\n'),...
+        ('Priority may be specified in the input table or shapefile attributes (name = "priority"). If no priority is specified, faults are also cut in table order.\n'),...
+        ('If the source fault is plotted first it will be treated as a major fault, independent of priority or table order. This option can be selected even when cutting of intersecting faults is disabled.')));
+    set(helpbox2,'Value',helptext);
+end
+function helpbox2 = uihelp_filename(helpbox2)
+    helptext = sprintf('Output file name: Name for the output file that will be created\n');
+    set(helpbox2,'Value',helptext);
+end
+function helpbox2 = uihelp_subplot(helpbox2)
+    helptext = sprintf('Plotting the entire network needs more time than only plotting the source fault. Does not affect the output file.\n');
     set(helpbox2,'Value',helptext);
 end
 end
