@@ -118,9 +118,8 @@ t = calc_length(fault_input,t); %calling calc_length function
 t.plot(row) = false;
 if any(ismember(fault_input.Properties.VariableNames,'priority'))
     t.priority = fault_input.priority;
-    t.priority(find(isnan(t.priority))) = 0;
 else
-    t.priority = zeros(length(t.plot),1);
+    t.priority = nan(length(t.plot),1);
 end
 %% configuration of user interface elements
 %fill table with data

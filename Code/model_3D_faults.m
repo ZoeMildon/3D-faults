@@ -98,7 +98,7 @@ end
 if rb_cut_on.Value == true
     switch priority_dd.Value
         case 'by priority'
-            faults = sortrows(faults,8,'descend');
+            faults = sortrows(faults,8,'ascend');
     end
 end
 source_idx = find(faults.source_fault == 1);

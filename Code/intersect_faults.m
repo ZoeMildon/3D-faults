@@ -60,6 +60,5 @@ function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_poi
     ccmatrix(last_idx+1:last_idx+numel(mx_points),1) = mx_points;
     ccmatrix(last_idx+1:last_idx+numel(mx_points),2) = my_points;
     ccmatrix(last_idx+1:last_idx+numel(mx_points),3) = abs(mz_points);
-    %clearvars ccrow cccol ccidx x_dist y_dist z_dist near_x nr nc np mx_points my_points mz_points
     %scatter3(ccmatrix(1:last_idx,1),ccmatrix(1:last_idx,2),-ccmatrix(1:last_idx,3),'k','filled'); %plot the intersection grid (for debugging)
 end
