@@ -8,7 +8,7 @@
 % Start and end points (in km) of ruptures are specified.
 % Identical for both variable and planar dip, and better functionality for changing the location of maximum slip
 
-slip_distribution=zeros((length(z_points(:,1))-1),(length(x_points(1,:))-1)); % generates a blank matrix for slip_distribution to be put into
+slip_distribution=zeros(size(x_points) - [1 1]); % generates a blank matrix for slip_distribution to be put into
 % Checking for potential issues
 if end_slip>fault_length
     errordlg('The specified slip length is longer than fault length!')
@@ -43,7 +43,7 @@ else
 	distances=[set_centre_hor.Value];
 end
 
-a=find((distances >= (start_slip*1000)) & (distances <= (end_slip*1000))); %find the indicies of slip distribution that are within the area of slip along the fault
+a=find((distances >= (start_slip*1000)) & (distances <= (end_slip*1000))); %find the indices of slip distribution that are within the area of slip along the fault
 slip_distances=distances(a);
     
 % Calculate the slip distribution for the specific section of the fault
@@ -57,20 +57,24 @@ slipsx=interp1(data_distances,slip_values,slip_distances);
 slips=slipsx.';
     
 % Extending the slip distribution to depth, with a triangular profile
+switch geometry %make sure that rupture depth is not larger than the deepest portion of the fault
+    case 'variable'
+        if rupture_depth > dip_depth(end)*1000
+            rupture_depth = dip_depth(end)*1000;
+        end
+end
 depth_distances=[0;centre_vertical;rupture_depth]; 
 given_slip_proportions=[slip_at_surface;1;0];
        
 % Calculating the depth of the middle of all the elements, works for both variable and planar dip cases
 for h=1:length(z_points(:,1))-1
-	calc_depth(h,1)=-(z_points(h,1)+z_points(h+1,1))/2;
+	calc_depth(h,1)=-(z_points_copy(h,1)+z_points_copy(h+1,1))/2;
 end
+calc_depth(calc_depth > rupture_depth) = []; % remove depths below the specified rupture depth   
 
-calc_depth=calc_depth(find(calc_depth<rupture_depth)); % remove depths below the specified rupture depth
-    
 slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
 slip_dist=slip_proportions*slips;
     
 b=find((calc_depth <= rupture_depth)); % find the indicies that are with the area of slip down the fault
-
 slip_distribution(b(1):b(end),a(1):a(end))=slip_dist; % Putting slip_dist matrix into the zeros matrix previously set up
-
+clearvars a b calc_depth d d2 data_distances depth_distances distances end_slip given_slip_proportions h L mid_slip rupture_length slip_distances slip_proportions slip_values slips slipsx

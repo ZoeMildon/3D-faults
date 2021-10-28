@@ -1,16 +1,12 @@
 %% This code is triggered by the import button
-clearvars settings
-tab2.Parent = tabgp;
-set(imp_btn,'Enable','off')
-%fetch variables from first ui tab:
-filename = cell2mat(set_filename.Value);
+clearvars lbl settings subplot_btn %free up workspace (delete unnecessary elements)
+%get utm zone from import window:
 utmzone = str2double(set_utmzone.Value);
 if rb1.Value == true
     utmhemi = 'n';
 else
     utmhemi = 's';
 end
-
 %% Import faults:
 if rb_shp.Value == true %shapefile
         disp('Choose a .shp file')
@@ -68,7 +64,8 @@ elseif rb_kmz.Value == true %kmz file
             end
         end
 end
-figure(fig);
+close(imp_fig)
+clearvars imp_fig set_utmzone bg1 rb1 rb2 utm_btn bg2 rb_shp rb_kml rb_kmz imp_btn bg_cut bg_source file path %free up workspace (delete import window elements and redundant variables)
 %% check data and configure input table
 %check for southern hemishphere coordinates and add 'false northing' of 10M
 for i = 1:length(fault_input.Y)
@@ -105,7 +102,7 @@ for i = 1:length(fault_input.fault_name) %replace space by underscore in fault n
     fault_input.fault_name{i} = strrep(fault_input.fault_name{i},' ','_');
 end
 
-%build the table t to be plotted in the uitable (other data remains stored in fault_input)
+%build the table t to be plotted in the uitable (coordinates remain stored in fault_input)
 t = fault_input(:,variables);
 t.len = zeros(length(t.fault_name),1);
 t.depth = num2cell(t.depth);
@@ -116,103 +113,38 @@ for i = 1:length(t.depth)
 end
 t.source_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
-t = calc_length(fault_input,t);
+t = calc_length(fault_input,t); %calling calc_length function
 [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
 t.plot(row) = false;
-
+if any(ismember(fault_input.Properties.VariableNames,'priority'))
+    t.priority = fault_input.priority;
+else
+    t.priority = nan(length(t.plot),1);
+end
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,50,50,73,78,80,75,45});
-s = uistyle('BackgroundColor','[.95 .5 .3]');
-addStyle(uit,s,'row',row);
-
-set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
-set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
-set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt));
+set(uit,'Data',t,'ColumnWidth',{215,40,40,55,78,80,70,40,55});
 
 %initiate plot:
-autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt);
-axe = uiaxes(tab2,'Position',[710 10 400 400],'Color',[1 1 1],'Box','On');
-axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt);
-set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
+axe = uiaxes(fig,'Position',[720 10 400 400],'Color',[1 1 1],'Box','On');
+autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt,axe);
+axe = map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input);
+set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input,set_centre_hor,set_centre_ver,set_seismoDepth));
 
-set(reset2_btn,'ButtonPushedFcn',@(reset2_btn,event) reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size));
-set(coord_btn,'ButtonPushedFcn',@(coord_btn,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
-set(tabgp,'SelectedTab',tab2);
-%set(set_seismoDepth,'ValueChangingFcn',@(set_seismoDepth,event) tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth));
+%configure interface element callbacks:
+set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
+set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
+set(exp_config_btn,'ButtonPushedFcn',@(exp_config_btn,event) export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt));
+set(imp_config_btn,'ButtonPushedFcn',@(imp_config_btn,event) import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt));
+set(sort_dd,'ValueChangedFcn', @(sort_dd,event) tablesort(uit,sort_dd));
+set(reset_btn,'ButtonPushedFcn',@(reset_btn,event) reset(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_grid_size,sort_dd));
+set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt,axe));
+set(update_plot_btn,'ButtonPushedFcn',@(update_plot_btn,event) map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input));
 
+set(fig,'Visible','on') %window appears when setup is finished
+clearvars utmhemi utmzone variables
 %% ------------------ function space -------------------------
-%calculate well-fitting grid extends (Auto button):
-function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_txt,maxx_txt,miny_txt,maxy_txt,margin_txt)
-    rows = find(uit.Data.plot);
-    faults = uit.Data(rows,:);
-    faults.X = fault_input.X(rows);
-    faults.Y = fault_input.Y(rows);
-    dim = zeros(length(faults.X),4);
-    for i = 1:length(faults.X)
-       dim(i,1)= min(faults.X{i});
-       dim(i,2)= max(faults.X{i});
-       dim(i,3)= min(faults.Y{i});
-       dim(i,4)= max(faults.Y{i});
-    end
-    width = max(dim(:,2)) - min(dim(:,1));
-    height = max(dim(:,4)) - min(dim(:,3));
-    mrg = str2double(margin_txt.Value{1})/100;
-    set(minx_txt,'Value', num2str(round((min(dim(:,1)) - mrg * width),-3)/1000));
-    set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + mrg * width),-3)/1000));
-    set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * height),-3)/1000));
-    set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
-end
-%function that plots the map and automatically sets the vertical and horizontal centre
-function axe = tableChangedfun(axe,fault_input,uit,minx_txt,maxx_txt,miny_txt,maxy_txt,set_centre_hor,set_centre_ver,set_seismoDepth)
-    %set the horizontal spinner to faultlength/2 and the vertical spinner
-    %to depth/2
-    idx = find(uit.Data.source_fault);
-    if nnz(idx) == 1
-        len = uit.Data.len(idx)/2;
-        if isnan(len) == true
-            warndlg('No fault length given for slip fault. Make sure to set a sensible horizontal centre or fault length')
-        else
-            set(set_centre_hor,'Value',len)
-        end
-        if isempty(uit.Data.depth{idx}) == false && strcmp(uit.Data.depth{idx},'seism. dep.') == false
-            if isnumeric(uit.Data.depth{idx}) == false
-                dep = str2double(uit.Data.depth{idx});
-            else
-                dep = uit.Data.depth{idx}/2;
-            end
-        elseif isempty(uit.Data.depth{idx}) == true || strcmp(uit.Data.depth{idx},'seism. dep.') == true
-            dep = set_seismoDepth.Value/2;
-        else
-            dep = 17;
-        end
-        set(set_centre_ver,'Value',dep);
-    end
-    %plot the overview map
-    min_x = str2double(minx_txt.Value{1});
-    max_x = str2double(maxx_txt.Value{1});
-    min_y = str2double(miny_txt.Value{1});
-    max_y = str2double(maxy_txt.Value{1});
-    cla(axe)
-    hold(axe,'ON')
-    rectangle(axe,'Position',[min_x min_y max_x-min_x max_y-min_y],'FaceColor',[.85 .95 .7])
-    axis(axe, 'equal')
-    title(axe, 'Overview Map of the Fault Network')
-    xlabel(axe,'UTM x')
-    ylabel(axe,'UTM y')
-    for i = 1:length(fault_input.X)
-        if uit.Data.plot(i) == true && uit.Data.source_fault(i) == false
-            plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'k')
-        elseif uit.Data.plot(i) == true && uit.Data.source_fault(i) == true
-            plot(axe,cell2mat(fault_input.X(i))/1000,cell2mat(fault_input.Y(i))/1000,'r','LineWidth',2)
-            xval=fault_input.X{i}(~isnan(fault_input.X{i}));
-            yval=fault_input.Y{i}(~isnan(fault_input.Y{i}));
-            scatter(axe,(xval(1))/1000,(yval(1))/1000,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','w')
-            scatter(axe,(xval(end))/1000,(yval(end))/1000,'Marker','o','MarkerFaceColor','w','MarkerEdgeColor','k')
-        end
-    end
-end
-%function to calculate fault length from X and Y data
+%function to calculate fault length from X and Y data (when faults are imported)
 function t = calc_length(fault_input,t)
     f = waitbar(0,'Importing fault network...');
     for i = 1:length(fault_input.X)
@@ -227,23 +159,107 @@ function t = calc_length(fault_input,t)
     t.len = round(t.len);
     close(f)
 end
-%function to calculate the fault depth to maintain aspect ratio for short faults
-function uit = calc_depth(fault_input,uit)
-    f = waitbar(0,'Please wait for the calculation of fault depths...');
-    uit.Data.depth = zeros(length(uit.Data.depth),1);
-    for i = 1:length(fault_input.X)
-        if isnan(fault_input.down_dip_len(i))==1
-            uit.Data.depth(i) = 15; %set_seismoDepth.Value - I NEED MANUEL's HELP
-        else
-            depth = fault_input.down_dip_len(i) * sind(fault_input.dip{i});
-            uit.Data.depth(i) = depth;
-        end
-        waitbar(i/length(fault_input.X));
+%calculate well-fitting grid extends (Auto button):
+function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_txt,maxx_txt,miny_txt,maxy_txt,margin_txt,axe)
+    rows = find(uit.Data.plot);
+    coords = table(fault_input.X,fault_input.Y);
+    coords.Properties.VariableNames = {'X','Y'};
+    for i = 1:length(uit.Data.plot) %fetching coordiniates from input table
+        idx = find(strcmp(uit.Data.fault_name(i),fault_input.fault_name));
+        coords.X(i) = fault_input.X(idx);
+        coords.Y(i) = fault_input.Y(idx);
     end
-    close(f)
+    faults = uit.Data(rows,:);
+    faults.X = coords.X(rows);
+    faults.Y = coords.Y(rows);
+    dim = zeros(length(faults.X),4);
+    for i = 1:length(faults.X)
+       dim(i,1)= min(faults.X{i});
+       dim(i,2)= max(faults.X{i});
+       dim(i,3)= min(faults.Y{i});
+       dim(i,4)= max(faults.Y{i});
+    end
+    width = max(dim(:,2)) - min(dim(:,1));
+    height = max(dim(:,4)) - min(dim(:,3));
+    mrg = str2double(margin_txt.Value{1})/100;
+    set(minx_txt,'Value', num2str(round((min(dim(:,1)) - mrg * width),-3)/1000));
+    set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + mrg * width),-3)/1000));
+    set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * height),-3)/1000));
+    set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
+    map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input);
+end
+%tableChangedFcn: set vertical and horizontal centre, update table style and overview map
+function [set_centre_hor,set_centre_ver,uit] = tableChangedfun(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input,set_centre_hor,set_centre_ver,set_seismoDepth)
+    %set the horizontal spinner to faultlength/2 and the vertical spinner to depth/2
+    idx = find(uit.Data.source_fault);
+    if nnz(idx) == 1
+        len = uit.Data.len(idx)/2;
+        if isnan(len) == true
+            warndlg('No fault length given for source fault. Make sure to set a sensible horizontal centre or fault length')
+        else
+            set(set_centre_hor,'Value',len)
+        end
+        if isempty(uit.Data.depth{idx}) == true || strcmp(uit.Data.depth{idx},'seism. dep.') == true %no depth specified --> use seismo depth or aspect ratio 1
+            if uit.Data.len(idx) >= set_seismoDepth.Value
+                dep = set_seismoDepth.Value/2;
+            else                                        %faults shorter than seismo_depth
+                dep = (uit.Data.len(idx)*cosd(uit.Data.dip{idx}))/2;
+            end
+        else %use specified depth
+            dep = str2double(uit.Data.depth{idx})/2;
+        end
+        set(set_centre_ver,'Value',dep);
+    end
+    %plot the overview map
+    map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit, fault_input);
+    
+    %set style for table rows
+    s = uistyle('BackgroundColor',[.3 .8 .3]);
+    s2 = uistyle('BackgroundColor',[.95 .5 .3]);
+    removeStyle(uit);
+    for i = 1:length(uit.Data.dip)
+        if any(isnan(uit.Data.dip{i})) || isnan(uit.Data.rake(i)) || isnan(uit.Data.dip_dir(i)) || ismissing(uit.Data.rake(i)) || ismissing(uit.Data.dip_dir(i)) %highlight rows with missing data
+            uit.Data.plot(i) = false;
+            addStyle(uit,s2,'row',i);
+        elseif ~isnumeric(uit.Data.dip{i}) %highlight variable dip faults
+            addStyle(uit,s,'row',i);            
+        end
+    end
+end
+%plot/update overview map:
+function axe = map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input)
+    min_x = str2double(minx_txt.Value{1});
+    max_x = str2double(maxx_txt.Value{1});
+    min_y = str2double(miny_txt.Value{1});
+    max_y = str2double(maxy_txt.Value{1});
+    cla(axe)
+    hold(axe,'ON')
+    rectangle(axe,'Position',[min_x min_y max_x-min_x max_y-min_y],'FaceColor',[.85 .95 .7])
+    axis(axe, 'equal')
+    title(axe, 'Overview Map of the Fault Network')
+    xlabel(axe,'UTM x')
+    ylabel(axe,'UTM y')
+    coords = table(fault_input.X,fault_input.Y);
+    coords.Properties.VariableNames = {'X','Y'};
+    for i = 1:length(uit.Data.plot)
+        idx = find(strcmp(uit.Data.fault_name(i),fault_input.fault_name));
+        coords.X(i) = fault_input.X(idx);
+        coords.Y(i) = fault_input.Y(idx);
+    end
+    for i = 1:length(coords.X)
+        if uit.Data.plot(i) == true && uit.Data.source_fault(i) == false
+            plot(axe,cell2mat(coords.X(i))/1000,cell2mat(coords.Y(i))/1000,'k')
+        elseif uit.Data.plot(i) == true && uit.Data.source_fault(i) == true
+            plot(axe,cell2mat(coords.X(i))/1000,cell2mat(coords.Y(i))/1000,'r','LineWidth',2)
+            xval=coords.X{i}(~isnan(coords.X{i}));
+            yval=coords.Y{i}(~isnan(coords.Y{i}));
+            scatter(axe,(xval(1))/1000,(yval(1))/1000,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','w')
+            scatter(axe,(xval(end))/1000,(yval(end))/1000,'Marker','o','MarkerFaceColor','w','MarkerEdgeColor','k')
+        end
+    end
 end
 
-%function for table export to .csv
+%table export to .csv
 function table_export(uit)
     output_file = inputdlg('Output file name:');
     file = strcat('Output_files/',output_file{1},'.csv');
@@ -251,22 +267,22 @@ function table_export(uit)
     msg = sprintf('Table stored to %s',file);
     msgbox(msg)
 end
-%function to fetch variable dip data from table
+%fetch variable dip data from table
 function [uit,vardip] = variable_dip(uit,vardip,fig)
     [file,path] = uigetfile('*.xlsx','Variable Dip Data');
     figure(fig);
     dip_imp = readtable(fullfile(path,file));
     dipdata = table(cell(height(dip_imp),1),cell(height(dip_imp),1),cell(height(dip_imp),1));
     dipdata.Properties.VariableNames = {'fault_name','depth','dip'};
-    depth_dip = table2array(dip_imp(:,2:21));
-    s = uistyle('BackgroundColor',[.3 .8 .8]);
+    depth_dip = table2array(dip_imp(:,2:22));
+    s = uistyle('BackgroundColor',[.3 .8 .3]);
     for i = 1:length(dip_imp.fault_name)
         dip_imp.fault_name{i} = strrep(dip_imp.fault_name{i},' ','_');
         idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
         if any(idx) == true
             dipdata.fault_name{i} = uit.Data.fault_name{idx};
-            dipdata.depth{i} = depth_dip(i,[1 3 5 7 9]);
-            dipdata.dip{i} = depth_dip(i,[2 4 6 8 10]);
+            dipdata.depth{i} = depth_dip(i,[1 3 5 7 9 11 13 15 17 19 21]);
+            dipdata.dip{i} = depth_dip(i,[2 4 6 8 10 12 14 16 18 20]);
             addStyle(uit,s,'row',idx);
             uit.Data.dip{idx} = 'var. dip';
         else
@@ -276,15 +292,65 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     set(vardip,'Data',dipdata);
     disp('Variable dip information imported.')
 end
-function [uit] = reset2(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,set_centre_hor,set_centre_ver,set_grid_size)
+%reset all values to standard config
+function [uit] = reset(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_grid_size,sort_dd)
     set(uit,'Data',t);
     settings = readtable('config.txt');
-    set(set_surfSlip,'Value',settings.value(3));
-    set(set_maxSlip,'Value',settings.value(4));
-    set(set_seismoDepth,'Value',settings.value(5));
-    set(set_ruptureDepth,'Value',settings.value(5));
-    set(set_centre_hor,'Value',settings.value(7));
-    set(set_centre_ver,'Value',settings.value(5)/2);
-    set(set_grid_size,'Value',settings.value(1));
-    vars
+    set(set_surfSlip,'Value',settings.value(1));
+    set(set_maxSlip,'Value',settings.value(2));
+    set(set_seismoDepth,'Value',settings.value(3));
+    set(set_ruptureDepth,'Value',settings.value(4));
+    set(int_thresh,'Value',settings.value(5));
+    set(set_grid_size,'Value',settings.value(6));
+    set(sort_dd,'Value','---');
+end
+%sort table based on drop-down menu selection
+function [uit] = tablesort(uit,sort_dd)
+    switch sort_dd.Value
+        case 'name A-Z'
+            uit.Data = sortrows(uit.Data,1);
+        case 'name Z-A'
+            uit.Data = sortrows(uit.Data,1,'descend');
+        case 'length asc.'
+            uit.Data = sortrows(uit.Data,6);
+        case 'length desc.'
+            uit.Data = sortrows(uit.Data,6,'descend');
+    end
+    %update uitable style (same code as in tableChangedFun function)
+    s = uistyle('BackgroundColor',[.3 .8 .3]);
+    s2 = uistyle('BackgroundColor',[.95 .5 .3]);
+    removeStyle(uit);
+    for i = 1:length(uit.Data.dip)
+        if any(isnan(uit.Data.dip{i})) || isnan(uit.Data.rake(i)) || isnan(uit.Data.dip_dir(i)) || ismissing(uit.Data.rake(i)) || ismissing(uit.Data.dip_dir(i)) %highlight rows with missing data
+            uit.Data.plot(i) = false;
+            addStyle(uit,s2,'row',i);
+        elseif ~isnumeric(uit.Data.dip{i}) %highlight variable dip faults
+            addStyle(uit,s,'row',i);            
+        end
+    end      
+end
+% save custom config
+function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt)
+    custom_config = readtable('config.txt');
+    custom_config.value(1) = set_surfSlip.Value;
+    custom_config.value(2) = set_maxSlip.Value;
+    custom_config.value(3) = set_seismoDepth.Value;
+    custom_config.value(4) = set_ruptureDepth.Value;
+    custom_config.value(5) = int_thresh.Value;
+    custom_config.value(6) = set_grid_size.Value;
+    custom_config.value(7) = str2double(cell2mat(margin_txt.Value));
+    writetable(custom_config,'Code/custom_config.txt');
+    disp('Custom configuration saved.')
+end
+% load custom configuration
+function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh] = import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt)
+    custom_config = readtable('custom_config.txt');
+    set(set_surfSlip,'Value',custom_config.value(1));
+    set(set_maxSlip,'Value',custom_config.value(2));
+    set(set_seismoDepth,'Value',custom_config.value(3));
+    set(set_ruptureDepth,'Value',custom_config.value(4));
+    set(int_thresh,'Value',custom_config.value(5));
+    set(set_grid_size,'Value',custom_config.value(6));
+    set(margin_txt,'Value',num2str(custom_config.value(7)));
+    disp('Loaded custom configuration. Make sure all settings are correct before plotting.')
 end
