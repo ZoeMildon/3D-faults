@@ -206,7 +206,11 @@ function [set_centre_hor,set_centre_ver,uit] = tableChangedfun(axe,minx_txt,maxx
                 dep = (uit.Data.len(idx)*cosd(uit.Data.dip{idx}))/2;
             end
         else %use specified depth
-            dep = str2double(uit.Data.depth{idx})/2;
+            if isnumeric(uit.Data.depth{idx}) == false
+                dep = str2double(uit.Data.depth{idx})/2;
+            else
+                dep = uit.Data.depth{idx}/2;
+            end
         end
         set(set_centre_ver,'Value',dep);
     end

@@ -103,11 +103,11 @@ if rb_cut_on.Value == true
 end
 source_idx = find(faults.source_fault == 1);
 fault_slip_name = faults.fault_name{source_idx};  %extract the name of the fault that slips
-if rb_source_on.Value == true
-    source = faults(source_idx,:);                    %rearranging the table so that source fault is on top
-    faults = [source;faults];
-    faults(source_idx+1,:) = [];
-end
+% if rb_source_on.Value == true
+%     source = faults(source_idx,:);                    %rearranging the table so that source fault is on top
+%     faults = [source;faults];
+%     faults(source_idx+1,:) = [];
+% end
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
 fprintf (fid,'Fault with slip is %s, the grid size of faults is %2.0f km\n',fault_slip_name,(grid_size));
@@ -126,8 +126,8 @@ fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxx
 %% calculate grid for each fault
 count = 1;  %counter for the variable dip table
 patch_count = 0;
-ccmatrix = nan(100000,3);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
-mkdir('Output_files',strcat(filename,'_coords')); %directory for exporting fault geometry data
+ccmatrix = nan(100000,4);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
+%mkdir('Output_files',strcat(filename,'_coords')); %directory for exporting fault geometry data
 for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
     rake = faults.rake(i);
@@ -304,16 +304,16 @@ for i = 1:length(faults.fault_name)
     z_points_copy = z_points;
     % detect and remove intersecting fault elements
     if rb_cut_on.Value == true
-        [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh); %call intersecting faults function
+        [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults,rb_rev_on); %call intersecting faults function
     end
     
     %store fault geometry for stress plots:
-    writematrix(x_points,strcat('Output_files/',filename,'_coords/x_points_',num2str(i),'.csv'));
-    writematrix(y_points,strcat('Output_files/',filename,'_coords/y_points_',num2str(i),'.csv'));
-    writematrix(z_points,strcat('Output_files/',filename,'_coords/z_points_',num2str(i),'.csv'));
-    writematrix(x_points_copy,strcat('Output_files/',filename,'_coords/x_points_copy_',num2str(i),'.csv'));
-    writematrix(y_points_copy,strcat('Output_files/',filename,'_coords/y_points_copy_',num2str(i),'.csv'));
-    writematrix(z_points_copy,strcat('Output_files/',filename,'_coords/z_points_copy_',num2str(i),'.csv'));
+    %writematrix(x_points,strcat('Output_files/',filename,'_coords/x_points_',num2str(i),'.csv'));
+    %writematrix(y_points,strcat('Output_files/',filename,'_coords/y_points_',num2str(i),'.csv'));
+    %writematrix(z_points,strcat('Output_files/',filename,'_coords/z_points_',num2str(i),'.csv'));
+    %writematrix(x_points_copy,strcat('Output_files/',filename,'_coords/x_points_copy_',num2str(i),'.csv'));
+    %writematrix(y_points_copy,strcat('Output_files/',filename,'_coords/y_points_copy_',num2str(i),'.csv'));
+    %writematrix(z_points_copy,strcat('Output_files/',filename,'_coords/z_points_copy_',num2str(i),'.csv'));
     
 %% Calculating the bulls eye slip distribution. Options included
     if strcmp(fault_name,fault_slip_name)==1
