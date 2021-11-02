@@ -58,12 +58,12 @@ uilabel(intersect_pnl,'Position',[10 90 200 20],'Text','Intersection distance (k
 int_thresh = uispinner(intersect_pnl,'Position',[160 90 50 20],'Step',.1,'Limits',[0 10],'Value',1);
 uilabel(intersect_pnl,'Position',[10 60 200 20],'Text','Select major/minor faults:');
 priority_dd = uidropdown(intersect_pnl,'Position',[150 60 90 20],'Items',{'in table order','by priority'});
-%bg_source = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Always plot source fault first:');
-%rb_source_on = uiradiobutton(bg_source,'Position',[10 3 80 15],'Text','yes','Value',0);
-%rb_source_off = uiradiobutton(bg_source,'Position',[90 3 80 15],'Text','no','Value',1);
-bg_rev = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Review each intersection?');
-rb_rev_on = uiradiobutton(bg_rev,'Position',[10 3 80 15],'Text','yes','Value',0);
-rb_rev_off = uiradiobutton(bg_rev,'Position',[90 3 80 15],'Text','no','Value',1);
+bg_source = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Always plot source fault first:');
+rb_source_on = uiradiobutton(bg_source,'Position',[10 3 80 15],'Text','yes','Value',0);
+rb_source_off = uiradiobutton(bg_source,'Position',[90 3 80 15],'Text','no','Value',1);
+%bg_rev = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Review each intersection?');
+%rb_rev_on = uiradiobutton(bg_rev,'Position',[10 3 80 15],'Text','yes','Value',0);
+%rb_rev_off = uiradiobutton(bg_rev,'Position',[90 3 80 15],'Text','no','Value',1);
 
 %grid size input
 uilabel(fig,'Position',[770 620 130 20],'Text','Grid Size (km):');

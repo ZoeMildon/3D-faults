@@ -304,7 +304,7 @@ for i = 1:length(faults.fault_name)
     z_points_copy = z_points;
     % detect and remove intersecting fault elements
     if rb_cut_on.Value == true
-        [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults,rb_rev_on); %call intersecting faults function
+        [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults); %call intersecting faults function
     end
     
     %store fault geometry for stress plots:
