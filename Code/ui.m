@@ -4,8 +4,8 @@ close all
 settings = readtable('config.txt');
 COUL_GRID_SIZE = settings.value(8);
 % set up import window
-imp_fig = uifigure('Name','Fault Input','Position',[200 200 730 420],'Color',[.7 .8 .7],'Resize','off'); %import window
-uilabel(imp_fig,'Position',[280 380 210 40],'Text','3D-Faults v2.3','FontSize',24,'FontWeight','bold');
+imp_fig = uifigure('Name','Fault Input','Position',[200 200 730 420],'Color',[.7 .8 .7],'Resize','off'); %import window %randi([7 10],1,3)/10
+uilabel(imp_fig,'Position',[280 380 260 40],'Text','3D-Faults v2.4_alpha','FontSize',24,'FontWeight','bold');
 % UTM zone/hemisphere panel
 utm_pnl = uipanel(imp_fig,'Title','UTM zone (only for kml/kmz import)','Position',[10 200 320 150],'BackgroundColor',[1 1 1]);
 uilabel(utm_pnl,'Position',[10 90 130 20],'Text','UTM zone:');
@@ -61,6 +61,9 @@ priority_dd = uidropdown(intersect_pnl,'Position',[150 60 90 20],'Items',{'in ta
 bg_source = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Always plot source fault first:');
 rb_source_on = uiradiobutton(bg_source,'Position',[10 3 80 15],'Text','yes','Value',0);
 rb_source_off = uiradiobutton(bg_source,'Position',[90 3 80 15],'Text','no','Value',1);
+%bg_rev = uibuttongroup(intersect_pnl,'Position',[5 10 200 40],'BackgroundColor',[1 1 1],'BorderType','none','Title','Review each intersection?');
+%rb_rev_on = uiradiobutton(bg_rev,'Position',[10 3 80 15],'Text','yes','Value',0);
+%rb_rev_off = uiradiobutton(bg_rev,'Position',[90 3 80 15],'Text','no','Value',1);
 
 %grid size input
 uilabel(fig,'Position',[770 620 130 20],'Text','Grid Size (km):');

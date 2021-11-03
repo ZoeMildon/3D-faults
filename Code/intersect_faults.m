@@ -1,24 +1,62 @@
 % code to detect intersecting faults and modify x/y/z_points  
-function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh)
+function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults)
+    fault_id = i; %assigns a specific id to each fault
+%    int_decision = zeros(i,1); %array saving the decisions for intersections (0 = undecided, 1= delete, 2= ignore)
     %find all values that are close to an existing x, y and z-coordinate triplet:
     for k = 1:numel(x_points)
         x_dist = abs(ccmatrix(:,1) - abs(x_points(k)));
         y_dist = abs(ccmatrix(:,2) - abs(y_points(k)));
         z_dist = abs(ccmatrix(:,3) - abs(z_points(k)));
-        near_x = find(x_dist < (int_thresh.Value*1000));
+        near_x = find(x_dist < (int_thresh.Value*1000)); %x coords closer than threshold
         if isempty(near_x) == false
-        for j = 1:length(near_x)
-            if any(y_dist(near_x(j)) < (int_thresh.Value*1000)) == true && any(z_dist(near_x(j)) < (int_thresh.Value*1000)) == true
-                [ccrow,cccol] = find(x_points-x_points(k) == 0);
-                for n = 1:numel(ccrow)                    
-                    x_points(ccrow(n):end,cccol(n)) = NaN; %delete intersecting points
-                    y_points(ccrow(n):end,cccol(n)) = NaN;
-                    z_points(ccrow(n):end,cccol(n)) = NaN;
+            for j = 1:length(near_x)
+                if any(y_dist(near_x(j)) < (int_thresh.Value*1000)) == true && any(z_dist(near_x(j)) < (int_thresh.Value*1000)) == true %check if y and z points are also nearer than threshold
+                    [ccrow,cccol] = find(x_points-x_points(k) == 0);
+                    %OPTION FOR MANUAL REVIEW OF INTERSECTIONS:
+%                    if rb_rev_on.Value == true %manual review of each intersection
+                        %identify the fault patches that interfere:
+                        near_y = find(y_dist < (int_thresh.Value*1000));
+                        near_z = find(z_dist < (int_thresh.Value*1000));
+                        
+                        near_idx = nan(length(near_x),1);
+                        
+                        for c = 1:length(near_x)
+                            if (any(near_y == near_x(c)) && any(near_z == near_x(c))) == true
+                                near_idx(c) = near_x(c);
+                            end
+                        end
+                        near_idx(isnan(near_idx)) = [];
+                        int_list = ccmatrix(near_idx,4); %identifies the fault_id of the intersecting faults
+                        %get the single fault ids from the int_list:
+                        for n = 1:fault_id
+                            if any(int_list == n)
+                                if faults.priority(i) > faults.priority(n)
+                                    [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
+                                end
+%                                if int_decision(n) == 0
+%                                %decide for each fault_id individually whether to delete or ignore
+%                                     intq_txt = strcat(sprintf('%s intersecting with %s',faults.fault_name{fault_id},faults.fault_name{n})); %plotted fault, preexisting fault
+%                                     intersect_q = questdlg(intq_txt,'Intersecting faults!','Delete','Ignore','Ignore');
+%                                     switch intersect_q
+%                                         case 'Delete'
+%                                             int_decision(n) = 1;
+%                                             [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
+%                                         case 'Ignore'
+%                                             int_decision(n) = 2;
+%                                     end
+%                                elseif int_decision(n) == 1
+%                                    [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
+%                                end
+                            end
+                        end
+%                    elseif rb_rev_on.Value == false
+%                        [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);                    
+%                    end
                 end
             end
         end
-        end
     end
+    
     %writing the cross-cut matrix that stores all existing x-y-z coordinate triplets
     last_elem = nnz(~isnan(ccmatrix(:,1)));
     for j = 1:(numel(x_points))%-nnz(isnan(x_points)))      %convert x_points, y_points and z_points to lists and attach them to the cross-cut matrix
@@ -26,6 +64,7 @@ function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_poi
             ccmatrix(last_elem + j,1) = abs(x_points(j));
             ccmatrix(last_elem + j,2) = abs(y_points(j)); %[abs could cause problems when the study area crosses the equator]
             ccmatrix(last_elem + j,3) = abs(z_points(j));
+            ccmatrix(last_elem + j,4) = fault_id;
         elseif isnan(x_points(j))
             last_elem = last_elem-1;
         end
@@ -60,5 +99,13 @@ function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_poi
     ccmatrix(last_idx+1:last_idx+numel(mx_points),1) = mx_points;
     ccmatrix(last_idx+1:last_idx+numel(mx_points),2) = my_points;
     ccmatrix(last_idx+1:last_idx+numel(mx_points),3) = abs(mz_points);
+    ccmatrix(last_idx+1:last_idx+numel(mx_points),4) = fault_id;
     %scatter3(ccmatrix(1:last_idx,1),ccmatrix(1:last_idx,2),-ccmatrix(1:last_idx,3),'k','filled'); %plot the intersection grid (for debugging)
+    function [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol)
+        for a = 1:numel(ccrow)                    
+             x_points(ccrow(a):end,cccol(a)) = NaN; %delete intersecting points
+             y_points(ccrow(a):end,cccol(a)) = NaN;
+             z_points(ccrow(a):end,cccol(a)) = NaN;
+        end
+    end
 end
