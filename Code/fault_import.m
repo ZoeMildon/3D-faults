@@ -1,5 +1,5 @@
 %% This code is triggered by the import button
-clearvars lbl settings subplot_btn %free up workspace (delete unnecessary elements)
+clearvars lbl lbl1 lbl2 settings utm_btn %free up workspace (delete unnecessary elements)
 %get utm zone from import window:
 utmzone = str2double(set_utmzone.Value);
 if rb1.Value == true
@@ -121,24 +121,26 @@ if any(ismember(fault_input.Properties.VariableNames,'priority'))
 else
     t.priority = nan(length(t.plot),1);
 end
+t = movevars(t,'source_fault','before','dip');
+t = movevars(t,'plot','before','source_fault');
 %% configuration of user interface elements
 %fill table with data
-set(uit,'Data',t,'ColumnWidth',{215,40,40,55,78,80,70,40,55});
+set(uit,'Data',t,'ColumnWidth',{215,40,70,40,40,55,78,80,57});
 
 %initiate plot:
 axe = uiaxes(fig,'Position',[720 10 400 400],'Color',[1 1 1],'Box','On');
-autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt,axe);
+autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, set_margin,axe);
 axe = map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input);
 set(uit, 'CellEditCallback', @(uit,event) tableChangedfun(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input,set_centre_hor,set_centre_ver,set_seismoDepth));
 
 %configure interface element callbacks:
 set(dip_btn,'ButtonPushedFcn', @(dip_btn,event) variable_dip(uit,vardip,fig));
 set(exp_btn,'ButtonPushedFcn', @(exp_btn,event) table_export(uit));
-set(exp_config_btn,'ButtonPushedFcn',@(exp_config_btn,event) export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt));
-set(imp_config_btn,'ButtonPushedFcn',@(imp_config_btn,event) import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt));
+set(exp_config_btn,'ButtonPushedFcn',@(exp_config_btn,event) export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_margin));
+set(imp_config_btn,'ButtonPushedFcn',@(imp_config_btn,event) import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_margin));
 set(sort_dd,'ValueChangedFcn', @(sort_dd,event) tablesort(uit,sort_dd));
 set(reset_btn,'ButtonPushedFcn',@(reset_btn,event) reset(uit,t,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_grid_size,sort_dd));
-set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, margin_txt,axe));
+set(auto_btn,'ButtonPushedFcn',@(auto_btn,event) autogrid(uit,fault_input,minx_txt, maxx_txt, miny_txt, maxy_txt, set_margin,axe));
 set(update_plot_btn,'ButtonPushedFcn',@(update_plot_btn,event) map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input));
 
 set(fig,'Visible','on') %window appears when setup is finished
@@ -160,7 +162,7 @@ function t = calc_length(fault_input,t)
     close(f)
 end
 %calculate well-fitting grid extends (Auto button):
-function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_txt,maxx_txt,miny_txt,maxy_txt,margin_txt,axe)
+function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_txt,maxx_txt,miny_txt,maxy_txt,set_margin,axe)
     rows = find(uit.Data.plot);
     coords = table(fault_input.X,fault_input.Y);
     coords.Properties.VariableNames = {'X','Y'};
@@ -181,7 +183,7 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     end
     width = max(dim(:,2)) - min(dim(:,1));
     height = max(dim(:,4)) - min(dim(:,3));
-    mrg = str2double(margin_txt.Value{1})/100;
+    mrg = set_margin.Value/100;
     set(minx_txt,'Value', num2str(round((min(dim(:,1)) - mrg * width),-3)/1000));
     set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + mrg * width),-3)/1000));
     set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * height),-3)/1000));
@@ -316,9 +318,9 @@ function [uit] = tablesort(uit,sort_dd)
         case 'name Z-A'
             uit.Data = sortrows(uit.Data,1,'descend');
         case 'length asc.'
-            uit.Data = sortrows(uit.Data,6);
+            uit.Data = sortrows(uit.Data,8);
         case 'length desc.'
-            uit.Data = sortrows(uit.Data,6,'descend');
+            uit.Data = sortrows(uit.Data,8,'descend');
     end
     %update uitable style (same code as in tableChangedFun function)
     s = uistyle('BackgroundColor',[.3 .8 .3]);
@@ -334,7 +336,7 @@ function [uit] = tablesort(uit,sort_dd)
     end      
 end
 % save custom config
-function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt)
+function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_margin)
     custom_config = readtable('config.txt');
     custom_config.value(1) = set_surfSlip.Value;
     custom_config.value(2) = set_maxSlip.Value;
@@ -342,12 +344,12 @@ function export_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoD
     custom_config.value(4) = set_ruptureDepth.Value;
     custom_config.value(5) = int_thresh.Value;
     custom_config.value(6) = set_grid_size.Value;
-    custom_config.value(7) = str2double(cell2mat(margin_txt.Value));
+    custom_config.value(7) = set_margin.Value;
     writetable(custom_config,'Code/custom_config.txt');
     disp('Custom configuration saved.')
 end
 % load custom configuration
-function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh] = import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,margin_txt)
+function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh] = import_custom_config(set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDepth,int_thresh,set_margin)
     custom_config = readtable('custom_config.txt');
     set(set_surfSlip,'Value',custom_config.value(1));
     set(set_maxSlip,'Value',custom_config.value(2));
@@ -355,6 +357,6 @@ function [set_grid_size,set_surfSlip,set_maxSlip,set_seismoDepth,set_ruptureDept
     set(set_ruptureDepth,'Value',custom_config.value(4));
     set(int_thresh,'Value',custom_config.value(5));
     set(set_grid_size,'Value',custom_config.value(6));
-    set(margin_txt,'Value',num2str(custom_config.value(7)));
+    set(set_margin,'Value',custom_config.value(7));
     disp('Loaded custom configuration. Make sure all settings are correct before plotting.')
 end
