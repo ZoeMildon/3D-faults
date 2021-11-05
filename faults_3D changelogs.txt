@@ -125,3 +125,16 @@ Version 2.3
 - removed the vars.m script, which became unnecessary after recent changes
 - updated help texts
 - bug fixes (fault down-dip length, some data format issues,...)
+
+Version 2.4
+- changes to intersecting faults code:
+	- priority values are now ascending (e.g. lower numbers are the dominant faults)
+	- the code now identifies both intersecting faults, faults with same priority are not cut
+- chages to the user interface
+	- simplified the import window
+	- replaced most help buttons by tooltips
+	- restructured several user interface elements for a cleaner look and (hopefully) more intuitive handling
+	- added map key to overview map
+- restructured and simplified a lot of code
+- fixed bug that caused errors when using preset depth values
+- fixed bug at writing intersecting faults to .inr
