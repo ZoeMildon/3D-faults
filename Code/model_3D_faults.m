@@ -239,6 +239,8 @@ for i = 1:length(faults.fault_name)
             x_points=utm_x;
             y_points=utm_y;
             z_points=utm_z; 
+            num_dip = nan(1,100);%pre-allocate arrays for dip values
+            dip_angle = nan(1,100);
             for j=1:length(dip_depth(:,1))-1
                 constant_dip=dip_values(j);
                 depth1=dip_depth(j+1);
@@ -295,7 +297,10 @@ for i = 1:length(faults.fault_name)
                     end
                 end
                 num_dip(j)=length(x_points(:,1));
+                dip_angle(j) = constant_dip;
             end
+            num_dip(isnan(num_dip)) = [];
+            dip_angle(isnan(dip_angle)) = [];
     end
     %% intersecting faults:
     %copy x_points, y_points, z_points (needed in other parts of the code)
@@ -306,14 +311,6 @@ for i = 1:length(faults.fault_name)
     if rb_cut_on.Value == true
         [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults,priority_dd); %call intersecting faults function
     end
-    
-    %store fault geometry for stress plots:
-    %writematrix(x_points,strcat('Output_files/',filename,'_coords/x_points_',num2str(i),'.csv'));
-    %writematrix(y_points,strcat('Output_files/',filename,'_coords/y_points_',num2str(i),'.csv'));
-    %writematrix(z_points,strcat('Output_files/',filename,'_coords/z_points_',num2str(i),'.csv'));
-    %writematrix(x_points_copy,strcat('Output_files/',filename,'_coords/x_points_copy_',num2str(i),'.csv'));
-    %writematrix(y_points_copy,strcat('Output_files/',filename,'_coords/y_points_copy_',num2str(i),'.csv'));
-    %writematrix(z_points_copy,strcat('Output_files/',filename,'_coords/z_points_copy_',num2str(i),'.csv'));
     
 %% Calculating the bulls eye slip distribution. Options included
     if strcmp(fault_name,fault_slip_name)==1
@@ -327,11 +324,8 @@ for i = 1:length(faults.fault_name)
                 end_slip=str2double(partial_slip{2});
                 slip_bulls_eye_distribution_partial
         end
-        seismic_moment
     elseif strcmp(fault_name,fault_slip_name)==0
         slip_distribution=zeros((length(z_points_copy(:,1))-1),(length(x_points_copy(1,:))-1)); % creates a slip of 0 for faults without movement
-    else
-        errordlg('Slip calculations have gone wrong')
     end
     
     %remove (set as NaN) all patches from the slip distribution that intersect with another fault:
@@ -342,9 +336,12 @@ for i = 1:length(faults.fault_name)
             end            
         end
     end
-    
+    if strcmp(fault_name,fault_slip_name)==1
+        seismic_moment
+    end
+        
     patch_count = patch_count + numel(slip_distribution) - nnz(isnan(slip_distribution));
-    % plot fault network
+    % plot and export fault network
     set(figure(1),'Visible','on');
     gcf = figure(1);
     patch_plotting_ext
@@ -361,13 +358,8 @@ for i = 1:length(faults.fault_name)
                         case 'constant'
                             dip = constant_dip;
                         case 'variable'
-                            %creating a matrix of dip values to use for the output file
-                            dip_matrix = zeros(size(z_points));
-                            for k=1:length(z_points(1,:))-1
-                                a = find(abs(z_points_copy(r,k))>=(dip_depth*1000)-1,1,'last');
-                                dip_matrix(r,k) = dip_values(a);
-                            end
-                            dip = dip_matrix(r,c);
+                            a = find(abs(z_points_copy(r,k))>=(dip_depth*1000)-1,1,'last');
+                            dip = dip_values(a);
                     end
                     if isempty(dip_dir)==1 %for faults which are vertical
                         fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.0f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
@@ -386,7 +378,7 @@ for i = 1:length(faults.fault_name)
             end
         end
     end
-    clearvars a b c cb col constant_dip delta_x delta_y delta_z dip dip_dir dx dy fault_down_dip_length fault_name geometry grid_size_depth grid_size_surface grid_size_to_depth idx I j k l last_point m n r rake row rows slip_distribution slipq tp utm_lat utm_lon utm_x utm_y utm_z x_points y_points z_points
+    clearvars a b c col constant_dip delta_x delta_y delta_z dip dip_dir dx dy fault_down_dip_length fault_name geometry grid_size_depth grid_size_surface grid_size_to_depth idx I j k l last_point m n r rake row rows slip_distribution slipq tp utm_lat utm_lon utm_x utm_y utm_z x_points y_points z_points
 end
 
 %% Finishing off writing the Coulomb input file
