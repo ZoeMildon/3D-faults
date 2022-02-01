@@ -130,7 +130,7 @@ Version 2.4
 - changes to intersecting faults code:
 	- priority values are now ascending (e.g. lower numbers are the dominant faults)
 	- the code now identifies both intersecting faults, faults with same priority are not cut
-- chages to the user interface
+- changes to the user interface
 	- simplified the import window
 	- replaced most help buttons by tooltips
 	- restructured several user interface elements for a cleaner look and (hopefully) more intuitive handling
@@ -138,3 +138,21 @@ Version 2.4
 - restructured and simplified a lot of code
 - fixed bug that caused errors when using preset depth values
 - fixed bug at writing intersecting faults to .inr
+
+
+Version 2.5
+- added different user interface setups for coseismic and interseismic slip distributions
+(interseismic only features backslip with simple triangular slip distribution derived from max slip rates)
+- added menu bar
+	- added variable dip import to 'Import' menu, removed the button from UI
+	- added import of slip rates to 'Import' menu
+	- added restart, reset and table export to 'Options' menu and removed related buttons from UI
+	- moved import and export of custom config to 'options' menu, different configs for coseismic and interseismic
+- added code that refines the imported dip and depth values for variable dip to get a smooth, equally spaced grid (refine_grid.m)
+- major changes to code structure, mostly related to the new UI setups
+	- added ui_earthquake.m and ui_interseis.m to configure the UI for coseismic and interseismic slip distributions
+	- moved several functions to separate scripts, which are called by both ui scripts
+	- removed the tooltips.m, tooltips are now added in the two ui setup scripts
+	- ui.m is now only setting up the import window, the main window without most elements and the menu bar
+- fixed a bug that imported the wrong variable dip data in some cases
+- fixed seismic moment calculation for faults with variable dip
