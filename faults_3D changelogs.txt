@@ -154,5 +154,6 @@ Version 2.5
 	- moved several functions to separate scripts, which are called by both ui scripts
 	- removed the tooltips.m, tooltips are now added in the two ui setup scripts
 	- ui.m is now only setting up the import window, the main window without most elements and the menu bar
+- faults are now always from west to east (determined by start and end coordinates)
 - fixed a bug that imported the wrong variable dip data in some cases
 - fixed seismic moment calculation for faults with variable dip
