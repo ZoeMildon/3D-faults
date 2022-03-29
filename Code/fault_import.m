@@ -67,12 +67,18 @@ end
 close(imp_fig)
 set(fig,'Visible','on');
 %% check data and configure input table
-%check for southern hemishphere coordinates and add 'false northing' of 10M
 for i = 1:length(fault_input.Y)
-   if any(fault_input.Y{i} < 0) == true
-       fault_input.Y{i} = fault_input.Y{i}+10000000;
-   end
+    %check for southern hemishphere coordinates and add 'false northing' of 10M
+    if any(fault_input.Y{i} < 0) == true
+        fault_input.Y{i} = fault_input.Y{i}+10000000;
+    end
+    %make all faults go from west to east:
+    if fault_input.X{i}(1) > fault_input.X{i}(end-1)
+        fault_input.X{i} = flip(fault_input.X{i});
+        fault_input.Y{i} = flip(fault_input.Y{i});
+    end
 end
+
 %check if variables in input files have correct names
 variables = {'fault_name','dip','rake','dip_dir','depth'};  %variable names of the relevant fields
 for i = 1:length(variables)
@@ -123,9 +129,10 @@ else
 end
 t = movevars(t,'source_fault','before','dip');
 t = movevars(t,'plot','after','fault_name');
-%fill table with data: (remains invisible until a function is opened from menu)
+%fill table with data:
 set(uit,'Data',t);
 clearvars ans col file i imp_fig path rb1 rb2 rb_shp rb_kml rb_kmz row set_utmzone utmhemi utmzone variables %free up workspace (delete import window elements and redundant variables)
+pause(3) %UI stops working if called before import ready, pause to avoid
 ui_earthquake %earthquake panel opened as default
 %% ------------------ function space -------------------------
 %function to calculate fault length from X and Y data (when faults are imported)

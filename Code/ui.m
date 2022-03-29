@@ -31,9 +31,12 @@ imp_btn = uibutton(imp_pnl,'push','Text','Import Faults','Position',[500, 40, 15
 set(imp_btn,'Tooltip','Import faults and properties. Make sure that files are formatted appropriately');
 set(file_bg,'SelectionChangedFcn',@(file_bg,event)format_select(rb_kml,rb_kmz,utm_bg,utm_btn,lbl1,lbl2,set_utmzone));
 
+% citation box
+citation(imp_fig)
+
 %% set up main window
 fig = uifigure('Name','3D-Faults','Position',[5 45 1356 680],'Color',[.98 .98 .98],'Resize','off','Visible','off','HandleVisibility','on');
-infotext = sprintf('\n\n 3D - Faults version 2.4 started.');
+infotext = sprintf('\n\n 3D - Faults version 2.5 started.');
 helpbox2 = uitextarea(fig,'Position',[940 480 400 180],'Value',infotext,'Editable','off','HandleVisibility','off');
 %checkboxes at plot_btn
 subplot_cb = uicheckbox(fig,'Position',[1140 110 200 20],'Text','Display entire network','HandleVisibility','off','Visible','off');
@@ -44,8 +47,7 @@ vardip = uitable(fig,'Visible','off','HandleVisibility','off'); %this table is j
 uit = uitable(fig,'Position',[10 10 700, 410],'ColumnEditable',[false true true true true true true true true],'Visible','off','HandleVisibility','off');
 %menu bar
 [exp_config_menu,imp_config_menu,reset_menu] = create_menu(fig,uit,vardip);
-% citation box
-citation(imp_fig)
+
 clearvars file_bg imp_btn imp_pnl bg1 utm_bg utm_btn bg2
 
 %% ------------------- functions ------------------------

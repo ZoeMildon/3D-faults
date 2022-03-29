@@ -20,10 +20,11 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     end
     width = max(dim(:,2)) - min(dim(:,1));
     height = max(dim(:,4)) - min(dim(:,3));
+    add = max([width height]);
     mrg = set_margin.Value/100;
-    set(minx_txt,'Value', num2str(round((min(dim(:,1)) - mrg * width),-3)/1000));
-    set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + mrg * width),-3)/1000));
-    set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * height),-3)/1000));
-    set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * height),-3)/1000));
+    set(minx_txt,'Value', num2str(round((min(dim(:,1)) - mrg * add),-3)/1000));
+    set(maxx_txt,'Value', num2str(round((max(dim(:,2)) + mrg * add),-3)/1000));
+    set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * add),-3)/1000));
+    set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * add),-3)/1000));
     map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input);
 end
