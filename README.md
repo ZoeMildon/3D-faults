@@ -33,8 +33,7 @@ It is recommended to name the properties/attributes exactly as given, otherwise 
 
 Variable dip:
 
-To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx).
-The table can be imported via the 'import variable dip' button on the 'Customisation' tab, fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
+To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx). The table can be imported via `import > variable dip`; fault names in the file must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
 ## Running the code
 In MATLAB, navigate to the 'faults_3D_v2.x' folder (or similarly named). Execute the script by entering `faults_3D` in the command line or open the faults_3D script and press F5.
@@ -45,9 +44,7 @@ The code will build simple bulls eye slip distributions according to two differe
 The down-dip extent of the rupture can be controlled by changing the `rupture_depth` variable.
 The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed with the `vertical centre` and `horizontal centre` spinners.
 1. The whole fault slips. This assumes the slip is zero at the base, zero at the edges and a specified proportion of maximum slip reaches the surface. 
-2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the 
-   fault is arbitrary, it is indicated with a black circle on the overview map. Make sure that the specified horizontal center of the slip distribution is within
-   the specified segment.
+2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the fault is arbitrary, it is indicated with a black circle on the overview map (the start is always the western end of the fault). Make sure that the specified horizontal center of the slip distribution is within the specified segment.
 
 Alternatively, slip distributions can be manually assigned to each element in the Coulomb input file created from running this code.
 
