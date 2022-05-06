@@ -5,7 +5,7 @@ Code to generate 3D strike- and dip-variable faults from surface traces, and ass
 Code is free to use for research purposes, please cite the following paper:\
 Mildon, Z. K., Toda, S., Faure Walker, J. P. and Roberts, G. P. (2016), [Evaluating models of Coulomb stress transfer- is variable fault geometry important?](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016GL071128), Geophys. Res. Lett., 43
 
-MATLAB Mapping Toolbox is required to run this code. This can be installed from MathWorks. To check if Mapping Toolbox is installed, type `ver` in Matlab Command Window.
+MATLAB Mapping Toolbox is required to use shapefiles as input. This can be installed from MathWorks. To check if Mapping Toolbox is installed, type `ver` in Matlab Command Window.
 
 ## Inputs:
 
