@@ -13,8 +13,8 @@ L=length(x_points(1,:));
 
 d2=grid_sizem/2;
 if length(x_points(:,1))>=3
-    for i=1:L-3
-        d(i)=d2+grid_sizem*i;
+    for c=1:L-3
+        d(c)=d2+grid_sizem*c;
     end
 else
     disp('length(x_points(:,1)) < 3')   %just for debugging!
@@ -57,4 +57,6 @@ end
 slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
 slip_distribution=slip_proportions*slips;
 slip_distribution(isnan(slip_distribution))=0; % changing any NaN values to zeros
+
 clearvars calc_depth d d2 data_distances depth_distances distances given_slip_proportions h L length_last slip_proportions slip_values slips slipsx
+
