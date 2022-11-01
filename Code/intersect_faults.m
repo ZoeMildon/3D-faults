@@ -1,7 +1,6 @@
 % code to detect intersecting faults and modify x/y/z_points  
-function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults)
+function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults,priority_dd)
     fault_id = i; %assigns a specific id to each fault
-%    int_decision = zeros(i,1); %array saving the decisions for intersections (0 = undecided, 1= delete, 2= ignore)
     %find all values that are close to an existing x, y and z-coordinate triplet:
     for k = 1:numel(x_points)
         x_dist = abs(ccmatrix(:,1) - abs(x_points(k)));
@@ -12,14 +11,11 @@ function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_poi
             for j = 1:length(near_x)
                 if any(y_dist(near_x(j)) < (int_thresh.Value*1000)) == true && any(z_dist(near_x(j)) < (int_thresh.Value*1000)) == true %check if y and z points are also nearer than threshold
                     [ccrow,cccol] = find(x_points-x_points(k) == 0);
-                    %OPTION FOR MANUAL REVIEW OF INTERSECTIONS:
-%                    if rb_rev_on.Value == true %manual review of each intersection
+                    if strcmp(priority_dd.Value,'by priority') == true
                         %identify the fault patches that interfere:
                         near_y = find(y_dist < (int_thresh.Value*1000));
                         near_z = find(z_dist < (int_thresh.Value*1000));
-                        
                         near_idx = nan(length(near_x),1);
-                        
                         for c = 1:length(near_x)
                             if (any(near_y == near_x(c)) && any(near_z == near_x(c))) == true
                                 near_idx(c) = near_x(c);
@@ -30,28 +26,14 @@ function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_poi
                         %get the single fault ids from the int_list:
                         for n = 1:fault_id
                             if any(int_list == n)
-                                if faults.priority(i) > faults.priority(n)
+                                if faults.priority(fault_id) > faults.priority(n)
                                     [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
                                 end
-%                                if int_decision(n) == 0
-%                                %decide for each fault_id individually whether to delete or ignore
-%                                     intq_txt = strcat(sprintf('%s intersecting with %s',faults.fault_name{fault_id},faults.fault_name{n})); %plotted fault, preexisting fault
-%                                     intersect_q = questdlg(intq_txt,'Intersecting faults!','Delete','Ignore','Ignore');
-%                                     switch intersect_q
-%                                         case 'Delete'
-%                                             int_decision(n) = 1;
-%                                             [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
-%                                         case 'Ignore'
-%                                             int_decision(n) = 2;
-%                                     end
-%                                elseif int_decision(n) == 1
-%                                    [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
-%                                end
                             end
                         end
-%                    elseif rb_rev_on.Value == false
-%                        [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);                    
-%                    end
+                    else
+                        [x_points,y_points,z_points] = delete_patches(x_points,y_points,z_points,ccrow,cccol);
+                    end
                 end
             end
         end

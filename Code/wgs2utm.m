@@ -70,28 +70,27 @@ function  [x,y,utmzone,utmhemi] = wgs2utm(Lat,Lon,utmzone,utmhemi)
 
 %% Argument checking
 if ~sum(double(nargin==[2,4]))
-    error('Wrong number of input arguments');return
+    error('Wrong number of input arguments');
 end
 n1=size(Lat);
 n2=size(Lon);
 if (n1~=n2)
-    error('Lat and Lon should have same size');return
+    error('Lat and Lon should have same size');
 end
 if exist('utmzone','var') && exist('utmhemi','var')
     n3=size(utmzone);
     n4=size(utmhemi);
     if (sort(n3)~=sort(n4))
-        error('utmzone and utmhemi should have same size');return
+        error('utmzone and utmhemi should have same size');
     end
     if max(n3)~=1 && max(n3)~=max(n1)
-        error('utmzone should have either same size as Lat and Long, or size=1');return
+        error('utmzone should have either same size as Lat and Long, or size=1');
     end
 end
 
 % expand utmzone and utmhemi if needed
 if exist('utmzone','var') && exist('utmhemi','var')
     n3=size(utmzone);
-    n4=size(utmhemi);
     if n3==[1 1]
         utmzone = utmzone.*ones(size(Lat));
         utmhemi = char(utmhemi.*ones(size(Lat)));
@@ -151,10 +150,7 @@ y = FN + k0.*M + k0.*N.*tan(lat).*(                                     A.^2./2 
                                    + (61-58.*T+T.^2+600.*C-330.*eps) .* A.^6./720 );
                                  
 %% UTM zone
-if exist('utmzone','var') && exist('utmhemi','var')
-    utmzone = utmzone;
-    utmhemi = utmhemi;
-else 
+if ~exist('utmzone','var') && ~exist('utmhemi','var')
    utmzone = floor(Lon0./6)+31;
    utmhemi = char( 83.* (Lat < 0) + 78.* (Lat >= 0) );
 end
