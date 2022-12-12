@@ -32,4 +32,6 @@ disp(['   Total seismic moment = ' num2str(amo,'%6.2e') ' dyne cm (Mw = ', num2s
 % add-on for display in UI:
 seis_txt = strcat('Total seismic moment = ',num2str(amo,'%6.2e'),' dyne cm (Mw = ',num2str(mw,'%4.2f'),')');
 infotext = [seis_txt,infotext];
+
 clearvars amo shearmod flength wfault slip smo mw dip_angle dip
+

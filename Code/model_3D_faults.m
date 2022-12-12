@@ -154,28 +154,17 @@ for i = 1:length(faults.fault_name)
     utm_lat = cell2mat(faults.Y(i))';
     utm_lat(ismissing(utm_lat)) = [];
     utm_lon(ismissing(utm_lon)) = [];
-        
-    % Adding extra point to enable calculation of the next point
-    I=eye(length(utm_lat));
-    b=zeros(1,length(utm_lat));
-    tp =I(2:end,:);
-    I(2,:)=b;
-    I(3:end+1,:)=tp;
-    utm_lat = I * utm_lat;
-    utm_lat(2)=utm_lat(1)+0.1;
-    utm_lon=I*utm_lon;
-    utm_lon(2)=utm_lon(1)+0.1;
-    % Grid the fault
+
+    % Setting counters for gridding the fault
     last_point=0;
-    r=1;
+    r=1; % counter for filling utm_x and utm_y
+    a=2; % counter for working through points in utm_lat and utm_lon. Set to 2 to cope with first point.
     utm_x(1)=utm_lon(1);
     utm_y(1)=utm_lat(1);
-    b=0;
     % Finding the next grid point by hypotenuse method
     while last_point<1
-        [utm_x(r+1),utm_y(r+1),last_point,a]=nextpoint_hyp(utm_x(r),utm_y(r),grid_sizem,utm_lon,utm_lat,b);
+        [utm_x(r+1),utm_y(r+1),last_point,a]=nextpoint_hyp(utm_x(r),utm_y(r),grid_sizem,utm_lon,utm_lat,last_point,a);
         r=r+1;
-        b=a;
     end
     %% Extending the fault to depth
     switch geometry
@@ -415,3 +404,4 @@ set(fig,'HandleVisibility','on');
 toc
 infotext = [sprintf('\n-----------\nOutput file: %s \n',output_data_file),sprintf('Number of fault elements (#fixed): %d \n',patch_count),sprintf('Elapsed time is %.0f seconds. \n',round(toc)),infotext];
 set(helpbox2,'Value',infotext);
+
