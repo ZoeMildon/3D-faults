@@ -67,6 +67,7 @@ Version 1.1 - Written by Zoe Mildon, 2016
 Functionality to model dip-variable faults added in 2018.
 
 Version 2.0 -  06/2021 written by Manuel Diercks and Zoe Mildon
+
 New features include:
 - input files can be .shp, .kml or .kmz
 - planar and non-planar (e.g. listric, ramp-flat) geometries can be generated at the same time
