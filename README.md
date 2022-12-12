@@ -5,7 +5,7 @@ Code to generate 3D strike- and dip-variable faults from surface traces, and ass
 Code is free to use for research purposes, please cite the following paper:\
 Mildon, Z. K., Toda, S., Faure Walker, J. P. and Roberts, G. P. (2016), [Evaluating models of Coulomb stress transfer- is variable fault geometry important?](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016GL071128), Geophys. Res. Lett., 43
 
-MATLAB Mapping Toolbox is required to run this code. This can be installed from MathWorks. To check if Mapping Toolbox is installed, type `ver` in Matlab Command Window.
+MATLAB Mapping Toolbox is required to use shapefiles as input. This can be installed from MathWorks. To check if Mapping Toolbox is installed, type `ver` in Matlab Command Window.
 
 ## Inputs:
 
@@ -19,45 +19,47 @@ For shp-import, the file should be projected in UTM coordinates.
 
 Required properties (either in the table or as attributes in the shape file) are:
 
-fault_name - for kml import, the name of the kml file must be the same as the fault_name
-dip - dip angle
-rake - using the Aki and Richards (1980) conventions (normal = -90, reverse = 90, left-lateral = 0, right-lateral = 180)
-dip_dir - dip direction (projection direction)
+* fault_name - for kml import, the name of the kml file must be the same as the fault_name
+* dip - dip angle
+* rake - using the Aki and Richards (1980) conventions (normal = -90, reverse = 90, left-lateral = 0, right-lateral = 180)
+* dip_dir - dip direction (projection direction)
+
+Optional properties:
+
+* priority - determines which fault is cut in case of intersection (lower number = prioritised)
+* depth - depth (vertical) to which the fault plane extends (if not specified, depth = seismogenic depth)
 
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
-A depth column may be optionally given. In the 3D-plot, faults will reach to that specified depth (km).
 
 Variable dip:
 
-To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx).
-The table can be imported via the 'import variable dip' button on the 'Customisation' tab, fault names must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
+To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx). The table can be imported via `import > variable dip`; fault names in the file must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
 ## Running the code
-In MATLAB, navigate to the 'faults_3D_v2.0' folder (or similarly named). Execute the script by entering `faults_3D` in the command line or open the faults_3D script and press F5.
+In MATLAB, navigate to the 'faults_3D_v2.x' folder (or similarly named). Execute the script by entering `faults_3D` in the command line or open the faults_3D script and press F5.
 
 ### Building slip distributions
 The code will build simple bulls eye slip distributions according to two different options (which are made as selections when the code is running).
 
 The down-dip extent of the rupture can be controlled by changing the `rupture_depth` variable.
-The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed by altering the `centre_vertical` and `centre_horizontal` variables.
+The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed with the `vertical centre` and `horizontal centre` spinners.
 1. The whole fault slips. This assumes the slip is zero at the base, zero at the edges and a specified proportion of maximum slip reaches the surface. 
-2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the 
-   fault is arbitrary, it is indicated with a black circle on the overview map. Make sure that the specified horizontal center of the slip distribution is within
-   the specified segment.
+2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the fault is arbitrary, it is indicated with a black circle on the overview map (the start is always the western end of the fault). Make sure that the specified horizontal center of the slip distribution is within the specified segment.
 
 Alternatively, slip distributions can be manually assigned to each element in the Coulomb input file created from running this code.
 
 ## Outputs:
 Writes a .inr file which can be used directly in Coulomb 3.4, this file is created in the "Output_files" folder. HOWEVER BEFORE using in Coulomb, the #fixed value needs to be changed in the third line of the file. This #fixed value is outputted to the Matlab Command Window when the code is run.
 
+The code also calculates the total seismic moment released by the calculated slip distribution, and displays this in the Matlab Command Window.
 
-The code also calculates the total seismic moment released by the calculated slip distribution, and displays this in the Matlab Command Window. 
+If ticked, the code outputs the fault geometries, which can be used for further applications (not included in the current version).
 
 ## Assumptions:
-  - the slip vector is preserved down dip
-  - the trace at the surface continues to depth
-  - the dip of the faults are consistent along the length of the fault
-  - the slip distribution generated by this code creates a simple bulls eye slip distribution.
+- the slip vector is preserved down dip
+- the trace at the surface continues to depth
+- the dip of the faults are consistent along the length of the fault
+- the slip distribution generated by this code creates a simple bulls eye slip distribution.
 
 For further information, please see the published GRL paper.
 
@@ -73,7 +75,13 @@ New features include:
 - planar and non-planar (e.g. listric, ramp-flat) geometries can be generated at the same time
 - new user interface
 
-Please report any issues or bugs to Zoe Mildon (zoe.mildon@plymouth.ac.uk).
+Version 2.5 - 03/2022 written by Manuel Diercks and Zoe Mildon
+- added option to automatically cut intersecting faults
+- added option to calculate interseismic stresses (alpha version)
+
+For full changes of each version see the changelogs.txt file
+
+Please report any issues or bugs to Manuel Diercks (manuel-lukas.diercks@plymouth.ac.uk) or Zoe Mildon (zoe.mildon@plymouth.ac.uk).
 
 # References:
 This code uses the following functions:

@@ -1,4 +1,5 @@
-% This script is triggered by the 'Build 3D Faults' button
+% alternative script to create inr file for backslip
+%[slip_file,slip_path] = uigetfile('*.txt','Select source for slip rates');
 set(fig,'HandleVisibility','off');
 close all
 figure(1);
@@ -9,15 +10,11 @@ format long
 %import and define variables:
 filename = cell2mat(set_filename.Value);
 grid_size = set_grid_size.Value;
-slip_at_surface = set_surfSlip.Value / 100;
-maximum_slip = set_maxSlip.Value;
 seismo_depthm = set_seismoDepth.Value*1000;
-rupture_depth = set_ruptureDepth.Value*1000;
-centre_horizontal = set_centre_hor.Value*1000;
-centre_vertical = set_centre_ver.Value*1000;
 grid_sizem = grid_size*1000;
-output_data_file = strcat('Output_files/',filename,num2str(maximum_slip),'m',num2str(grid_size),'km.inr');
+output_data_file = strcat('Output_files/',filename,'backslip',num2str(grid_size),'km.inr');
 fid=fopen(output_data_file, 'wt');
+
 if fid < 0                                              %check for correct directory
     errordlg('You are not in the correct directory.')
     return
@@ -84,15 +81,6 @@ for j = 1:length(faults.dip)
         return
     end
 end
-if nnz(uit.Data.source_fault) ~= 1    %checks if exactly 1 fault is selected as source fault
-    errordlg('No fault or more than one faults are assigned as slip faults!')
-    return
-end
-%check for senseless user input:
-if rupture_depth > seismo_depthm || centre_vertical > seismo_depthm
-    errordlg('Rupture depth or the vertical centre should not be deeper than the seismogenic depth')
-    return
-end
 
 %rearrange the table for correct plot order (important for interseting faults):
 if intersect_cb.Value == true
@@ -101,16 +89,9 @@ if intersect_cb.Value == true
             faults = sortrows(faults,8,'ascend');
     end
 end
-source_idx = find(faults.source_fault == 1);
-fault_slip_name = faults.fault_name{source_idx};  %extract the name of the fault that slips
-% if rb_source_on.Value == true
-%     source = faults(source_idx,:);                    %rearranging the table so that source fault is on top
-%     faults = [source;faults];
-%     faults(source_idx+1,:) = [];
-% end
 %% Write the beginning of the Coulomb output file (comments)
 fprintf (fid,'This is a file created by rectangularly gridding the faults.\n');
-fprintf (fid,'Fault with slip is %s, the grid size of faults is %2.0f km\n',fault_slip_name,(grid_size));
+fprintf (fid,'This file is made for modelling BACKSLIP \n');
 fprintf (fid,'#reg1=  0  #reg2=  0   #fixed= 1000  sym=  1\n');
 fprintf (fid,' PR1=       .250      PR2=       .250    DEPTH=        5.0\n');
 fprintf (fid,'  E1=   0.800000E+06   E2=   0.800000E+06\n');
@@ -125,7 +106,7 @@ fprintf (fid,'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxx
 
 %% calculate grid for each fault
 patch_count = 0;
-ccmatrix = nan(100000,4);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
+ccmatrix = nan(100000,3);  %create a matrix that stores the coordinates of all patches (rounded) for cross-cut detection (maximum 100k patches)
 for i = 1:length(faults.fault_name)
     fault_name = faults.fault_name{i};
     rake = faults.rake(i);
@@ -154,17 +135,28 @@ for i = 1:length(faults.fault_name)
     utm_lat = cell2mat(faults.Y(i))';
     utm_lat(ismissing(utm_lat)) = [];
     utm_lon(ismissing(utm_lon)) = [];
-
-    % Setting counters for gridding the fault
+        
+    % Adding extra point to enable calculation of the next point
+    I=eye(length(utm_lat));
+    b=zeros(1,length(utm_lat));
+    tp =I(2:end,:);
+    I(2,:)=b;
+    I(3:end+1,:)=tp;
+    utm_lat = I * utm_lat;
+    utm_lat(2)=utm_lat(1)+0.1;
+    utm_lon=I*utm_lon;
+    utm_lon(2)=utm_lon(1)+0.1;
+    % Grid the fault
     last_point=0;
-    r=1; % counter for filling utm_x and utm_y
-    a=2; % counter for working through points in utm_lat and utm_lon. Set to 2 to cope with first point.
+    n=1;
     utm_x(1)=utm_lon(1);
     utm_y(1)=utm_lat(1);
+    b=0;
     % Finding the next grid point by hypotenuse method
     while last_point<1
-        [utm_x(r+1),utm_y(r+1),last_point,a]=nextpoint_hyp(utm_x(r),utm_y(r),grid_sizem,utm_lon,utm_lat,last_point,a);
-        r=r+1;
+        [utm_x(n+1),utm_y(n+1),last_point,a]=nextpoint_hyp(utm_x(n),utm_y(n),grid_sizem,utm_lon,utm_lat,b);
+        n=n+1;
+        b=a;
     end
     %% Extending the fault to depth
     switch geometry
@@ -231,8 +223,6 @@ for i = 1:length(faults.fault_name)
             x_points=utm_x;
             y_points=utm_y;
             z_points=utm_z; 
-            num_dip = nan(1,100);%pre-allocate arrays for dip values
-            dip_angle = nan(1,100);
             for j=1:length(dip_depth(:,1))-1
                 constant_dip=dip_values(j);
                 depth1=dip_depth(j+1);
@@ -289,10 +279,7 @@ for i = 1:length(faults.fault_name)
                     end
                 end
                 num_dip(j)=length(x_points(:,1));
-                dip_angle(j) = constant_dip;
             end
-            num_dip(isnan(num_dip)) = [];
-            dip_angle(isnan(dip_angle)) = [];
     end
     %% intersecting faults:
     %copy x_points, y_points, z_points (needed in other parts of the code)
@@ -304,22 +291,23 @@ for i = 1:length(faults.fault_name)
         [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults,priority_dd); %call intersecting faults function
     end
     
-%% Calculating the bulls eye slip distribution. Options included
-    if strcmp(fault_name,fault_slip_name)==1
-        slipq=questdlg('How much of the fault slips?','Slip distribution','All','Partial rupture','All');
-        switch slipq
-            case 'All'
-                slip_bulls_eye_distribution
-            case 'Partial rupture'
-                partial_slip = inputdlg({'Start of rupture (km)','End of rupture (km)',},'Input', [1 20; 1 20]);
-                start_slip=str2double(partial_slip{1});
-                end_slip=str2double(partial_slip{2});
-                slip_bulls_eye_distribution_partial
-        end
-    elseif strcmp(fault_name,fault_slip_name)==0
-        slip_distribution=zeros((length(z_points_copy(:,1))-1),(length(x_points_copy(1,:))-1)); % creates a slip of 0 for faults without movement
+%% Calculate and plot the backslip distribution
+   %calculate backslip distribution
+    slip_distribution=zeros(size(x_points) - [1 1]);
+    max_slip = faults{i,2}/1000;
+%    slip_distribution = slip_distribution + max_slip; %CONSTANT SLIP
+    %max_slip = max_slip{1}/1000;
+    half_len = linspace(0,max_slip,round(size(slip_distribution,2)/2));
+    comp_len = [half_len, flip(half_len)];
+    if length(comp_len) > size(slip_distribution,2)
+        comp_len(length(half_len)) = [];
     end
-    
+    for j = 1:size(slip_distribution,1)
+        slip_distribution(j,:) = comp_len;
+    end
+    maximum_slip = max(faults.source_fault)/1000; %the column is named source_fault but contains max slip rates
+    clearvars max_slip half_len comp_len
+        
     %remove (set as NaN) all patches from the slip distribution that intersect with another fault:
     for r = 1:length(slip_distribution(:,1))
         for c = 1:length(slip_distribution(1,:))
@@ -328,16 +316,14 @@ for i = 1:length(faults.fault_name)
             end            
         end
     end
-    if strcmp(fault_name,fault_slip_name)==1
-        seismic_moment
-    end
-        
+    
     patch_count = patch_count + numel(slip_distribution) - nnz(isnan(slip_distribution));
-    % plot and export fault network
+    % plot fault network
     set(figure(1),'Visible','on');
     gcf = figure(1);
     patch_plotting_ext
     
+    title(cb,'Slip rate (m/a)');
     %% Writing the data to the Coulomb output file
     for r=1:length(z_points(:,1))-1
         for c=1:length(x_points(1,:))-1
@@ -354,23 +340,23 @@ for i = 1:length(faults.fault_name)
                             dip = dip_values(a);
                     end
                     if isempty(dip_dir)==1 %for faults which are vertical
-                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
+                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.6f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
                     %south dipping faults
                     elseif  dip_dir>=90 && dip_dir<=270 && x_points_copy(1,1)<x_points_copy(1,end) % x_points section corrects for the direction that the fault trace is drawn
-                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
+                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.6f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
                     elseif  dip_dir>=90 && dip_dir<=270 && x_points_copy(1,1)>x_points_copy(1,end) % x_points section corrects for the direction that the fault trace is drawn
-                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
+                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.6f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
                     % north dipping faults
                     elseif x_points_copy(1,1)>x_points_copy(1,end) % x_points section corrects for the direction that the fault trace is drawn
-                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
+                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.6f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
                     elseif x_points_copy(1,1)<x_points_copy(1,end) % x_points section corrects for the direction that the fault trace is drawn
-                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.3f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
+                        fprintf (fid,'  1    %4.3f   %4.3f    %4.3f   %4.3f 100     %2.2f      %2.6f    %2.1f     %2.2f     %2.2f    %s\n', x_points_copy(r,c+1)/1000,y_points_copy(r,c+1)/1000,x_points_copy(r,c)/1000,y_points_copy(r,c)/1000,rake,slip_distribution(r,c),dip,abs(z_points_copy(r,c)/1000),abs(z_points_copy(r+1,c)/1000),fault_name);
                     end
                 end
             end
         end
     end
-    clearvars a b c col constant_dip delta_x delta_y delta_z dip dip_dir dx dy fault_down_dip_length fault_name geometry grid_size_depth grid_size_surface grid_size_to_depth idx I j k l last_point m n r rake row rows slip_distribution slipq tp utm_lat utm_lon utm_x utm_y utm_z x_points y_points z_points
+    clearvars a b c cb col constant_dip delta_x delta_y delta_z dip_dir dx dy fault_down_dip_length fault_name geometry grid_size_depth grid_size_surface grid_size_to_depth idx I j k l last_elem last_idx last_point m n r rake row rows slip_distribution slipq tp utm_lat utm_lon utm_x utm_y utm_z x_points y_points z_points
 end
 
 %% Finishing off writing the Coulomb input file
@@ -404,4 +390,3 @@ set(fig,'HandleVisibility','on');
 toc
 infotext = [sprintf('\n-----------\nOutput file: %s \n',output_data_file),sprintf('Number of fault elements (#fixed): %d \n',patch_count),sprintf('Elapsed time is %.0f seconds. \n',round(toc)),infotext];
 set(helpbox2,'Value',infotext);
-

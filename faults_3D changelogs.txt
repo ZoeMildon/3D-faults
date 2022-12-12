@@ -52,13 +52,13 @@ Version 1.7 (changes made by Zoe Mildon)
 - Minor text changes for the GUI and changed the colours of buttons
 - attempted to re-write how the slip distribution is calculated - needs testing after the GUI has been rearranged
 
-Version 1.7b (changes made by Manuel)
+Version 1.7b
 - rearranged GUI and related code:
 	- GUI is built up in ui.m script, faults  are imported and input data configured in the fault_import.m script (replaced uitab1.m and uitab2.m)
 	- settings, fault preview etc. shifted to the 2nd ui tab (now called customisation)
 - multiple bugs fixed which occurred after the recent changes of version 1.7 and 1.7b and extensive testing
 
-Version 1.7c
+Version 1.7c (changes made by Zoe Mildon)
 - rewritten code to calculate the slip-distribution for a partial fault rupture
 - minor changes to GUI
 
@@ -76,9 +76,84 @@ Version 1.9
 - removed 'calculate length' button
 - length is now always calculated from input coordinates, 'len' column in input files is no longer used
 - depth may now be (optionally) specified in input files
-- changed the use of the depth for down-dip length claculation:
-	- if depth is given, it is used to calculated down-dip length of the fault from the dp angle
+- changed the use of the depth for down-dip length calculation:
+	- if depth is given, it is used to calculate down-dip length of the fault from the dip angle
 	- if depth is not given, the seismogenic depth is used instead
 	- if the fault is shorter than the seismogenic depth, a 'real' (down dip) aspect ratio of 1 is applied
 - minor changes in the UI, some variables and code comments
 
+Version 2.0
+- basically the same as v. 1.9 with minor changes to the UI and few bugs fixed
+- version released on github.com/ZoeMildon/3D-faults main
+
+Version 2.1
+- added buttons to select/deselect all faults to be plotted
+- added dropdown menu to sort the fault table by name, depth or length
+- added option to automatically detect faults that intersect other faults and cut them at the matching depth
+	--> faults are plotted in the order they occur in the table, source fault is always first; at intersections faults that are plotted later will be cut
+- added back the option to plot faults in an external figure instead of the user interface (better performance)
+- bug fixes:
+	- calculation of fault down dip length for short faults
+	- automatic calculation of vertical centre for short source faults
+
+Version 2.2
+- improvements of the function to cut intersecting faults:
+	- added option to define major and minor faults by setting a priority in the uitable
+	- priority values can now be imported from the input files (table or shapefile attributes)
+	- plotting of source fault as the first fault is now optional, as it may interfere with the intersecting faults functionality
+	- restructured UI to add new interface elements
+	- refining the intersection grid to erase artifacts. Enables the distance threshold to be smaller (~0.5*grid size advised)
+	- added option (incl. button) to plot only the source fault (saves time)
+	- added help texts
+	- fixed the plot of intersecting faults (plotted patches were not identical with exported patches)
+	- fixed bugs causing erroneous seismic moment and slip distribution calculation for intersecting faults
+- fixed important bug in the variable dip import
+- fixed an issue with slip distribution calculation for faults with variable dip
+- fixed the style for uitable (highlighting faults with missing data or variable dip)
+- moved the filename input from tab1 to tab2, enabling multiple outputs without restarting or use of command window
+- various other bug fixes
+
+Version 2.3
+- major changes to user interface
+	- deleted the tab structure; import, settings and plot now in separate windows (better performance)
+	- removed internal patch-plot (patch_plotting.m)
+	- results (output file, number of elements, elapsed time and seismic moment) are printed in the helpbox
+	- added 'Restart' button to the main window that replaces the former 'Reset' button on tab1
+- updated the custom configuration load/save functions and reset button to latest code features and options
+- improvements on code structure, better variable names, removal of unnecessary variables and code lines, etc.
+- fixed issue that caused horizontal and vertical centre to change when 'Update Plot' button was pressed
+- removed the vars.m script, which became unnecessary after recent changes
+- updated help texts
+- bug fixes (fault down-dip length, some data format issues,...)
+
+Version 2.4
+- changes to intersecting faults code:
+	- priority values are now ascending (e.g. lower numbers are the dominant faults)
+	- the code now identifies both intersecting faults, faults with same priority are not cut
+- changes to the user interface
+	- simplified the import window
+	- replaced most help buttons by tooltips
+	- restructured several user interface elements for a cleaner look and (hopefully) more intuitive handling
+	- added map key to overview map
+- restructured and simplified a lot of code
+- fixed bug that caused errors when using preset depth values
+- fixed bug at writing intersecting faults to .inr
+
+
+Version 2.5
+- added different user interface setups for coseismic and interseismic slip distributions
+(interseismic only features backslip with simple triangular slip distribution derived from max slip rates)
+- added menu bar
+	- added variable dip import to 'Import' menu, removed the button from UI
+	- added import of slip rates to 'Import' menu
+	- added restart, reset and table export to 'Options' menu and removed related buttons from UI
+	- moved import and export of custom config to 'options' menu, different configs for coseismic and interseismic
+- added code that refines the imported dip and depth values for variable dip to get a smooth, equally spaced grid (refine_grid.m)
+- major changes to code structure, mostly related to the new UI setups
+	- added ui_earthquake.m and ui_interseis.m to configure the UI for coseismic and interseismic slip distributions
+	- moved several functions to separate scripts, which are called by both ui scripts
+	- removed the tooltips.m, tooltips are now added in the two ui setup scripts
+	- ui.m is now only setting up the import window, the main window without most elements and the menu bar
+- faults are now always from west to east (determined by start and end coordinates)
+- fixed a bug that imported the wrong variable dip data in some cases
+- fixed seismic moment calculation for faults with variable dip
