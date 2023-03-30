@@ -5,7 +5,7 @@ settings = readtable('config.txt');
 COUL_GRID_SIZE = settings.value(8);
 %% set up import window
 imp_fig = uifigure('Name','Fault Input','Position',[200 200 730 420],'Color',randi([7 10],1,3)/10,'Resize','off'); %import window %randi([7 10],1,3)/10
-uilabel(imp_fig,'Position',[280 380 260 40],'Text','3D-Faults v2.5 alpha','FontSize',24,'FontWeight','bold');
+uilabel(imp_fig,'Position',[280 380 260 40],'Text','3D-Faults v2.6','FontSize',24,'FontWeight','bold');
 
 %import button panel
 imp_pnl = uipanel(imp_fig,'Title','Import fault network','Position',[10 200 710 150],'BackgroundColor',[1 1 1]);
@@ -119,15 +119,15 @@ function [uit,vardip] = variable_dip(uit,vardip,fig)
     dip_imp = readtable(fullfile(path,file));
     dipdata = table(cell(height(dip_imp),1),cell(height(dip_imp),1),cell(height(dip_imp),1));
     dipdata.Properties.VariableNames = {'fault_name','depth','dip'};
-    depth_dip = table2array(dip_imp(:,2:32));
+    depth_dip = table2array(dip_imp(:,2:size(dip_imp,2)));
     s = uistyle('BackgroundColor',[.3 .8 .3]);
     for i = 1:length(dip_imp.fault_name)
         dip_imp.fault_name{i} = strrep(dip_imp.fault_name{i},' ','_');
         idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
         if any(idx) == true
             dipdata.fault_name{i} = uit.Data.fault_name{idx};
-            dipdata.depth{i} = depth_dip(i,[1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31]);
-            dipdata.dip{i} = depth_dip(i,[2 4 6 8 10 12 14 16 18 20 22 24 26 28 30]);
+            dipdata.depth{i} = depth_dip(i,1:2:size(depth_dip,2));
+            dipdata.dip{i} = depth_dip(i,2:2:size(depth_dip,2));
             addStyle(uit,s,'row',idx);
             uit.Data.dip{idx} = 'var. dip';
         end
