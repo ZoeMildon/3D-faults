@@ -7,11 +7,11 @@ imp_fig = uifigure('Name','3D - Fault - Fault Import','Position',[200 200 730 42
 uilabel(imp_fig,'Position',[10 380 710 40],'Text','3D-Faults','FontSize',24,'FontWeight','bold','FontName','Cambria','FontColor','white','HorizontalAlignment','center');
 version_desc = sprintf(strcat('A code to build 3D fault networks and slip distributions for use with Coulomb 3.3 software. \n',...
     'Written by Zoe Mildon and Manuel Diercks \n',...
-    'Version 2.6.1 - 05/2023'));
+    'Version 2.7 - 01/2023'));
 uilabel(imp_fig,'Position',[10 310 710 50],'Text',version_desc,'FontName','Cambria','FontColor','white');
 
 %import button panel
-imp_pnl = uipanel(imp_fig,'Title','Import fault network','Position',[10 140 710 150],'BorderType','none');
+imp_pnl = uipanel(imp_fig,'Title','Import fault network','Position',[10 150 710 150],'BorderType','none');
 file_bg = uibuttongroup(imp_pnl,'Position',[40 10 100 110],'BorderType','none','Title','File format:');
 rb_shp = uiradiobutton(file_bg,'Position',[10 70 50 15],'Text','.shp','Tooltip','Import shapefile containing fault traces and properties (attributes). Must be projected in UTM coordinates.');
 rb_kml = uiradiobutton(file_bg,'Position',[10 40 50 15],'Text','.kml','Tooltip','Import fault properties from a table (e.g. .txt, .csv, .xlsx). Store kml files in /Fault_traces folder');
@@ -32,28 +32,12 @@ set(file_bg,'SelectionChangedFcn',@(file_bg,event)format_select(rb_kml,rb_kmz,ut
 
 citation(imp_fig) % citation box
 
-%% set up main window
-fig = uifigure('Name','3D-Faults','Position',[5 45 1356 680],'Color',[.98 .98 .98],'Resize','off','Visible','off','HandleVisibility','on');
-infotext = sprintf('\n\n 3D - Faults version 2.6.1 started.');
-helpbox2 = uitextarea(fig,'Position',[940 480 400 180],'Value',infotext,'Editable','off','HandleVisibility','off');
-%checkboxes at plot_btn
-subplot_cb = uicheckbox(fig,'Position',[1140 110 200 20],'Text','Display entire network','HandleVisibility','off','Visible','off');
-exp_geo_cb = uicheckbox(fig,'Position',[1140 140 200 20],'Text','Export fault geometry','Value',false,'HandleVisibility','off','Visible','off');
-set(subplot_cb,'Tooltip','Reduce time by only plotting the source fault');
-%hidden elements
-vardip = uitable(fig,'Visible','off','HandleVisibility','off'); %this table is just for storing variable dip values but is not shown in ui
-uit = uitable(fig,'Position',[10 10 700, 410],'ColumnEditable',[false true true true true true true true true],'Visible','off','HandleVisibility','off');
-%menu bar
-[exp_config_menu,imp_config_menu,reset_menu] = create_menu(fig,uit,vardip);
-
-clearvars file_bg imp_btn imp_pnl bg1 utm_bg utm_btn bg2
-
 %% ------------------- functions ------------------------
 % paper citation
 function citation(imp_fig)
     citation = sprintf(strcat(('This code is free to use for research purposes, please cite the following paper: \n'),...
     ('Diercks, M., Mildon, Z., Boulton, S., Hussain, E. (2023):'),...
-    (' Constraining historical earthquake sequences with Coulomb stress models \n'),...
+    (' Constraining historical earthquake sequences with Coulomb stress models '),...
     (' JGR Solid Earth \n'),...
     ('Updates to the code will be made available at github.com/ZoeMildon/3D-faults')));
     uilabel(imp_fig,'Position',[10 10 710 70],'Text',citation,'FontColor','white','FontName','Cambria');
@@ -74,25 +58,7 @@ function format_select(rb_kml,rb_kmz,utm_bg,utm_btn,lbl1,lbl2,set_utmzone)
         set(set_utmzone,'Visible','off');
     end
 end
-%create menu bar
-function [exp_config_menu,imp_config_menu,reset_menu] = create_menu(fig,uit,vardip)
-imp_menu = uimenu(fig,'Text','Import','HandleVisibility','off');
-    imp_vardip = uimenu(imp_menu,'Text','Variable Dip','HandleVisibility','off','MenuSelectedFcn',@(imp_vardip,event) variable_dip(uit,vardip,fig)); %#ok<NASGU>
-    imp_sliprate = uimenu(imp_menu,'Text','Slip Rates','HandleVisibility','off','MenuSelectedFcn',@(imp_sliprate,event) import_sliprate(uit)); %#ok<NASGU>
-build_menu = uimenu(fig,'Text','Slip Distribution','HandleVisibility','off');
-    eq_menu = uimenu(build_menu,'Text','Coseismic','HandleVisibility','off','MenuSelectedFcn','ui_earthquake'); %#ok<NASGU>
-    intseis_menu = uimenu(build_menu,'Text','Interseismic','HandleVisibility','off','MenuSelectedFcn','ui_interseis'); %#ok<NASGU>
-%plot_menu = uimenu(fig,'Text','Plot');
-%    cumstress_menu = uimenu(plot_menu,'Text','Cumulative Stress');
-opt_menu = uimenu(fig,'Text','Options','HandleVisibility','off');
-    exp_config_menu = uimenu(opt_menu,'Text','Save Custom Configuration','Enable','off','Tooltip','Export the current settings as custom configuration for later use.');
-    imp_config_menu = uimenu(opt_menu,'Text','Load Custom Configuration','Enable','off','Tooltip','Import custom settings');
-    reset_menu = uimenu(opt_menu,'Text','Reset','Enable','off');
-    restart_menu = uimenu(opt_menu,'Text','Restart','HandleVisibility','off','MenuSelectedFcn','ui'); %#ok<NASGU>
-    exp_table_menu = uimenu(opt_menu,'Text','Export table to .csv','HandleVisibility','off','MenuSelectedFcn',@(exp_table_menu,event) table_export(uit));
-    set(exp_table_menu,'Tooltip','Save table to .txt file. Stored in "3D-Faults/Output_files"');
 
-end
 % convert output from 'utmzone' function to a useful format:
 function [rb1,rb2,set_utmzone] = utm_select(rb1,rb2,set_utmzone)
     zone = utmzone;
@@ -110,56 +76,5 @@ function [rb1,rb2,set_utmzone] = utm_select(rb1,rb2,set_utmzone)
         set(set_utmzone,'Value',zone(1))
     end
 end
-%fetch variable dip data from table
-function [uit,vardip] = variable_dip(uit,vardip,fig)
-    [file,path] = uigetfile('*.xlsx','Variable Dip Data');
-    figure(fig);
-    dip_imp = readtable(fullfile(path,file));
-    dipdata = table(cell(height(dip_imp),1),cell(height(dip_imp),1),cell(height(dip_imp),1));
-    dipdata.Properties.VariableNames = {'fault_name','depth','dip'};
-    depth_dip = table2array(dip_imp(:,2:size(dip_imp,2)));
-    s = uistyle('BackgroundColor',[.3 .8 .3]);
-    for i = 1:length(dip_imp.fault_name)
-        dip_imp.fault_name{i} = strrep(dip_imp.fault_name{i},' ','_');
-        idx = find(strcmp(uit.Data.fault_name,dip_imp.fault_name(i)));
-        if any(idx) == true
-            dipdata.fault_name{i} = uit.Data.fault_name{idx};
-            dipdata.depth{i} = depth_dip(i,1:2:size(depth_dip,2));
-            dipdata.dip{i} = depth_dip(i,2:2:size(depth_dip,2));
-            addStyle(uit,s,'row',idx);
-            uit.Data.dip{idx} = 'var. dip';
-        end
-    end
-    set(vardip,'Data',dipdata);
-    %delete empty rows to get correct table dimensions (bugfix 01/2022)
-    vardip.Data(find(cellfun(@isempty,vardip.Data.depth)),:) = [];
-    disp('Variable dip information imported.')
-end
-%table export to .csv
-function table_export(uit)
-    output_file = inputdlg('Output file name:');
-    file = strcat('Output_files/',output_file{1},'.csv');
-    writetable(uit.Data,file)
-    msg = sprintf('Table stored to %s',file);
-    msgbox(msg)
-end
-%import slip rates
-function [slip_rates,uit] = import_sliprate(uit)
-    if isnumeric(uit.Data{2,3})
-        [slip_file,slip_path] = uigetfile('*.txt','Select source for slip rates');
-        slip_rates = readtable(fullfile(slip_path,slip_file),'Delimiter',';');
-        max_slip_rate = slip_rates{:,2};
-        for i = 1:length(uit.Data.fault_name)
-            slip_idx = strcmp(uit.Data.fault_name(i),slip_rates{:,1});
-            if any(slip_idx) == true
-                uit.Data{i,3} = max_slip_rate(slip_idx);
-            else
-                uit.Data.plot(i) = false;
-            end
-        end
-        msgbox('Slip rates successfully imported.')
-    else
-        warndlg('Slip rates can only be imported for backslip calculation')
-    end
-end
+
 

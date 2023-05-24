@@ -1,11 +1,11 @@
 variable,value
-slip_at_surface,10
+slip_at_surface,40
 maximum_slip,3.5
-seismo_depth,15
-rupture_depth,15
+seismo_depth,18
+rupture_depth,18
 intersect_threshold,1
 grid_size,2
-map_margin,10
-COUL_GRID_SIZE,5
+map_margin,15
+COUL_GRID_SIZE,2
 default_utm_zone,32
 
