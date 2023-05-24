@@ -404,4 +404,4 @@ set(fig,'HandleVisibility','on');
 toc
 infotext = [sprintf('\n-----------\nOutput file: %s \n',output_data_file),sprintf('Number of fault elements (#fixed): %d \n',patch_count),sprintf('Elapsed time is %.0f seconds. \n',round(toc)),infotext];
 set(helpbox2,'Value',infotext);
-
+replace_fixed(patch_count,output_data_file)
