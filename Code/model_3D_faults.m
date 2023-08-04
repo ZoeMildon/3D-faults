@@ -14,6 +14,7 @@ if fid < 0                                              %check for correct direc
     errordlg('You are not in the correct directory.')
     return
 end
+maximum_slip = 1; %needs to be specified for patch_plot
 
 % build input table from selected faults
 faults = uit.Data;
@@ -288,9 +289,6 @@ for ii = 1:length(faults.fault_name)
         slip_options_panel %open the window to set all rupture parameters
         close(slip_fig); %close the window after fetching all variables
     elseif faults.source_fault(ii) == false
-        if ~any(faults.source_fault) == true
-            maximum_slip = 1; %fixes bug in patch_plotting
-        end
         slip_distribution=zeros((length(z_points_copy(:,1))-1),(length(x_points_copy(1,:))-1)); % creates a slip of 0 for faults without movement
         slip_distribution(1,1) = 0.000001; %assign a small value to the first element to fix the issue with Coulomb code
     end
