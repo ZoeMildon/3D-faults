@@ -81,6 +81,9 @@ for i = 1:length(fault_input.Y)
     if any(fault_input.Y{i} < 0) == true
         fault_input.Y{i} = fault_input.Y{i}+10000000;
     end
+    %remove nans from coordinates
+    fault_input.X{i}(isnan(fault_input.X{i})) = [];
+    fault_input.Y{i}(isnan(fault_input.Y{i})) = [];
     %make all faults go from west to east:
     if fault_input.X{i}(1) > fault_input.X{i}(end-1)
         fault_input.X{i} = flip(fault_input.X{i});

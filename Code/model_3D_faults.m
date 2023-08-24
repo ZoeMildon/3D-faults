@@ -290,9 +290,10 @@ for ii = 1:length(faults.fault_name)
         close(slip_fig); %close the window after fetching all variables
     elseif faults.source_fault(ii) == false
         slip_distribution=zeros((length(z_points_copy(:,1))-1),(length(x_points_copy(1,:))-1)); % creates a slip of 0 for faults without movement
+    end
+    if ii == 1 && slip_distribution(1,1) == 0
         slip_distribution(1,1) = 0.000001; %assign a small value to the first element to fix the issue with Coulomb code
     end
-        
     %% remove (set as NaN) all patches from the slip distribution that intersect with another fault:
     for r = 1:length(slip_distribution(:,1))
         for c = 1:length(slip_distribution(1,:))

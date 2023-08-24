@@ -1,19 +1,29 @@
 %function triggerred when slip options change
-function slip_opts_update(sl_centre_hor,sp_end,sp_start,l_lbl,txt_hor,sl_centre_ver,txt_centre_ver,sl_rupture_d,txt_rupture_d,warn_lbl,btn_ok) %set_maxSlip,set_surfSlip,x_points,y_points,z_points,z_points_copy,grid_sizem,geometry,dip_depth
+function input_check = slip_opts_update(sl_centre_hor,sp_end,sp_start,l_lbl,txt_hor,sp_rupt_top,sp_centre_ver,sp_rupt_bot,warn_lbl,set_surfSlip,btn_ok) 
 l_lbl.Text = strcat('Rupture length: ',num2str(round(sp_end.Value-sp_start.Value)),' km');
-sp_start.Limits = [0 sl_centre_hor.Value-0.5];
-sp_end.Limits = [sl_centre_hor.Value+0.5,sp_end.Limits(2)];
 txt_hor.Value = num2str(round(sl_centre_hor.Value));
-txt_centre_ver.Value = num2str(round(sl_centre_ver.Value),2);
-txt_rupture_d.Value = num2str(round(sl_rupture_d.Value));
-if round(sl_centre_ver.Value) <= round(sl_rupture_d.Value) %|| sl_centre_ver.Value <= sl_rupture_d.Value
-    warn_lbl.Text = 'Warning: Vertical centre must be shallower than rupture depth!';
+if sp_rupt_top.Value ~= 0
+    set(set_surfSlip,'Enable','off');
+else
+    set(set_surfSlip,'Enable','on');
+end
+
+%%check if inputs are valid:
+if sp_centre_ver.Value >= sp_rupt_bot.Value || sp_centre_ver.Value <= sp_rupt_top.Value
+    warn_lbl.Text = 'Vertical centre must be between rupture top and rupture bottom!';
     set(btn_ok,'Enable','off');
-    return
+    input_check = false;
+elseif sp_start.Value >= round(sl_centre_hor.Value) || sp_end.Value <= round(sl_centre_hor.Value)
+    warn_lbl.Text = 'Horizontal centre must be between start and end of rupture!';
+    set(btn_ok,'Enable','off');   
+    input_check = false;    
 else
     warn_lbl.Text = ' ';
-    set(btn_ok,'Enable','on');    
+    set(btn_ok,'Enable','on');   
+    input_check = true;
 end
+
+
 %% preview slip distribution
 % start_slip = sp_start.Value;
 % end_slip = sp_end.Value;
