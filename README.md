@@ -13,8 +13,10 @@ Mildon, Z. K., Toda, S., Faure Walker, J. P. and Roberts, G. P. (2016), [Evaluat
 MATLAB Mapping Toolbox is required to use shapefiles as input. This can be installed from MathWorks. To check if Mapping Toolbox is installed, type `ver` in Matlab Command Window.
 We recommend using Matlab R2022a or later.
 
-## Inputs:
+## Running the code
+In MATLAB, navigate to the 'faults_3D_v2.x' folder (or similarly named). Execute the script by entering `faults_3D` in the command line or open the faults_3D script and press F5.
 
+## Inputs:
 Three input formats are supported:
 1) A shapefile (in UTM coordinates) that contains all faults. It may contain more faults than to be modelled, faults can be selected within the workflow.
 2) kml-files of all faults (stored in the 'Fault_traces' folder) AND a table (.txt, .csv, .xlsx,...) that contains the properties of the faults
@@ -38,14 +40,21 @@ Optional properties:
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
 
 Variable dip:
-
 To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx). The table can be imported via `import > variable dip`; fault names in the file must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
-## Running the code
-In MATLAB, navigate to the 'faults_3D_v2.x' folder (or similarly named). Execute the script by entering `faults_3D` in the command line or open the faults_3D script and press F5.
+### 3D-Faults parameters
+Before building the slip distribution enter the relevant parameters for building the 3D fault network:
+* seismogenic depth - specifies the vertical depth of all faults, depth can alternatively be specified for individual faults in the table
+* grid size - size of the small rectangular elements forming the 3D fault surfaces
+* cut intersecting faults - with this option enabled, faults that intersect another at depth can be cut based on priority; the fault with lower priority value is contidued to the seismogenic depth, the fault with higher value is cut where it intersects the primary fault
+* intersection distance - specifies distance where intersecting fault elements should be removed; should be at least 0.6x grid size to avoid artifacts
+* filename - this is used for the output file
+* grid parameters - these affect the map extend used in Coulomb
+
+Tick all faults to be plotted (included in the model) in the 'plot' column of the table. Tick all source faults that ruptured in the earthquake to be modelled. Once all parameters are set, press the 'Build 3D-Faults' button.
 
 ### Building slip distributions
-The code will build simple bulls eye slip distributions according to two different options (which are made as selections when the code is running).
+The code will build simple bulls eye slip distributions.
 
 The down-dip extent of the rupture can be controlled by changing the `rupture_depth` variable.
 The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed with the `vertical centre` and `horizontal centre` spinners.
