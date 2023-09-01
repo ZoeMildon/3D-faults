@@ -9,15 +9,11 @@ if input_check == false
 end
 start_slip = sp_start.Value;
 end_slip = sp_end.Value;
-%rupture_depth = -round(sl_rupture_d.Value)*1000;
-
 rupt_top = sp_rupt_top.Value*1000;
 rupt_bot = sp_rupt_bot.Value*1000;
-
 max_slip = set_maxSlip.Value;
 surf_slip = set_surfSlip.Value / 100;
 centre_hor = round(sl_centre_hor.Value)*1000;
-%centre_ver = -round(sl_centre_ver.Value)*1000;
 centre_ver = sp_centre_ver.Value*1000;
 %% check slip type & call functions
 switch slip_type
@@ -40,12 +36,6 @@ imagesc(slip_ax,slip_distribution)
 
 % adjusted version for new user interface - updated 08/2023
 function slip_distribution = slipdist_bulls_eye(start_slip,end_slip,rupt_top,rupt_bot,grid_sizem,max_slip,surf_slip,centre_hor,centre_ver,x_points,y_points,z_points,z_points_copy,geometry,dip_depth)
-    % %check for input issues
-    % if centre_ver >= rupt_bot || centre_ver < rupt_top
-    %     msgbox('Vertical centre must be between trupture top and ruture bottom!')
-    %     return
-    % end
-    
     slip_distribution=zeros(size(x_points) - [1 1]); % generates a blank matrix for slip_distribution to be put into
     L=length(x_points(1,:));
     d2=grid_sizem/2;
@@ -98,20 +88,11 @@ function slip_distribution = slipdist_bulls_eye(start_slip,end_slip,rupt_top,rup
     end  
     calc_depth = mid_depths(mid_depths > rupt_top & mid_depths < rupt_bot); %remove depths between rupture top and rupture bottom
     
-    % calc_depth=mid_depths(find(mid_depths<set_ruptureDepth.Value*1000)); % remove depths below the specified rupture depth
-    % calc_depth=calc_depth(find(calc_depth>set_rupture_top.Value*1000));% remove depths above the specified rupture depth
-
     slip_proportions=interp1(depth_distances,given_slip_proportions,calc_depth);
     slip_dist=slip_proportions*slips;
-        
-    %b=find((calc_depth <= rupture_depth)); % find the indicies that are within the area of slip down the fault
+    
     row_idx=find(calc_depth(1)==mid_depths);
     slip_distribution(row_idx:(row_idx+length(calc_depth)-1),col_idx(1):col_idx(end))=slip_dist; % Putting slip_dist matrix into the zeros matrix previously set up
-    
-    %slip_distribution(b(1):b(end),a(1):a(end))=slip_dist; % Putting slip_dist matrix into the zeros matrix previously set up
-    % if slip_distribution(1,1) == 0
-    %     slip_distribution(1,1) = 0.000001; %assign a small value to the first element to fix the issue with Coulomb code
-    % end
 end
 
 %% simple triangular slip distribution (for backslip)
