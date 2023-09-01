@@ -7,7 +7,7 @@ Diercks, M., Mildon, Z., Boulton, S., Hussain, E. (pre-print, in review): [Const
 https://doi.org/10.22541/essoar.168057577.71492202/v1
 Please cite the peer-reviewed version when published.
 
-For older versions cite:\
+and the original publication of the code (version 1):\
 Mildon, Z. K., Toda, S., Faure Walker, J. P. and Roberts, G. P. (2016), [Evaluating models of Coulomb stress transfer- is variable fault geometry important?](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016GL071128), Geophys. Res. Lett., 43
 
 MATLAB Mapping Toolbox is required to use shapefiles as input. This can be installed from MathWorks. To check if Mapping Toolbox is installed, type `ver` in Matlab Command Window.
@@ -39,27 +39,26 @@ Optional properties:
 
 It is recommended to name the properties/attributes exactly as given, otherwise they have to be entered during execution. Example files for each input type are included in the 'input_examples' folder.
 
-Variable dip:
-To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx). The table can be imported via `import > variable dip`; fault names in the file must exactly match faults in the table, otherwise they will not be detected and dip remains constant.
 
-### 3D-Faults parameters
+## 3D-Faults parameters
 Before building the slip distribution enter the relevant parameters for building the 3D fault network:
 * seismogenic depth - specifies the vertical depth of all faults, depth can alternatively be specified for individual faults in the table
 * grid size - size of the small rectangular elements forming the 3D fault surfaces
-* cut intersecting faults - with this option enabled, faults that intersect another at depth can be cut based on priority; the fault with lower priority value is contidued to the seismogenic depth, the fault with higher value is cut where it intersects the primary fault
-* intersection distance - specifies distance where intersecting fault elements should be removed; should be at least 0.6x grid size to avoid artifacts
+* cut intersecting faults - with this option enabled, faults that intersect another at depth can be cut based on priority; the fault with lower priority value is contidued to the seismogenic depth, the fault with higher value is cut where it intersects the primary fault; if both faults have the same value, none is cut; supports decimal values
+* intersection distance - specifies distance where intersecting fault elements should be removed; should be at least 0.6 x grid size to avoid artifacts
 * filename - this is used for the output file
 * grid parameters - these affect the map extend used in Coulomb
 
 Tick all faults to be plotted (included in the model) in the 'plot' column of the table. Tick all source faults that ruptured in the earthquake to be modelled. Once all parameters are set, press the 'Build 3D-Faults' button.
+Variable dip:
+To model faults with variable dip, the depth intervals and respective dip values need to be specified in an extra table in the format of the given example (variable_dip_example.xlsx). The table can be imported via `import > variable dip`; fault names in the file must exactly match faults in the table, otherwise they will not be detected and dip remains constant. Faults with variable dip are highlighted in green in the table.
 
-### Building slip distributions
-The code will build simple bulls eye slip distributions.
+## Building slip distributions
+The code will build simple bulls eye slip distributions. By default the fault ruptures along its entire length and the location of maximum slip is at the centre of the fault.
 
-The down-dip extent of the rupture can be controlled by changing the `rupture_depth` variable.
-The default is that the location of maximum slip is at the centre of the fault. However the location of maximum slip can be changed with the `vertical centre` and `horizontal centre` spinners.
-1. The whole fault slips. This assumes the slip is zero at the base, zero at the edges and a specified proportion of maximum slip reaches the surface. 
-2. A segment, which is specified by the user, slips. The segment is defined by two distances from one of the faults end (the 'start' point). As the start of the fault is arbitrary, it is indicated with a black circle on the overview map (the start is always the western end of the fault). Make sure that the specified horizontal center of the slip distribution is within the specified segment.
+If only a segment of the fault slips, this can be controlled by the user:
+The location of the rupture along the source fault can be controlled with the 'horizontal centre' slider and the rupture start and rupture end. As the start of the fault is arbitrary, it is indicated with a black circle on the overview map (the start is always the western end of the fault).
+The down-dip position and extent of the rupture can be controlled by changing the rupture top, vertical centre and rupture bottom values.
 
 Alternatively, slip distributions can be manually assigned to each element in the Coulomb input file created from running this code.
 
@@ -99,6 +98,11 @@ Version 2.6.1 - 05/2023 written by Manuel Diercks and Zoe Mildon
 - version released with the Diercks et al. (2023, JGR Solid Earth) paper
 - includes multiple performance and UI improvements, and bug fixes
 - changing the #fixed value in output files no longer required
+
+Version 2.8 - 08/2023 written by Manuel Diercks and Zoe Mildon
+- improved user interface for easier and intuitive adjustment of the rupture area
+- fault network can be built without specifying a source fault or with multiple source faults in the same event
+- depth and depth extent of partial ruptures can now be controlled by the user
 
 Please report any issues or bugs to Manuel Diercks (manuel-lukas.diercks@plymouth.ac.uk) or Zoe Mildon (zoe.mildon@plymouth.ac.uk).
 
