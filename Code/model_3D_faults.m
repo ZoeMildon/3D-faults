@@ -304,6 +304,7 @@ for ii = 1:length(faults.fault_name)
     end
     if faults.source_fault(ii) == true
         seismic_moment
+        clearvars shearmod flength wfault slip smo dip_angle dip
     end
     patch_count = patch_count + numel(slip_distribution) - nnz(isnan(slip_distribution));
     gcf = figure(1); patch_plotting_ext; % plot and export fault network

@@ -35,7 +35,7 @@ set_maxSlip = uispinner(slip_fig,'Position',[160 130 60 20],'Step',0.1,'Limits',
 
 %moment magnitude button
 uilabel(slip_fig,'Position',[50 100 140 20],'Text','Calculate Mw:');
-btn_mw = uibutton(slip_fig,'Position',[160 100 50 20],'Text','Mw','ButtonPushedFcn','prelim_mw');
+btn_mw = uibutton(slip_fig,'Position',[160 100 50 20],'Text','Mw','ButtonPushedFcn','prelim_mw','Tooltip','note: If button stops working, click any other element');
 
 %% plot 2d-preview of slip distribution/adjust slip properties
 slip_ax = uiaxes(slip_fig,'Position',[50 200 440 250],'Color',[1 1 1],'Color',[.95 .95 .95]);
