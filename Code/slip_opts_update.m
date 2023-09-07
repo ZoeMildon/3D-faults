@@ -9,7 +9,7 @@ else
     set(set_surfSlip,'Enable','on');
 end
 
-%%check if inputs are valid:
+%% check if inputs are valid:
 if sp_centre_ver.Value >= sp_rupt_bot.Value || sp_centre_ver.Value <= sp_rupt_top.Value
     warn_lbl.Text = 'Vertical centre must be between rupture top and rupture bottom!';
     set(btn_ok,'Enable','off');

@@ -33,6 +33,10 @@ uilabel(slip_fig,'Position',[50 130 140 20],'Text','Maximum slip (m):');
 set_surfSlip = uispinner(slip_fig,'Position',[160 160 60 20],'Step',5,'Limits',[0 100],'Value',settings.value(1),'ValueChangedFcn',update_function,'Tooltip','Slip at surface, percentage of max. slip');
 set_maxSlip = uispinner(slip_fig,'Position',[160 130 60 20],'Step',0.1,'Limits',[0 inf],'Value',settings.value(2),'ValueChangedFcn',update_function,'Tooltip','maximum slip at the centre of the bulls eye slip distribution');
 
+%moment magnitude button
+uilabel(slip_fig,'Position',[50 100 140 20],'Text','Calculate Mw:');
+btn_mw = uibutton(slip_fig,'Position',[160 100 50 20],'Text','Mw','ButtonPushedFcn','prelim_mw');
+
 %% plot 2d-preview of slip distribution/adjust slip properties
 slip_ax = uiaxes(slip_fig,'Position',[50 200 440 250],'Color',[1 1 1],'Color',[.95 .95 .95]);
 ylim(slip_ax,[0 inf])
