@@ -1,5 +1,5 @@
 %% This code is triggered by the import button
-clearvars lbl lbl1 lbl2 utm_btn %free up workspace (delete unnecessary elements)
+clearvars file_bg imp_btn imp_pnl lbl1 lbl2 utm_bg version_desc utm_btn %free up workspace (delete unnecessary elements)
 %get utm zone from import window:
 utmzone = str2double(set_utmzone.Value);
 if rb1.Value == true
@@ -65,13 +65,25 @@ elseif rb_kmz.Value == true %kmz file
         end
 end
 close(imp_fig)
-set(fig,'Visible','on');
 %% check data and configure input table
+if iscell(fault_input.Y) == false
+    Y = cell(length(fault_input.Y),1);
+    X = cell(length(fault_input.X),1);
+    for i = 1:length(fault_input.Y)
+        Y{i} = fault_input.Y(i,1:end);
+        X{i} = fault_input.X(i,1:end);
+    end
+    fault_input.Y = Y;
+    fault_input.X = X;
+end
 for i = 1:length(fault_input.Y)
     %check for southern hemishphere coordinates and add 'false northing' of 10M
     if any(fault_input.Y{i} < 0) == true
         fault_input.Y{i} = fault_input.Y{i}+10000000;
     end
+    %remove nans from coordinates
+    fault_input.X{i}(isnan(fault_input.X{i})) = [];
+    fault_input.Y{i}(isnan(fault_input.Y{i})) = [];
     %make all faults go from west to east:
     if fault_input.X{i}(1) > fault_input.X{i}(end-1)
         fault_input.X{i} = flip(fault_input.X{i});
@@ -129,11 +141,10 @@ else
 end
 t = movevars(t,'source_fault','before','dip');
 t = movevars(t,'plot','after','fault_name');
-%fill table with data:
-set(uit,'Data',t);
+
 clearvars ans col file i imp_fig path rb1 rb2 rb_shp rb_kml rb_kmz row set_utmzone utmhemi utmzone variables %free up workspace (delete import window elements and redundant variables)
 pause(3) %UI stops working if called before import ready, pause to avoid
-ui_earthquake %earthquake panel opened as default
+ui_main %earthquake panel opened as default
 %% ------------------ function space -------------------------
 %function to calculate fault length from X and Y data (when faults are imported)
 function t = calc_length(fault_input,t)

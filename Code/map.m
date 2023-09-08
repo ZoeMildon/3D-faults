@@ -9,7 +9,7 @@ function axe = map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input)
     hold(axe,'ON')
     rectangle(axe,'Position',[min_x min_y max_x-min_x max_y-min_y],'FaceColor',[.85 .95 .7])
     axis(axe, 'equal')
-    title(axe, 'Overview Map of the Fault Network')
+    title(axe, 'Fault Network Map')
     xlabel(axe,'UTM x')
     ylabel(axe,'UTM y')
     coords = table(fault_input.X,fault_input.Y);

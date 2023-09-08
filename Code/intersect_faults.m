@@ -1,6 +1,6 @@
 % code to detect intersecting faults and modify x/y/z_points  
-function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,i,faults,priority_dd)
-    fault_id = i; %assigns a specific id to each fault
+function [ccmatrix,x_points,y_points,z_points] = intersect_faults(x_points,y_points,z_points,ccmatrix,int_thresh,ii,faults,priority_dd)
+    fault_id = ii; %assigns a specific id to each fault
     %find all values that are close to an existing x, y and z-coordinate triplet:
     for k = 1:numel(x_points)
         x_dist = abs(ccmatrix(:,1) - abs(x_points(k)));

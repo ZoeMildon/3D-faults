@@ -16,7 +16,7 @@ for r=1:length(x_points(:,1))-1
             z(2)=z_points_copy(r+1,c);
             z(3)=z_points_copy(r+1,c+1);
         end
-        if subplot_cb.Value == true || strcmp(fault_name,fault_slip_name)==1
+        if subplot_cb.Value == true || faults.source_fault(ii) == true
             patch(x,y,z,slip_distribution(r,c));
         end
         %prepare fault geometry export
@@ -31,7 +31,7 @@ for r=1:length(x_points(:,1))-1
     end
 end
 xyz(find(isnan(xyz(:,1)),1,'first'):end,:) = [];
-if subplot_cb.Value == true || strcmp(fault_name,fault_slip_name)==1
+if subplot_cb.Value == true || faults.source_fault(ii) == true
     hold('on')
     plot(utm_lon,utm_lat,'g','LineWidth',2);
     axis('equal')
@@ -43,7 +43,7 @@ if subplot_cb.Value == true || strcmp(fault_name,fault_slip_name)==1
     colormap(slip_dist);
     cb = colorbar('southoutside');
     title(cb,'Total slip (m)');
-    caxis([0 maximum_slip])
+    caxis([0 maximum_slip]);
     xlabel('UTM x')
     ylabel('UTM y')
     zlabel('Depth (m)')

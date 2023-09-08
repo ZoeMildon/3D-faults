@@ -3,9 +3,9 @@ amo=0.0;
 switch geometry
     case 'variable'
         dip = nan(1,length(slip_distribution(:,1)));
-        num_dip = [0,num_dip];
-        for j = 1:length(num_dip(1,:))-1
-            dip(num_dip(j)+1:num_dip(j+1)) = dip_angle(j);
+        num_dip2 = [0,num_dip];
+        for j = 1:length(num_dip2(1,:))-1
+            dip(num_dip2(j)+1:num_dip2(j+1)) = dip_angle(j);
         end
 end
 for r=1:length(slip_distribution(:,1))
@@ -28,10 +28,4 @@ end
 mw = (2/3) * log10(amo) - 10.7; %Hanks & Kanamori, 1979
 %mw = (2/3) * (log10(amo) - 16.1);
 disp(['   Total seismic moment = ' num2str(amo,'%6.2e') ' dyne cm (Mw = ', num2str(mw,'%4.2f') ')']);
-
-% add-on for display in UI:
-seis_txt = strcat('Total seismic moment = ',num2str(amo,'%6.2e'),' dyne cm (Mw = ',num2str(mw,'%4.2f'),')');
-infotext = [seis_txt,infotext];
-
-clearvars amo shearmod flength wfault slip smo mw dip_angle dip
 
