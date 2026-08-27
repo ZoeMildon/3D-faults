@@ -1,4 +1,9 @@
+function [amo,mw] = seismic_moment(geometry,constant_dip,dip_angle,num_dip,slip_distribution,x_points,y_points,z_points)
 % Calculating the seismic moment of the assigned slip distribution. Adapted from seis_moment Coulomb code.
+rupture_area = 0;
+average_slip = 0;
+sum_slip = 0;
+num_patches = 0;
 amo=0.0;
 switch geometry
     case 'variable'
@@ -23,9 +28,19 @@ for r=1:length(slip_distribution(:,1))
         if isnan(smo) == false %for intersecting (cut) faults
             amo = amo + smo;
         end
+        if slip > 0
+            if ~isnan(flength) && ~isnan(wfault)
+                rupture_area = rupture_area + (flength/1000 * wfault/1000);
+            end
+            sum_slip = sum_slip + slip;
+            num_patches = num_patches + 1;
+        end
+        average_slip = sum_slip/num_patches;
     end
 end
 mw = (2/3) * log10(amo) - 10.7; %Hanks & Kanamori, 1979
 %mw = (2/3) * (log10(amo) - 16.1);
-disp(['   Total seismic moment = ' num2str(amo,'%6.2e') ' dyne cm (Mw = ', num2str(mw,'%4.2f') ')']);
+disp(['Total seismic moment = ' num2str(amo,'%6.2e') ' dyne cm (Mw = ', num2str(mw,'%4.2f') ')']);
+fprintf('Rupture area: %.2f sqkm \n',rupture_area)
+fprintf('Average slip on rupture area: %.2f m \n', average_slip)
 

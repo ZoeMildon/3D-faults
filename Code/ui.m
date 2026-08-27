@@ -1,17 +1,16 @@
 %setting up the import window and the blank main window
 close all
 settings = readtable('config.txt');
-COUL_GRID_SIZE = settings.value(8);
 %% set up import window
-imp_fig = uifigure('Name','3D - Fault - Fault Import','Position',[200 200 730 420],'Color',[.4 .4 .4],'Resize','off'); %import window %randi([7 10],1,3)/10
-uilabel(imp_fig,'Position',[10 380 710 40],'Text','3D-Faults','FontSize',24,'FontWeight','bold','FontName','Cambria','FontColor','white','HorizontalAlignment','center');
-version_desc = sprintf(strcat('A code to build 3D fault networks and slip distributions for use with Coulomb 3.3 software. \n',...
+imp_fig = uifigure('Name','3D-Faults - Fault Import','Position',[200 200 830 520],'Color',[.75 .8 .85],'Resize','off'); %import window %randi([7 10],1,3)/10
+uilabel(imp_fig,'Position',[60 480 710 40],'Text','3D-Faults','FontSize',26,'FontWeight','bold','FontName','Cambria','FontColor','black','HorizontalAlignment','center');
+version_desc = sprintf(strcat('A code to build complex 3D fault networks and slip distributions for use with Coulomb 3.3 software. \n',...
     'Written by Zoe Mildon and Manuel Diercks \n',...
-    'Version 2.8.2 - 01/2024'));
-uilabel(imp_fig,'Position',[10 310 710 50],'Text',version_desc,'FontName','Cambria','FontColor','white');
+    'Version 2.10.08 - 08/2026'));
+uilabel(imp_fig,'Position',[60 410 710 50],'Text',version_desc,'FontName','Cambria','FontColor','black','FontSize',13);
 
 %import button panel
-imp_pnl = uipanel(imp_fig,'Title','Import fault network','Position',[10 150 710 150],'BorderType','none');
+imp_pnl = uipanel(imp_fig,'Title','Import fault network','Position',[60 250 710 150],'BorderType','none');
 file_bg = uibuttongroup(imp_pnl,'Position',[40 10 100 110],'BorderType','none','Title','File format:');
 rb_shp = uiradiobutton(file_bg,'Position',[10 70 50 15],'Text','.shp','Tooltip','Import shapefile containing fault traces and properties (attributes). Must be projected in UTM coordinates.');
 rb_kml = uiradiobutton(file_bg,'Position',[10 40 50 15],'Text','.kml','Tooltip','Import fault properties from a table (e.g. .txt, .csv, .xlsx). Store kml files in /Fault_traces folder');
@@ -45,8 +44,8 @@ function citation(imp_fig)
     (' Evaluating models of Coulomb stress transfer- is variable fault geometry important?'),...
     (' Geophys. Res. Lett., 43, doi:10.1002/2016GL071128.$$\\$$'),...
     ('\textbf{Updates to the code will be made available at github.com/MDiercks/3D-faults}'));
-    uilabel(imp_fig,'Position',[10 0 710 190],'Text',citation,'FontColor','white','WordWrap','on','Interpreter','latex','FontSize',10);
-    %uitextarea(imp_fig,'Position',[10 0 710 190],'Value',citation,'FontColor','white','WordWrap','on','Interpreter','latex','FontSize',10);
+    uilabel(imp_fig,'Position',[60 0 710 270],'Text',citation,'FontColor','black','WordWrap','on','Interpreter','latex','FontSize',11);
+    %uitextarea(imp_fig,'Position',[10 0 710 130],'Value',citation,'FontColor','white','WordWrap','on','Interpreter','latex','FontSize',10);
 end
 %toggle UTM buttons depending on format selection (import window)
 function format_select(rb_kml,rb_kmz,utm_bg,utm_btn,lbl1,lbl2,set_utmzone)

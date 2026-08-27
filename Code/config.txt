@@ -1,11 +1,13 @@
 variable,value
 slip_at_surface,40
 maximum_slip,1.0
-seismo_depth,18
-rupture_depth,18
-intersect_threshold,1
-grid_size,2
+seismo_depth,15
+rupture_depth,15
+intersect_threshold,0.6
+grid_size,1
 map_margin,15
-COUL_GRID_SIZE,2
+COUL_GRID_SIZE,0.5
 default_utm_zone,32
+rake_converging,0
+rake_amount,20
 

@@ -139,7 +139,6 @@ Version 2.4
 - fixed bug that caused errors when using preset depth values
 - fixed bug at writing intersecting faults to .inr
 
-
 Version 2.5
 - added different user interface setups for coseismic and interseismic slip distributions
 (interseismic only features backslip with simple triangular slip distribution derived from max slip rates)
@@ -157,3 +156,18 @@ Version 2.5
 - faults are now always from west to east (determined by start and end coordinates)
 - fixed a bug that imported the wrong variable dip data in some cases
 - fixed seismic moment calculation for faults with variable dip
+
+Version 2.7
+- major GUI and workflow streamlining
+- ability to model multiple earthquakes at once
+
+Version 2.8
+- added functionality to set the vertical location of ruptures not extending from seismogenic depth to surface
+- minor UI improvements and bug fixes from v2.7.1
+- added button to calculate seismic moment / moment magnitude directly in the slip options window
+
+Version 2.9
+- added UI elements to change between slip distributions: bulls-eye (coseismic), triangular (backslip), and custom (import via csv file)
+- moved UI elements to slip_options panel
+- general UI and QOL improvements
+- several bug fixes, including kml-support and plotting

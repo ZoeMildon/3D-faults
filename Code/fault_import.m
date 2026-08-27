@@ -93,6 +93,13 @@ for i = 1:size(fault_input,1)
         fault_input.X{i} = flip(fault_input.X{i});
         fault_input.Y{i} = flip(fault_input.Y{i});
     end
+    %for perfectly N-S trending faults: go from north to south
+    if fault_input.X{i}(1) == fault_input.X{i}(end)
+        if fault_input.Y{i}(1) < fault_input.Y{i}(end)
+            fault_input.X{i} = flip(fault_input.X{i});
+            fault_input.Y{i} = flip(fault_input.Y{i});
+        end
+    end
 end
 
 %check if variables in input files have correct names
@@ -124,6 +131,21 @@ for i = 1:size(fault_input,1) %replace space by underscore in fault names
     fault_input.fault_name{i} = strrep(fault_input.fault_name{i},' ','_');
 end
 
+% check for duplicate fault names and make them unique by appending an index
+[uniqueNames, ~, idx] = unique(fault_input.fault_name, 'stable');
+counts = accumarray(idx,1);
+if any(counts > 1)
+    dupNames = uniqueNames(counts > 1);
+    for k = 1:length(dupNames)
+        rows = find(strcmp(fault_input.fault_name, dupNames{k}));
+        for n = 1:length(rows)
+            if n > 1
+                fault_input.fault_name{rows(n)} = sprintf('%s_%d', dupNames{k}, n);
+            end
+        end
+    end
+end
+
 %build the table t to be plotted in the uitable (coordinates remain stored in fault_input)
 t = fault_input(:,variables);
 t.len = zeros(length(t.fault_name),1);
@@ -136,8 +158,8 @@ end
 t.source_fault = false(1,length(t.fault_name))';
 t.plot = true(1,length(t.fault_name))';
 t = calc_length(fault_input,t); %calling calc_length function
-[row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
-t.plot(row) = false;
+% [row,col] = find(ismissing([cell2mat(t.dip), t.rake, t.dip_dir]));
+% t.plot(row) = false;
 if any(ismember(fault_input.Properties.VariableNames,'priority'))
     t.priority = fault_input.priority;
 else
@@ -146,7 +168,7 @@ end
 t = movevars(t,'source_fault','before','dip');
 t = movevars(t,'plot','after','fault_name');
 
-clearvars ans col file i imp_fig path rb1 rb2 rb_shp rb_kml rb_kmz row set_utmzone utmhemi utmzone variables %free up workspace (delete import window elements and redundant variables)
+clearvars ans col file i imp_fig path rb1 rb2 rb_shp rb_kml rb_kmz row set_utmzone utmhemi utmzone variables uniqueNames %free up workspace (delete import window elements and redundant variables)
 pause(3) %UI stops working if called before import ready, pause to avoid
 ui_main %open main window
 %% ------------------ function space -------------------------

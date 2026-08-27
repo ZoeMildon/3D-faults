@@ -27,4 +27,5 @@ function [minx_txt,maxx_txt,miny_txt,maxy_txt] = autogrid(uit,fault_input,minx_t
     set(miny_txt,'Value', num2str(round((min(dim(:,3)) - mrg * add),-3)/1000));
     set(maxy_txt,'Value', num2str(round((max(dim(:,4)) + mrg * add),-3)/1000));
     map(axe,minx_txt,maxx_txt,miny_txt,maxy_txt,uit,fault_input);
+    
 end

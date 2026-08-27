@@ -1,5 +1,5 @@
-%function plt = patch_plotting(plt,x_points,y_points,z_points,utm_lat,utm_lon, maximum_slip, slip_distribution)
 %Plotting 3D fault planes with patch approach, colour coded by slip distribution
+gca = fax;
 xyz = nan(numel(x_points),14);
 p = 1;
 for r=1:length(x_points(:,1))-1
@@ -17,7 +17,11 @@ for r=1:length(x_points(:,1))-1
             z(3)=z_points_copy(r+1,c+1);
         end
         if subplot_cb.Value == true || faults.source_fault(ii) == true
-            patch(x,y,z,slip_distribution(r,c));
+            if faults.source_fault(ii) == true && max(slip_distribution(:)) < 0.1 %fix to adjust color scale for backslip slip distribution
+                patch(x,y,z,abs(slip_distribution(r,c).*1000),'Parent',fax);
+            else
+                patch(x,y,z,slip_distribution(r,c),'Parent',fax);
+            end
         end
         %prepare fault geometry export
         if (~isnan(x_points(r,c)) && ~isnan(x_points(r,c+1)) && ~isnan(x_points(r+1,c)) && ~isnan(x_points(r+1,c+1))) ||... %all corners complete
@@ -32,18 +36,31 @@ for r=1:length(x_points(:,1))-1
 end
 xyz(find(isnan(xyz(:,1)),1,'first'):end,:) = [];
 if subplot_cb.Value == true || faults.source_fault(ii) == true
-    hold('on')
-    plot(utm_lon,utm_lat,'g','LineWidth',2);
-    axis('equal')
-    view(3)
-    % Colour map for slip distribution
+    %create plot
+    hold(fax,'on')
+    plot(fax,utm_lon,utm_lat,'g','LineWidth',2);
+    axis(fax,'equal')
+    view(fax,3)
+
+    % Define Colormap and colorbar
     T=[1,1,1; 1,1,0; 1,0,0];% white, yellow, red
     A=[0;1;2];
     slip_dist = interp1(A,T,linspace(0,2,101));
-    colormap(slip_dist);
-    cb = colorbar('southoutside');
-    title(cb,'Total slip (m)');
-    clim([0 maximum_slip]);
+    colormap(fax,slip_dist);
+
+    %determine colorbar limits
+    if max(abs(slip_distribution(:))) > max_slip_total
+        max_slip_total = max(abs(slip_distribution(:)));
+    end
+    if faults.source_fault(ii) == true && max(abs(slip_distribution(:))) > 0.1 %different color scales for coseismic and interseismic
+        clim([0 max_slip_total]);
+        cb = colorbar(fax,'southoutside');
+        title(cb,'Total slip (m)');
+    elseif faults.source_fault(ii) == true && max(slip_distribution(:)) < 0.1
+        clim([0 max_slip_total*1000]); %converting to mm in backslip mode
+        cb = colorbar(fax,'southoutside');
+        title(cb,'Slip rate (mm/a)');
+    end
     xlabel('UTM x')
     ylabel('UTM y')
     zlabel('Depth (m)')
@@ -51,7 +68,9 @@ end
 if exp_geo_cb.Value == true
     %export geometry
     file = strcat(fault_name,'.csv');
-    mkdir('Output_files',strcat('fault_geometry_',filename))
+    if ii == 1 && ~isfolder(strcat('Output_files/fault_geometry_',filename))
+        mkdir('Output_files',strcat('fault_geometry_',filename))
+    end
     path = strcat('Output_files/fault_geometry_',filename);
     writematrix(xyz,fullfile(path,file))
 end

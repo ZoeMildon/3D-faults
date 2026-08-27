@@ -11,10 +11,10 @@ found=0;
 while_loop_count=0;
     while found<1
         hyp_dist=sqrt((utm_lon(a)-x_start)^2+(utm_lat(a)-y_start)^2);
-        if hyp_dist>grid_size
+        if hyp_dist>grid_size*1000
             found=1; 
             if while_loop_count==0 % when hyp_dist>grid_size for the next closest utm coordinates, while loop hasn't run once
-                p=grid_size/hyp_dist;
+                p=(grid_size*1000)/hyp_dist;
                 % calculating the next coordinates
                 if utm_lon(a)>=x_start
                     x_next=x_start+p*(utm_lon(a)-x_start);
@@ -31,11 +31,11 @@ while_loop_count=0;
                 l2=[utm_lon(a-1),utm_lat(a-1),0]-[utm_lon(a),utm_lat(a),0]; % vector from point before to point after where hyp_length = grid_size
                 e=acos(dot(l1,l2)/(norm(l1)*norm(l2)))*180/pi; % gives angle between two vectors above
                 if e ==180 % dealing with the case when the next two kml_points are located along the same strike
-                    p=(grid_size-norm(l1))/norm(l2);
+                    p=((grid_size*1000)-norm(l1))/norm(l2);
                 else
-                    f=rad2deg(asin(norm(l1)*sind(e)/grid_size)); % law of sines
+                    f=rad2deg(asin(norm(l1)*sind(e)/(grid_size*1000))); % law of sines
                     g=180-e-f; % angles in a triangle
-                    p=(grid_size*sind(g)/sind(e))/norm(l2); % ratio to describe how far between (a-1) and (a) the next coordinate will be
+                    p=((grid_size*1000)*sind(g)/sind(e))/norm(l2); % ratio to describe how far between (a-1) and (a) the next coordinate will be
                 end
                 % calculating the next coordinates
                 if utm_lon(a)>=utm_lon(a-1)
